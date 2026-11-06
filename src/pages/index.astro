@@ -80,7 +80,7 @@ const scenes = [
   { file: 'tl-02-call-of-duty', from: 2, caption: '2002. A Normandy street in the style of a 19th-century battle painting, for the Call of Duty years that pulled me into online gaming.' },
   { file: 'tl-03-fnatic-lan', from: 4, caption: '2007 to 2011. A LAN by candlelight after Georges de La Tour. Players at their screens, an editor taking notes at the side: the Fnatic years.' },
   { file: 'tl-04-faceit-arena', from: 9, caption: '2012 to 2022. An esports final reimagined as a Veronese spectacle: the crowds, the stage, the broadcast cameras of the FACEIT decade.' },
-  { file: 'tl-05-elo-community-ai', from: 18, caption: '2024 to now. A School of Athens for ELO: communities gathered around a gentle intelligence, the Alps behind, Turin close by.' },
+  { file: 'tl-05-elo-community-ai', from: 19, caption: '2024 to now. A School of Athens for ELO: communities gathered around a gentle intelligence, the Alps behind, Turin close by.' },
 ];
 const sceneOf = (i: number) => scenes.reduce((a, sc, k) => (sc.from <= i ? k : a), 0);
 const fStart = () => stops.findIndex((x) => x.faceit);
@@ -112,6 +112,7 @@ const stops: Stop[] = [
   { kind: 'life', date: '2012', text: 'Dropped out of college and moved to Italy for FACEIT.' },
   { kind: 'career', faceit: true, story: '/work/faceit', date: '2012 to 2014', name: 'FACEIT', role: 'VP of Marketing, Milan', logo: tl.faceit, lead: "One of FACEIT's first hires, there from its first year through to its acquisition.", text: 'A broad early remit: business development, marketing, PR, community, even sales and logistics.' },
   { kind: 'career', faceit: true, story: '/work/faceit', date: '2014 to 2016', name: 'FACEIT', role: 'VP of Events', logo: tl.faceit, text: 'Tournament operations, player management, logistics and live production, as FACEIT turned professional.' },
+  { kind: 'life', faceit: true, date: '2015', text: 'Moved to London.' },
   { kind: 'career', faceit: true, story: '/work/faceit', date: '2016 to 2022', name: 'FACEIT', role: 'VP of Esports', logo: tl.faceit, text: 'Players, teams and publishers across the Esports Championship Series, Rainbow Six and more, plus white-label partnerships.' },
   { kind: 'highlight', faceit: true, date: '2016', logo: tl.eleague, text: 'Brought Counter-Strike and Overwatch to US TV with ELEAGUE on TBS.' },
   { kind: 'highlight', faceit: true, date: '2017', logo: tl.xGames, text: 'Took Rocket League esports to the X Games with ESPN.' },
