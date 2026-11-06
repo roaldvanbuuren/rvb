@@ -1,5 +1,6 @@
 ---
 import { links } from '../lib/posts';
+import Logo from './Logo.astro';
 const path = Astro.url.pathname;
 const onWriting = path === '/writing' || path.startsWith('/writing/');
 const onPress = path === '/press';
@@ -7,7 +8,7 @@ const onFaceit = path === '/work/faceit';
 ---
 <header class="enav">
   <div class="enav-bar">
-    <a class="enav-logo" href="/" aria-label="Roald van Buuren, home">Roald van Buuren</a>
+    <a class="enav-logo" href="/" aria-label="Roald van Buuren, home"><Logo /><span class="enav-name">Roald van Buuren</span></a>
     <nav class="enav-right" aria-label="Main">
       <a class="enav-link" href="/writing" aria-current={onWriting ? 'page' : undefined}>Writing</a>
       <a class="enav-link" href="/press" aria-current={onPress ? 'page' : undefined}>Press</a>
@@ -22,6 +23,8 @@ const onFaceit = path === '/work/faceit';
   @media (max-width:560px){
     .enav-bar{gap:12px}
     .enav-logo{font-size:17px;white-space:nowrap}
+    .enav-name{display:none}
+    .rvb-mark{height:20px}
     .enav-right{gap:14px}
     .enav-link{font-size:11px;letter-spacing:.08em}
   }
