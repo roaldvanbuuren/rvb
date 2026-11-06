@@ -34,8 +34,8 @@ for (let i = 0, guard = 0; i < COUNT && guard < 5000; guard++) {
   stars.push({
     x,
     y,
-    s: bright && rnd() < 0.6 ? 2 : 1,
-    o: bright ? between(0.7, 0.8) : between(0.3, 0.58),
+    s: bright ? 2 : 1,
+    o: bright ? between(0.82, 0.95) : between(0.45, 0.7),
   });
   i++;
 }
@@ -45,6 +45,8 @@ stars
   .sort(() => rnd() - 0.5)
   .slice(0, TWINKLE)
   .forEach((st) => {
+    st.s = 2; // the twinklers are the 2px ones, so the slow pulse can be seen
+    st.o = between(0.6, 0.7);
     st.d = Math.round(between(6, 10) * 10) / 10;
     st.dl = -Math.round(between(0, st.d) * 10) / 10;
   });

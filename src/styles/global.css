@@ -103,19 +103,19 @@ img,svg{display:block;max-width:100%}
   background:linear-gradient(180deg,rgba(111,116,173,0) 10%,rgba(111,116,173,.5) 30%,#6f74ad 50%,#5d63a0 66%,#6f74ad 76%,rgba(111,116,173,0) 90%)}
 .stars{z-index:-1;top:56px;height:calc(var(--hh) * .45 - 56px)}
 .st{position:absolute;width:var(--s,1px);height:var(--s,1px);border-radius:50%;background:#F5F6F2;
-  opacity:calc(clamp(0, (var(--dusk) - .15) / .85, 1) * var(--o,.5))}
+  opacity:calc(clamp(0, var(--dusk) * 6, 1) * var(--o,.5))}
 .st.tw{background:none}
 .st.tw::after{content:"";position:absolute;inset:0;border-radius:50%;background:#F5F6F2;animation:star-twinkle var(--d,8s) ease-in-out var(--dl,0s) infinite}
-@keyframes star-twinkle{0%,100%{opacity:1}50%{opacity:.55}}
+@keyframes star-twinkle{0%,100%{opacity:1}50%{opacity:.2}}
 /* valley mist: one wide soft band, twice as wide as the tile so a -50% slide loops with no seam */
-.mist{z-index:-1;top:calc(var(--hh) * .62);height:calc(var(--hh) * .2);overflow:hidden;opacity:.1;
+.mist{z-index:-1;top:calc(var(--hh) * .56);height:calc(var(--hh) * .24);overflow:hidden;opacity:.12;
   -webkit-mask-image:linear-gradient(180deg,transparent,#000 35%,#000 65%,transparent);mask-image:linear-gradient(180deg,transparent,#000 35%,#000 65%,transparent)}
 .mist::before{content:"";position:absolute;top:0;bottom:0;left:0;width:max(200%,2400px);will-change:transform;
   background:
-    radial-gradient(ellipse 28% 48% at 30% 50%,rgba(255,255,255,.9) 0,rgba(255,255,255,.5) 35%,rgba(255,255,255,.15) 65%,rgba(255,255,255,0) 100%),
-    radial-gradient(ellipse 26% 40% at 70% 42%,rgba(255,255,255,.75) 0,rgba(255,255,255,.4) 35%,rgba(255,255,255,.12) 65%,rgba(255,255,255,0) 100%),
-    radial-gradient(ellipse 40% 36% at 50% 62%,rgba(255,255,255,.6) 0,rgba(255,255,255,.32) 35%,rgba(255,255,255,.1) 65%,rgba(255,255,255,0) 100%);
-  background-size:50% 100%;background-repeat:repeat-x;animation:mist-drift 80s linear infinite}
+    radial-gradient(ellipse 34% 48% at 34% 50%,#fff 0,rgba(255,255,255,.8) 40%,rgba(255,255,255,.35) 70%,rgba(255,255,255,0) 100%),
+    radial-gradient(ellipse 30% 42% at 74% 44%,rgba(255,255,255,.9) 0,rgba(255,255,255,.65) 40%,rgba(255,255,255,.28) 70%,rgba(255,255,255,0) 100%),
+    radial-gradient(ellipse 42% 38% at 52% 64%,rgba(255,255,255,.75) 0,rgba(255,255,255,.5) 40%,rgba(255,255,255,.2) 70%,rgba(255,255,255,0) 100%);
+  background-size:50% 100%;background-repeat:repeat-x;animation:mist-drift 60s linear infinite}
 @keyframes mist-drift{to{transform:translate3d(-50%,0,0)}}
 @media (prefers-reduced-motion:reduce){.dusk,.dusk-glow,.stars,.mist{display:none}}
 
