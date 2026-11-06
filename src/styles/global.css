@@ -56,7 +56,7 @@ img,svg{display:block;max-width:100%}
 .enav-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;height:48px;padding:0 32px;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .enav a{text-decoration:none}
 .enav-logo{font:600 21px/1 var(--disp);letter-spacing:.005em;color:var(--bone);display:inline-flex;align-items:center;gap:12px}
-.rvb-mark{height:16px;width:auto;flex:none;color:var(--bone)}
+.rvb-mark{height:23px;width:auto;flex:none;color:var(--bone)}
 .enav-right{display:flex;align-items:center;gap:28px}
 .enav-link{font:500 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#fff;transition:color .15s}
 .enav-link:hover,.enav-link[aria-current="page"]{color:var(--accent-hover)}
@@ -78,8 +78,14 @@ img,svg{display:block;max-width:100%}
 .hero .ctas{justify-content:center}
 @media (max-width:700px){.portrait{width:80px;height:80px}}
 /* hero mark (replaces the portrait there); the portrait now lives in About, on the light intro frame */
-.hero-in .rvb-mark{height:64px}
-@media (max-width:700px){.hero-in .rvb-mark{height:52px}}
+.hero-in .rvb-mark{height:84px}
+@media (max-width:700px){.hero-in .rvb-mark{height:68px}}
+/* hero clover: leaves bloom in from the centre one by one, the accent leaf last; the stem follows */
+.hero-in .rvb-mark .lf{transform-box:fill-box;transform-origin:50% 100%;opacity:0;animation:lf-in .7s cubic-bezier(.2,.8,.2,1) forwards;animation-delay:calc(.15s + var(--i) * .13s)}
+.hero-in .rvb-mark .stem{opacity:0;animation:lf-fade .5s ease-out .75s forwards}
+@keyframes lf-in{from{opacity:0;transform:scale(.15)}to{opacity:1;transform:none}}
+@keyframes lf-fade{to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.hero-in .rvb-mark .lf,.hero-in .rvb-mark .stem{animation:none;opacity:1}}
 .hx-fa .portrait{width:clamp(72px,12vh,104px);height:clamp(72px,12vh,104px);margin-bottom:clamp(18px,3.4vh,30px);border-color:rgba(20,20,20,.16);background:transparent}
 
 /* hero dusk (components/Dusk.astro): one number, --dusk (0 at the top of the page, 1 at full dusk), drives everything.
