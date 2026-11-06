@@ -97,6 +97,9 @@ const tl = {
   universalOpen: { src: '/images/logos/rocket-league-universal-open.png', w: 263, h: 275, dh: 64, alt: 'Universal Open, Rocket League' },
   elo: { src: '/images/logos/elo-collective.png', w: 200, h: 200, dh: 44, replaces: true },
   lumen: { src: '/images/logos/lumen.png', w: 200, h: 200, dh: 56, alt: 'Lumen' },
+  milan: { src: '/images/cities/milan.png', w: 461, h: 436, dh: 64, alt: 'Milan Cathedral' },
+  london: { src: '/images/cities/london.png', w: 126, h: 462, dh: 84, alt: 'Big Ben, London' },
+  turin: { src: '/images/cities/turin.png', w: 210, h: 462, dh: 84, alt: 'Mole Antonelliana, Turin' },
   major: { src: '/images/logos/faceit-major-london-2018.png', w: 329, h: 272, dh: 60, alt: 'FACEIT Major London 2018' },
 };
 const stops: Stop[] = [
@@ -109,10 +112,10 @@ const stops: Stop[] = [
   { kind: 'career', story: '/work/fnatic', date: '2008 to 2011', name: 'Fnatic', role: 'Editor, Editor-in-Chief, General Manager', logo: tl.fnatic, text: "Joined as an editor and worked my way up. As GM: the Own3D streaming partnership, scouting talent, the shop, and launching Fnatic's tournament platform, PLAY." },
   { kind: 'career', story: '/work/early-years', date: '2010', name: 'Stermy.com', role: 'Head of Content and Community', text: "Content for Alessandro 'Stermy' Avallone's personal brand, my first close look at how a player's brand becomes a community." },
   { kind: 'career', story: '/work/early-years', date: '2011 to 2013', name: 'FPS Omega', role: 'Founder', logo: tl.fpsOmega, text: 'English-language community media for competitive shooters, including ShootManiaEsports.com and OverwatchEsports.com.' },
-  { kind: 'life', date: '2012', text: 'Dropped out of college and moved to Italy for FACEIT.' },
+  { kind: 'life', date: '2012', logo: tl.milan, text: 'Dropped out of college and moved to Italy for FACEIT.' },
   { kind: 'career', faceit: true, story: '/work/faceit', date: '2012 to 2014', name: 'FACEIT', role: 'VP of Marketing, Milan', logo: tl.faceit, lead: "One of FACEIT's first hires, there from its first year through to its acquisition.", text: 'A broad early remit: business development, marketing, PR, community, even sales and logistics.' },
   { kind: 'career', faceit: true, story: '/work/faceit', date: '2014 to 2016', name: 'FACEIT', role: 'VP of Events', logo: tl.faceit, text: 'Tournament operations, player management, logistics and live production, as FACEIT turned professional.' },
-  { kind: 'life', faceit: true, date: '2015', text: 'Moved to London.' },
+  { kind: 'life', faceit: true, date: '2015', logo: tl.london, text: 'Moved to London.' },
   { kind: 'career', faceit: true, story: '/work/faceit', date: '2016 to 2022', name: 'FACEIT', role: 'VP of Esports', logo: tl.faceit, text: 'Players, teams and publishers across the Esports Championship Series, Rainbow Six and more, plus white-label partnerships.' },
   { kind: 'highlight', faceit: true, date: '2016', logo: tl.eleague, text: 'Brought Counter-Strike and Overwatch to US TV with ELEAGUE on TBS.' },
   { kind: 'highlight', faceit: true, date: '2017', logo: tl.xGames, text: 'Took Rocket League esports to the X Games with ESPN.' },
@@ -121,7 +124,7 @@ const stops: Stop[] = [
   { kind: 'highlight', faceit: true, date: '2022', text: 'FACEIT acquired by Savvy Games Group, as part of a $1.5bn deal alongside ESL.' },
   { kind: 'career', date: '2024 to now', name: 'ELO', role: 'Co-founder', logo: tl.elo, bright: true },
   { kind: 'highlight', date: 'March 2026', logo: tl.lumen, text: 'Lumen first launched with design partners, pivoting from an agency to a tech company.' },
-  { kind: 'life', date: 'July 2026', text: 'Moved to Turin.', link: { href: '#now', label: "See what I'm doing now" }, link2: { href: '/press', label: 'Press, talks and podcasts' }, link3: { href: '/work', label: 'Work, in more detail' } },
+  { kind: 'life', date: 'July 2026', logo: tl.turin, text: 'Moved to Turin.', link: { href: '#now', label: "See what I'm doing now" }, link2: { href: '/press', label: 'Press, talks and podcasts' }, link3: { href: '/work', label: 'Work, in more detail' } },
 ];
 ---
 <Base
