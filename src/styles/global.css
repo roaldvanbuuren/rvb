@@ -106,12 +106,14 @@ img,svg{display:block;max-width:100%}
 /* the rose band above the ridge: cooled and dimmed as the indigo comes in, so it reads as the light going */
 .dusk-glow{z-index:-2;mix-blend-mode:multiply;opacity:calc(var(--dusk) * .9);
   background:linear-gradient(180deg,rgba(111,116,173,0) 10%,rgba(111,116,173,.5) 30%,#6f74ad 50%,#5d63a0 66%,#6f74ad 76%,rgba(111,116,173,0) 90%)}
-.stars{z-index:-1;top:56px;height:calc(var(--hh) * .45 - 56px)}
-.st{position:absolute;width:var(--s,1px);height:var(--s,1px);border-radius:50%;background:#F5F6F2;
-  opacity:calc(clamp(0, var(--dusk) * 6, 1) * var(--o,.5))}
-.st.tw{background:none}
-.st.tw::after{content:"";position:absolute;inset:0;border-radius:50%;background:#F5F6F2;animation:star-twinkle var(--d,8s) ease-in-out var(--dl,0s) infinite}
-@keyframes star-twinkle{0%,100%{opacity:1}50%{opacity:.2}}
+/* stars: the window is the top 45% of the image box under the nav. .sk is a zero-size pivot at its bottom centre and turns once
+   every 800s; each .sg is a 1px box whose box-shadows are the stars (offsets in em, font-size = disc radius, so they scale) */
+.stars{z-index:-1;top:56px;height:calc(var(--hh) * .45 - 56px);overflow:hidden;opacity:clamp(0, var(--dusk) * 6, 1)}
+.sk{position:absolute;left:50%;top:100%;width:0;height:0;animation:sky-turn 800s linear infinite}
+.sg{position:absolute;left:0;top:0;width:1px;height:1px;font-size:hypot(50vw, calc(var(--hh) * .45 - 56px));animation:star-twinkle var(--d,8s) ease-in-out var(--dl,0s) infinite}
+@keyframes sky-turn{to{transform:rotate(-360deg)}}
+@keyframes star-twinkle{0%,100%{opacity:1}50%{opacity:var(--lo,.35)}}
+@media (max-width:700px){.sg:nth-child(n+6){display:none}} /* smaller window: fewer groups keeps about 25 in view */
 @media (prefers-reduced-motion:reduce){.dusk,.dusk-glow,.stars{display:none}}
 
 /* graining and fade zones: full-bleed glow plus film grain, masked to fade in and out (same values as data.elocollective.com) */

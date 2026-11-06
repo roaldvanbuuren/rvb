@@ -5,10 +5,12 @@
 // animation on .hero (see global.css). The script below only runs where
 // animation-timeline is not supported.
 
-// Stars: fixed positions, generated once at build with a seeded PRNG so every build matches.
-// Percentages of the star field, which is the top 45% of the hero image box (never the mountains).
-type Star = { x: number; y: number; s: number; o: number; d?: number; dl?: number };
-
+// Stars: a night sky that turns. About 130 tiny stars sit on a disc around a pole at the bottom centre of the star
+// window (the top 45% of the hero image box, never the mountains). The disc turns once every 800s, so stars drift in
+// slow arcs and new ones rise into the window as others leave; about 25 are in view on a desktop. Positions are fixed
+// at build with a seeded PRNG, in units of the disc radius (em, with font-size set to that radius in CSS).
+// Stars are box-shadows on 8 tiny groups, and each group twinkles on its own 6 to 10 s cycle, so the whole sky is
+// 8 elements and every star twinkles, out of phase.
 function mulberry32(seed: number) {
   let a = seed;
   return () => {
@@ -21,45 +23,37 @@ function mulberry32(seed: number) {
 const rnd = mulberry32(20261106);
 const between = (a: number, b: number) => a + rnd() * (b - a);
 
-const COUNT = 25;
-const BRIGHT = 5; // a few slightly brighter than the rest
-const TWINKLE = 4; // at most four twinkle
-const stars: Star[] = [];
-for (let i = 0, guard = 0; i < COUNT && guard < 5000; guard++) {
-  const x = between(2, 98);
-  const y = between(4, 96);
-  // keep them apart so they read as scattered, not clumped (x is wider than y on screen, so weight it)
-  if (stars.some((p) => Math.hypot((p.x - x) * 1.6, p.y - y) < 11)) continue;
-  const bright = i < BRIGHT;
-  stars.push({
-    x,
-    y,
-    s: bright ? 2 : 1,
-    o: bright ? between(0.82, 0.95) : between(0.45, 0.7),
-  });
-  i++;
+const GROUPS = 8;
+const COUNT = 130;
+const hex = (n: number) => Math.round(Math.min(1, Math.max(0, n)) * 255).toString(16).padStart(2, '0');
+const shadows: string[][] = Array.from({ length: GROUPS }, () => []);
+const placed: { u: number; v: number }[] = [];
+for (let guard = 0; placed.length < COUNT && guard < 50000; guard++) {
+  const r = Math.sqrt(rnd()); // uniform over the disc's area
+  const t = rnd() * Math.PI * 2;
+  const u = r * Math.cos(t);
+  const v = r * Math.sin(t);
+  if (placed.some((p) => Math.hypot(p.u - u, p.v - v) < 0.065)) continue; // scattered, not clumped
+  const big = rnd() < 0.2; // a few slightly brighter and bigger (about 2.5px, the rest about 1.6px; the turn smears 1px dots)
+  const alpha = big ? between(0.9, 1) : between(0.7, 0.92);
+  shadows[placed.length % GROUPS].push(`${u.toFixed(3)}em ${v.toFixed(3)}em 0 ${big ? '.8px' : '.3px'} #f5f6f2${hex(alpha)}`);
+  placed.push({ u, v });
 }
-// twinkle on a few of the regular ones: 6 to 10 s cycle, negative delay so they are mid-cycle from the start
-stars
-  .slice(BRIGHT)
-  .sort(() => rnd() - 0.5)
-  .slice(0, TWINKLE)
-  .forEach((st) => {
-    st.s = 2; // the twinklers are the 2px ones, so the slow pulse can be seen
-    st.o = between(0.6, 0.7);
-    st.d = Math.round(between(6, 10) * 10) / 10;
-    st.dl = -Math.round(between(0, st.d) * 10) / 10;
-  });
+const groups = shadows.map((list) => ({
+  shadow: list.join(','),
+  d: Math.round(between(6, 10) * 10) / 10, // twinkle cycle, seconds
+  dl: -Math.round(between(0, 10) * 10) / 10, // negative delay: out of phase from the first frame
+  lo: Math.round(between(0.25, 0.45) * 100) / 100, // how far it dips
+}));
 ---
 <div class="dusk" aria-hidden="true"></div>
 <div class="dusk-glow" aria-hidden="true"></div>
 <div class="stars" aria-hidden="true">
-  {stars.map((st) => (
-    <i
-      class={st.d ? 'st tw' : 'st'}
-      style={`left:${st.x.toFixed(2)}%;top:${st.y.toFixed(2)}%;--s:${st.s}px;--o:${st.o.toFixed(2)}${st.d ? `;--d:${st.d}s;--dl:${st.dl}s` : ''}`}
-    ></i>
-  ))}
+  <div class="sk">
+    {groups.map((g) => (
+      <i class="sg" style={`box-shadow:${g.shadow};--d:${g.d}s;--dl:${g.dl}s;--lo:${g.lo}`}></i>
+    ))}
+  </div>
 </div>
 
 <script>
