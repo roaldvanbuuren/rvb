@@ -1,87 +1,37 @@
 ---
-import Base from '../../layouts/Base.astro';
+import CaseStudy from '../../components/CaseStudy.astro';
 ---
-<Base
-  title="Ten years at FACEIT – Roald van Buuren"
+<CaseStudy
+  title="Ten years at FACEIT"
   description="From Quake Live to the London Major: what ten years at FACEIT taught me about communities."
+  image="tl-04-faceit-arena"
+  meta="FACEIT · 2012–2022 · VP Marketing, VP Events, VP Esports"
+  prev={{ href: '/work/fnatic', title: 'Fnatic, 2008 to 2011' }}
 >
-  <article class="fx">
-    <header class="fx-hero">
-      <picture class="fx-img" aria-hidden="true">
-        <source type="image/webp" srcset="/timeline/tl-04-faceit-arena.webp" />
-        <img src="/timeline/tl-04-faceit-arena.jpg" alt="" width="1584" height="672" loading="eager" decoding="async" />
-      </picture>
-      <div class="fx-shade" aria-hidden="true"></div>
-      <div class="fx-head">
-        <a class="fx-back" href="/#about">← Back to About</a>
-        <h1 class="h1">Ten years at FACEIT</h1>
-        <p class="meta">FACEIT · 2012–2022 · VP Marketing, VP Events, VP Esports</p>
-      </div>
-      <p class="fx-cap">AI-generated in an old-master style.</p>
-    </header>
+  <p>I joined FACEIT in September 2012 as one of its first hires. It was a small startup in Milan with a big idea about what competitive gaming could become, and I'd just dropped out of college and moved to Italy for it. I left in August 2022, a few months after the company was acquired by Savvy Games Group. These are the parts I still think about.</p>
 
-    <div class="fx-body">
-      <p>I joined FACEIT in September 2012 as one of its first hires. It was a small startup in Milan with a big idea about what competitive gaming could become, and I'd just dropped out of college and moved to Italy for it. I left in August 2022, a few months after the company was acquired by Savvy Games Group. These are the parts I still think about.</p>
+  <h2>Starting with a community that didn't want us</h2>
+  <p>We launched the platform with Quake Live. A smaller community with its own habits, rules and platforms, and the initial reception was lukewarm to say the least. Lots of trolling, and a feeling that outsiders were coming in to tell them what to do. We stuck in there. We picked out the serious comments, asked for feedback, explained our decisions and changed things when the criticism was useful. Over time the scales tipped, and FACEIT became part of the fibre of the Quake community. That approach became the blueprint for how we went into CS:GO later on, where we became the leading platform.</p>
 
-      <h2>Starting with a community that didn't want us</h2>
-      <p>We launched the platform with Quake Live. A smaller community with its own habits, rules and platforms, and the initial reception was lukewarm to say the least. Lots of trolling, and a feeling that outsiders were coming in to tell them what to do. We stuck in there. We picked out the serious comments, asked for feedback, explained our decisions and changed things when the criticism was useful. Over time the scales tipped, and FACEIT became part of the fibre of the Quake community. That approach became the blueprint for how we went into CS:GO later on, where we became the leading platform.</p>
+  <h2>Doing a bit of everything</h2>
+  <p>My early remit was broad by necessity: business development, marketing, PR, community management, even sales and logistics. It gave me an unusually complete view of how the business worked from the ground up.</p>
 
-      <h2>Doing a bit of everything</h2>
-      <p>My early remit was broad by necessity: business development, marketing, PR, community management, even sales and logistics. It gave me an unusually complete view of how the business worked from the ground up.</p>
+  <h2>Going professional (2014 to 2016)</h2>
+  <p>As FACEIT grew I moved into leading events and broadcasting: tournament operations, player management, travel and logistics, and live production. This was the period where FACEIT began operating at the professional level, and my job was making sure the events we put our name on reflected that.</p>
 
-      <h2>Going professional (2014 to 2016)</h2>
-      <p>As FACEIT grew I moved into leading events and broadcasting: tournament operations, player management, travel and logistics, and live production. This was the period where FACEIT began operating at the professional level, and my job was making sure the events we put our name on reflected that.</p>
+  <h2>Esports on US television (2016 to 2018)</h2>
+  <ul class="fx-tv">
+    <li>2016: FACEIT was the official platform for ELEAGUE, Turner and WME | IMG's Counter-Strike league on TBS. Later that year we ran the ELEAGUE Overwatch Open with them, with the grand final live on TBS.</li>
+    <li>July 2017: Rocket League at the X Games in Minneapolis, with ESPN.</li>
+    <li>2017 and 2018: the Universal Open Rocket League with NBC Sports, with the grand finals at NBC's broadcast centre in Stamford.</li>
+  </ul>
 
-      <h2>Esports on US television (2016 to 2018)</h2>
-      <ul class="fx-tv">
-        <li>2016: FACEIT was the official platform for ELEAGUE, Turner and WME | IMG's Counter-Strike league on TBS. Later that year we ran the ELEAGUE Overwatch Open with them, with the grand final live on TBS.</li>
-        <li>July 2017: Rocket League at the X Games in Minneapolis, with ESPN.</li>
-        <li>2017 and 2018: the Universal Open Rocket League with NBC Sports, with the grand finals at NBC's broadcast centre in Stamford.</li>
-      </ul>
+  <h2>ECS, and what we got wrong</h2>
+  <p>In 2016 we launched the Esports Championship Series with Twitch. Teams got co-ownership and a share of the revenue, which was the first real push in that direction in Counter-Strike. It ran for eight seasons. By early 2019 teams and players didn't feel involved anymore, and in 2020 we replaced it with FLASHPOINT. Looking back, I think the biggest mistake was that we played too nice. We never really went out and said: look at what we've built for these teams.</p>
 
-      <h2>ECS, and what we got wrong</h2>
-      <p>In 2016 we launched the Esports Championship Series with Twitch. Teams got co-ownership and a share of the revenue, which was the first real push in that direction in Counter-Strike. It ran for eight seasons. By early 2019 teams and players didn't feel involved anymore, and in 2020 we replaced it with FLASHPOINT. Looking back, I think the biggest mistake was that we played too nice. We never really went out and said: look at what we've built for these teams.</p>
+  <h2>The London Major (2018)</h2>
+  <p class="fx-gold">In September 2018 we hosted the CS:GO Major, with the finals at the SSE Arena, Wembley. If you'd asked me the week after, I would have said it wasn't a success. Looking back, it was the event we learned the most from.</p>
 
-      <h2>The London Major (2018)</h2>
-      <p class="fx-gold">In September 2018 we hosted the CS:GO Major, with the finals at the SSE Arena, Wembley. If you'd asked me the week after, I would have said it wasn't a success. Looking back, it was the event we learned the most from.</p>
-
-      <h2>What I took with me</h2>
-      <p>I was part of FACEIT from its first year through to its acquisition, and those ten years shaped everything I think about communities and platforms. If there's one place to start with any community, it's an honest conversation with the people in it. That's what we're building on at ELO.</p>
-
-      <p class="fx-end"><a class="more" href="/#now">See what I'm doing now →</a></p>
-    </div>
-  </article>
-</Base>
-
-<style>
-  /* Header: painted arena scene, cropped wide, darkened so the title reads. Static: no drift, no fades. */
-  .fx-hero{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:flex-end;
-    min-height:clamp(380px,40vw,520px);padding:clamp(104px,12vw,150px) 24px 56px}
-  .fx-img{position:absolute;inset:0;z-index:-2;display:block}
-  .fx-img img{width:100%;height:100%;object-fit:cover;object-position:center}
-  .fx-shade{position:absolute;inset:0;z-index:-1;
-    background:linear-gradient(180deg,rgba(10,10,10,.6),rgba(10,10,10,.82) 70%,var(--ink))}
-  .fx-head{width:100%;max-width:680px;margin:0 auto}
-  .fx-back{display:inline-block;margin-bottom:clamp(28px,5vw,48px);font:500 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--warm);text-decoration:none;border-bottom:1px solid rgba(232,232,219,.3);padding-bottom:4px;transition:color .15s,border-color .15s}
-  .fx-back:hover{color:#fff;border-color:#fff}
-  .fx-head .h1{font-size:clamp(40px,5.4vw,66px);line-height:1.04;text-wrap:balance}
-  .fx-head .meta{margin:22px 0 0}
-  .fx-cap{position:absolute;right:clamp(16px,3vw,32px);bottom:14px;margin:0;font:400 10px/1.4 var(--mono);letter-spacing:.02em;color:var(--dim);text-align:right}
-
-  /* Reading column */
-  .fx-body{max-width:680px;margin:0 auto;padding:44px 24px clamp(90px,10vw,140px);font-size:17px;line-height:1.75;color:var(--body)}
-  .fx-body p{margin:0 0 1.35em}
-  .fx-body h2{margin:2em 0 .6em;font-family:var(--disp);font-weight:600;font-size:34px;line-height:1.15;letter-spacing:.005em;text-transform:uppercase;color:var(--warm)}
-  .fx-body > p:first-child{margin-top:0}
-
-  /* Gold rule, as on the timeline's highlights */
-  .fx-tv{list-style:none;margin:0 0 1.35em;padding:0;display:flex;flex-direction:column;gap:14px}
-  .fx-tv li{margin:0;padding-left:18px;border-left:2px solid #D9B45A}
-  .fx-gold{padding-left:18px;border-left:2px solid #D9B45A}
-
-  .fx-end{margin:2.4em 0 0!important}
-  @media (max-width:560px){
-    .fx-body h2{font-size:30px}
-    .fx-hero{padding-bottom:60px}
-  }
-</style>
+  <h2>What I took with me</h2>
+  <p>I was part of FACEIT from its first year through to its acquisition, and those ten years shaped everything I think about communities and platforms. If there's one place to start with any community, it's an honest conversation with the people in it. That's what we're building on at ELO.</p>
+</CaseStudy>

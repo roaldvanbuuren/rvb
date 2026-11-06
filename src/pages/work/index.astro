@@ -1,0 +1,48 @@
+---
+import Base from '../../layouts/Base.astro';
+
+// Oldest first, matching the timeline. Images live in public/timeline/ (.webp with .jpg fallback).
+const stories = [
+  { href: '/work/early-years', title: 'Early years', years: '2003–2013', line: 'From Call of Duty clan writer to running my own esports site.', image: 'tl-02-call-of-duty', tone: 'accent' },
+  { href: '/work/fnatic', title: 'Fnatic', years: '2008–2011', line: 'From $200 a month as an editor to General Manager.', image: 'tl-03-fnatic-lan', tone: 'amber' },
+  { href: '/work/faceit', title: 'FACEIT', years: '2012–2022', line: 'Ten years, from Quake Live to the London Major.', image: 'tl-04-faceit-arena', tone: 'bone' },
+];
+---
+<Base title="Work – Roald van Buuren" description="The longer stories behind the timeline.">
+  <section class="zone z-a">
+    <div class="wrap page-head">
+      <h1 class="h1">Work.</h1>
+      <p class="sub">The longer stories behind the timeline.</p>
+    </div>
+  </section>
+  <section class="wrap wlist" style="padding-bottom:clamp(90px,10vw,140px)">
+    {stories.map((s) => (
+      <a class={`wcard tone-${s.tone}`} href={s.href}>
+        <div class="wcard-img">
+          <picture>
+            <source type="image/webp" srcset={`/timeline/${s.image}.webp`} />
+            <img src={`/timeline/${s.image}.jpg`} alt="" width="1584" height="672" loading="lazy" decoding="async" />
+          </picture>
+          <span class="wk-cap">AI-generated in an old-master style.</span>
+        </div>
+        <div class="wcard-body">
+          <span class="wk-years">{s.years}</span>
+          <h3 class="t">{s.title}</h3>
+          <p class="s">{s.line}</p>
+          <span class="rm">Read<svg viewBox="0 0 12 16" aria-hidden="true"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></span>
+        </div>
+      </a>
+    ))}
+  </section>
+</Base>
+
+<style>
+  /* The shared .wcard rules position a direct <img>; here it sits inside a <picture>. */
+  .wcard-img picture{position:absolute;inset:0;display:block}
+  .wcard-img picture img{width:100%;height:100%;object-fit:cover;object-position:center}
+  /* Years, in the same dim mono as the date on a Writing card */
+  .wk-years{font:400 12px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+  /* Small dim caption over the image, on a soft dark strip so it stays legible */
+  .wk-cap{position:absolute;left:0;right:0;bottom:0;z-index:1;padding:22px 12px 8px;font:400 10px/1.4 var(--mono);letter-spacing:.02em;color:var(--dim);text-align:right;
+    background:linear-gradient(180deg,transparent,rgba(10,10,10,.72))}
+</style>

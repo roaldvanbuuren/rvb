@@ -67,7 +67,8 @@ type Stop = {
   link?: { href: string; label: string };
   link2?: { href: string; label: string };
   link3?: { href: string; label: string };
-  story?: boolean;
+  /** Where this stop's "Read the story" link goes. */
+  story?: string;
 };
 // Painted background scenes behind the timeline (public/timeline/<file>.webp with .jpg fallback).
 // `from` is the index of the first stop each scene sits behind.
@@ -87,21 +88,21 @@ const stops: Stop[] = [
   { kind: 'life', date: 'The 2000s', text: 'Started playing multiplayer games and found esports. The tumultuous start to the naughties got me interested in politics and power.' },
   { kind: 'life', date: '2003', text: 'Started playing Call of Duty.' },
   { kind: 'life', date: '2007', text: 'Went from playing games to writing about them.' },
-  { kind: 'career', date: '2007 to 2008', name: '4Kings', role: 'Editor', text: "Covering Call of Duty for one of the UK's oldest esports organisations." },
-  { kind: 'career', date: '2008 to 2011', name: 'Fnatic', role: 'Editor, Editor-in-Chief, General Manager', text: "Joined as an editor and worked my way up. As GM: the Own3D streaming partnership, scouting talent, the shop, and launching Fnatic's tournament platform, PLAY." },
-  { kind: 'career', date: '2010', name: 'Stermy.com', role: 'Head of Content and Community', text: "Content for Alessandro 'Stermy' Avallone's personal brand, my first close look at how a player's brand becomes a community." },
-  { kind: 'career', date: '2011 to 2013', name: 'FPS Omega', role: 'Founder', text: 'English-language community media for competitive shooters, including ShootManiaEsports.com and OverwatchEsports.com.' },
+  { kind: 'career', story: '/work/early-years', date: '2007 to 2008', name: '4Kings', role: 'Editor', text: "Covering Call of Duty for one of the UK's oldest esports organisations." },
+  { kind: 'career', story: '/work/fnatic', date: '2008 to 2011', name: 'Fnatic', role: 'Editor, Editor-in-Chief, General Manager', text: "Joined as an editor and worked my way up. As GM: the Own3D streaming partnership, scouting talent, the shop, and launching Fnatic's tournament platform, PLAY." },
+  { kind: 'career', story: '/work/early-years', date: '2010', name: 'Stermy.com', role: 'Head of Content and Community', text: "Content for Alessandro 'Stermy' Avallone's personal brand, my first close look at how a player's brand becomes a community." },
+  { kind: 'career', story: '/work/early-years', date: '2011 to 2013', name: 'FPS Omega', role: 'Founder', text: 'English-language community media for competitive shooters, including ShootManiaEsports.com and OverwatchEsports.com.' },
   { kind: 'life', date: '2012', text: 'Dropped out of college and moved to Italy for FACEIT.' },
-  { kind: 'career', faceit: true, story: true, date: '2012 to 2014', name: 'FACEIT', role: 'VP of Marketing, Milan', lead: "One of FACEIT's first hires, there from its first year through to its acquisition.", text: 'A broad early remit: business development, marketing, PR, community, even sales and logistics.' },
-  { kind: 'career', faceit: true, story: true, date: '2014 to 2016', name: 'FACEIT', role: 'VP of Events', text: 'Tournament operations, player management, logistics and live production, as FACEIT turned professional.' },
-  { kind: 'career', faceit: true, story: true, date: '2016 to 2022', name: 'FACEIT', role: 'VP of Esports', text: 'Players, teams and publishers across the Esports Championship Series, Rainbow Six and more, plus white-label partnerships.' },
+  { kind: 'career', faceit: true, story: '/work/faceit', date: '2012 to 2014', name: 'FACEIT', role: 'VP of Marketing, Milan', lead: "One of FACEIT's first hires, there from its first year through to its acquisition.", text: 'A broad early remit: business development, marketing, PR, community, even sales and logistics.' },
+  { kind: 'career', faceit: true, story: '/work/faceit', date: '2014 to 2016', name: 'FACEIT', role: 'VP of Events', text: 'Tournament operations, player management, logistics and live production, as FACEIT turned professional.' },
+  { kind: 'career', faceit: true, story: '/work/faceit', date: '2016 to 2022', name: 'FACEIT', role: 'VP of Esports', text: 'Players, teams and publishers across the Esports Championship Series, Rainbow Six and more, plus white-label partnerships.' },
   { kind: 'highlight', faceit: true, date: '2016', text: 'Brought Counter-Strike and Overwatch to US TV with ELEAGUE on TBS.' },
   { kind: 'highlight', faceit: true, date: '2017', text: 'Took Rocket League esports to the X Games with ESPN.' },
   { kind: 'highlight', faceit: true, date: '2017 to 2018', text: 'Brought Rocket League and the NHL to NBC.' },
   { kind: 'highlight', faceit: true, date: '2018', text: 'The London Counter-Strike Major.' },
   { kind: 'highlight', faceit: true, date: '2022', text: 'FACEIT acquired by Savvy Games Group, as part of a $1.5bn deal alongside ESL.' },
   { kind: 'career', date: '2024 to now', name: 'ELO', role: 'Co-founder', bright: true },
-  { kind: 'life', date: 'July 2026', text: 'Moved to Turin.', link: { href: '#now', label: "See what I'm doing now" }, link2: { href: '/press', label: 'Press, talks and podcasts' }, link3: { href: '/work/faceit', label: 'Ten years at FACEIT' } },
+  { kind: 'life', date: 'July 2026', text: 'Moved to Turin.', link: { href: '#now', label: "See what I'm doing now" }, link2: { href: '/press', label: 'Press, talks and podcasts' }, link3: { href: '/work', label: 'Work, in more detail' } },
 ];
 ---
 <Base
@@ -185,7 +186,7 @@ const stops: Stop[] = [
                         {st.role && <p class="s-role">{st.role}</p>}
                         {st.lead && <p class="s-desc s-lead">{st.lead}</p>}
                         {st.text && <p class="s-desc">{st.text}</p>}
-                        {st.story && <a class="s-link" href="/work/faceit">Read the story<svg viewBox="0 0 12 16" aria-hidden="true"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></a>}
+                        {st.story && <a class="s-link" href={st.story}>Read the story<svg viewBox="0 0 12 16" aria-hidden="true"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></a>}
                       </div>
                     ) : (
                       <>
