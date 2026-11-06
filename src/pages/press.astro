@@ -1,0 +1,48 @@
+---
+import Base from '../layouts/Base.astro';
+import { press, earlier, groupByYear, monthLabel } from '../lib/press';
+
+const groups = groupByYear(press);
+---
+<Base title="Press | Roald van Buuren" description="Press | Roald van Buuren">
+  <section class="zone z-a">
+    <div class="wrap page-head">
+      <h1 class="h1">Press, talks and podcasts</h1>
+      <p class="sub">Interviews, talks and podcasts, newest first.</p>
+    </div>
+  </section>
+  <section class="wrap press">
+    {groups.map((g) => (
+      <div class="press-year">
+        <h2 class="py">{g.year}</h2>
+        <ul class="rows">
+          {g.items.map((e) => (
+            <li>
+              <a class="prow" href={e.url} target="_blank" rel="noopener">
+                <span class="p-date dates">{monthLabel(e.date)}</span>
+                <span class="p-outlet">{e.outlet}</span>
+                <span class="p-desc">{e.title}<span class="vh"> (opens in a new tab)</span></span>
+                <span class="p-tag">{e.type}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+    <div class="press-year press-earlier">
+      <h2 class="py">Earlier (no longer online)</h2>
+      <ul class="rows">
+        {earlier.map((e) => (
+          <li>
+            <div class="prow prow-static">
+              <span class="p-date dates">{monthLabel(e.date)}</span>
+              <span class="p-outlet">{e.outlet}</span>
+              <span class="p-desc">{e.title}</span>
+              <span class="p-tag">{e.type}</span>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</Base>

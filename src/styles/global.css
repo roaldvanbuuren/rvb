@@ -34,7 +34,7 @@ img,svg{display:block;max-width:100%}
 .h3{font-size:28px;line-height:1;letter-spacing:.005em;color:var(--warm)}
 .sub{margin:0;font-size:clamp(17px,1.4vw,19px);color:var(--body)}
 
-/* mono eyebrows: 01 / About */
+/* mono eyebrows (not used for section numbers) */
 .eyebrow{margin:0;font:400 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
 .eyebrow .dot{display:inline-block;width:7px;height:7px;background:var(--accent);margin-right:10px;transform:translateY(-1px)}
 
@@ -121,6 +121,24 @@ a.card:hover .h3{color:#fff}
 .card .h3 svg{width:10px;height:14px;color:var(--accent);flex:none;transition:transform .2s}
 a.card:hover .h3 svg{transform:translateX(3px)}
 .now-line{margin:0 0 36px;max-width:640px;font-size:clamp(17px,1.4vw,19px);color:var(--body)}
+
+/* press page */
+.press{padding-bottom:clamp(90px,10vw,140px);display:flex;flex-direction:column;gap:clamp(40px,5vw,64px)}
+.py{margin:0 0 14px;font:400 12px/1 var(--mono);letter-spacing:.14em;color:var(--dim)}
+.prow{display:grid;grid-template-columns:96px 240px minmax(0,1fr) 92px;column-gap:24px;align-items:baseline;padding:20px 12px;margin:0 -12px;text-decoration:none;color:inherit;transition:background .2s}
+a.prow:hover{background:rgba(232,232,219,.03)}
+.p-outlet{font-size:15px;line-height:1.4;color:var(--body)}
+.p-desc{font-size:17px;line-height:1.4;color:var(--warm);transition:color .15s}
+a.prow:hover .p-desc{color:var(--accent-hover)}
+.p-tag{justify-self:end;font:500 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--body);border:1px solid var(--hair);border-radius:var(--radius);padding:6px 9px}
+.prow-static .p-desc{color:var(--body)}
+.press-earlier .py{color:var(--dim)}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:900px){.prow{grid-template-columns:96px 190px minmax(0,1fr) 92px;column-gap:20px}}
+@media (max-width:700px){
+  .prow{grid-template-columns:1fr auto;grid-template-areas:"date tag" "outlet outlet" "desc desc";row-gap:8px;padding:18px 12px}
+  .p-date{grid-area:date}.p-tag{grid-area:tag}.p-outlet{grid-area:outlet}.p-desc{grid-area:desc;font-size:18px}
+}
 
 /* hairline rows */
 .rows{list-style:none;margin:0;padding:0;border-top:1px solid var(--hair)}
@@ -225,7 +243,19 @@ a.card:hover .h3 svg{transform:translateX(3px)}
 .hx{position:relative}
 .hx-pin{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;overflow:clip;background:var(--ink)}
 .hx-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(60% 55% at 50% 56%,rgba(232,232,219,.07),transparent 72%)}
-.hx-bg::after{content:"";position:absolute;inset:0;background-image:var(--noise);background-size:180px;opacity:.12;filter:grayscale(1);mix-blend-mode:screen}
+.hx-bg{isolation:isolate}
+.hx-bg::after{content:"";position:absolute;inset:0;z-index:2;background-image:var(--noise);background-size:180px;opacity:.12;filter:grayscale(1);mix-blend-mode:screen}
+/* painted scenes: crossfade (600ms), dark overlay, slight blur and desaturation, very slow drift */
+.hx-scenes{position:absolute;inset:0;z-index:0;overflow:hidden}
+.hx-scene{position:absolute;inset:0;display:block;opacity:0;transition:opacity 0s linear .6s}
+.hx-scene.on{opacity:1;z-index:1;transition:opacity .6s ease}
+.hx-scene img{position:absolute;inset:-8px;width:calc(100% + 16px);height:calc(100% + 16px);object-fit:cover;object-position:center;filter:blur(2px) saturate(.85);animation:hx-drift 20s ease-in-out infinite alternate;animation-play-state:paused}
+.hx-scene.on img{animation-play-state:running}
+@keyframes hx-drift{from{transform:scale(1)}to{transform:scale(1.05)}}
+.hx-shade{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(10,10,10,.55),rgba(10,10,10,.85))}
+.hx-cap{position:absolute;z-index:3;right:clamp(24px,6vw,96px);bottom:calc(clamp(14px,3.4vh,30px) + 24px);width:min(320px,calc(100% - 48px));margin:0;font:400 11px/1.55 var(--mono);letter-spacing:.02em;color:var(--dim);opacity:0;transition:opacity .6s ease;pointer-events:none}
+.hx-cap.on{opacity:1}
+.hx-cap-ai{display:block;margin-top:6px;font-size:10px;line-height:1.4;opacity:.75}
 .hx-track{position:relative;display:flex;width:max-content;height:100%;will-change:transform}
 /* skip: jumps past the whole pinned scroll */
 .hx-skipwrap{position:sticky;top:0;height:0;z-index:6}
@@ -278,6 +308,8 @@ a.card:hover .h3 svg{transform:translateX(3px)}
 .s-link{display:inline-block;margin-top:14px;font:500 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(var(--accent-rgb),.4);padding-bottom:4px;transition:color .2s,border-color .2s}
 .s-link:hover{color:var(--accent-hover);border-color:var(--accent-hover)}
 .s-link svg{display:inline-block;width:8px;height:11px;margin-left:10px}
+.s-link-quiet{display:table;margin-top:12px;color:var(--body);border-bottom-color:var(--hair)}
+.s-link-quiet:hover{color:var(--warm);border-color:rgba(232,232,219,.35)}
 .s-card{text-align:left;padding:20px 22px 22px;background:var(--ink-2);border:1px solid var(--hair);border-radius:var(--radius)}
 .s-name{margin:0;font:600 26px/1.1 var(--disp);letter-spacing:.005em;color:var(--warm)}
 .s-role{margin:6px 0 0;font-size:14px;line-height:1.4;color:var(--dim)}
@@ -326,6 +358,7 @@ html.js .stop.in{opacity:1;transform:none}
   .s-body{width:min(300px,calc(var(--sw) - 20px))}
   .s-text{font-size:16px}
   .hx-end{width:0}
+  .hx-cap{left:24px;right:24px;width:auto}
 }
 @media (max-height:780px) and (min-width:761px){
   .s-desc{font-size:14px;line-height:1.5}
@@ -333,6 +366,9 @@ html.js .stop.in{opacity:1;transform:none}
 }
 /* reduced motion and no JS: a calm sideways scroller, everything visible and lit */
 @media (prefers-reduced-motion:reduce){
+  .hx-scene,.hx-scene.on,.hx-cap{transition:none}
+  .hx-scene img{animation:none}
+  .hx-bg{position:sticky;inset:auto;left:0;top:0;width:100%;height:100vh;height:100svh;margin-bottom:-100vh;margin-bottom:-100svh}
   .hx{height:auto!important}
   .hx-pin{position:relative;overflow-x:auto;overflow-y:hidden}
   .hx-track{transform:none!important;will-change:auto}

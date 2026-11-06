@@ -65,7 +65,18 @@ type Stop = {
   faceit?: boolean;
   bright?: boolean;
   link?: { href: string; label: string };
+  link2?: { href: string; label: string };
 };
+// Painted background scenes behind the timeline (public/timeline/<file>.webp with .jpg fallback).
+// `from` is the index of the first stop each scene sits behind.
+const scenes = [
+  { file: 'tl-01-doorn', from: 0, caption: 'Doorn, 1990s. Huis Doorn, where Kaiser Wilhelm II lived out his exile, painted in the manner of Ruisdael. Where it started: hockey sticks and big Dutch skies.' },
+  { file: 'tl-02-call-of-duty', from: 2, caption: '2002. A Normandy street in the style of a 19th-century battle painting, for the Call of Duty years that pulled me into online gaming.' },
+  { file: 'tl-03-fnatic-lan', from: 4, caption: '2007 to 2011. A LAN by candlelight after Georges de La Tour. Players at their screens, an editor taking notes at the side: the Fnatic years.' },
+  { file: 'tl-04-faceit-arena', from: 9, caption: '2012 to 2022. An esports final reimagined as a Veronese spectacle: the crowds, the stage, the broadcast cameras of the FACEIT decade.' },
+  { file: 'tl-05-elo-community-ai', from: 18, caption: '2024 to now. A School of Athens for ELO: communities gathered around a gentle intelligence, the Alps behind, Turin close by.' },
+];
+const sceneOf = (i: number) => scenes.reduce((a, sc, k) => (sc.from <= i ? k : a), 0);
 const fStart = () => stops.findIndex((x) => x.faceit);
 const fEnd = () => stops.length - 1 - [...stops].reverse().findIndex((x) => x.faceit);
 const stops: Stop[] = [
@@ -88,7 +99,7 @@ const stops: Stop[] = [
   { kind: 'highlight', faceit: true, date: '2018', text: 'The London Counter-Strike Major.' },
   { kind: 'highlight', faceit: true, date: '2022', text: 'FACEIT acquired by Savvy Games Group, as part of a $1.5bn deal alongside ESL.' },
   { kind: 'career', date: '2024 to now', name: 'ELO', role: 'Co-founder', bright: true },
-  { kind: 'life', date: 'July 2026', text: 'Moved to Turin.', link: { href: '#now', label: "See what I'm doing now" } },
+  { kind: 'life', date: 'July 2026', text: 'Moved to Turin.', link: { href: '#now', label: "See what I'm doing now" }, link2: { href: '/press', label: 'Press, talks and podcasts' } },
 ];
 ---
 <Base
@@ -128,12 +139,24 @@ const stops: Stop[] = [
   <section id="about" class="hx" data-hx aria-label="About Roald">
     <div class="hx-skipwrap"><a class="hx-skip" href="#now" data-skip aria-label="Skip the About scroll">Skip<svg viewBox="0 0 12 16" aria-hidden="true"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></a></div>
     <div class="hx-pin" data-pin>
-      <div class="hx-bg" aria-hidden="true"></div>
+      <div class="hx-bg">
+        <div class="hx-scenes" aria-hidden="true">
+          {scenes.map((sc, k) => (
+            <picture class={`hx-scene${k === 0 ? ' on' : ''}`} data-scene={k}>
+              <source type="image/webp" srcset={`/timeline/${sc.file}.webp`} />
+              <img src={`/timeline/${sc.file}.jpg`} alt="" width="1584" height="672" loading={k === 0 ? 'eager' : 'lazy'} decoding="async" />
+            </picture>
+          ))}
+        </div>
+        <div class="hx-shade" aria-hidden="true"></div>
+        {scenes.map((sc, k) => (
+          <p class="hx-cap" data-cap={k} aria-hidden="true">{sc.caption}<span class="hx-cap-ai">AI-generated in an old-master style.</span></p>
+        ))}
+      </div>
       <div class="hx-track" data-track>
         <div class="hx-intro light">
           <div class="light-grain" aria-hidden="true"></div>
           <div class="hx-fa">
-            <p class="eyebrow">01 / About</p>
             <p class="about-lead">I'm Roald. I'm Dutch, I've spent most of my working life abroad, and since July 2026 I live in Turin.</p>
             <p class="hx-hint" aria-hidden="true">Scroll<svg viewBox="0 0 12 16"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></p>
           </div>
@@ -150,7 +173,7 @@ const stops: Stop[] = [
             <div class="hx-brk" data-brk aria-hidden="true" style={`left:calc(var(--sw) * ${fStart()});width:calc(var(--sw) * ${fEnd() - fStart()})`}><i></i><span>FACEIT</span><i></i></div>
             <ol class="hx-list">
               {stops.map((st, i) => (
-                <li class={`stop ${st.kind}${i % 2 === 0 ? ' up' : ' down'}${st.bright ? ' bright' : ''}`} data-f={i === fStart() ? '' : undefined}>
+                <li class={`stop ${st.kind}${i % 2 === 0 ? ' up' : ' down'}${st.bright ? ' bright' : ''}`} data-f={i === fStart() ? '' : undefined} data-scene={sceneOf(i)}>
                   <span class="node" aria-hidden="true"></span>
                   <p class="s-date">{st.date}</p>
                   <div class="s-body">
@@ -165,6 +188,7 @@ const stops: Stop[] = [
                       <>
                         <p class="s-text">{st.text}</p>
                         {st.link && <a class="s-link" href={st.link.href}>{st.link.label}<svg viewBox="0 0 12 16" aria-hidden="true"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></a>}
+                        {st.link2 && <a class="s-link s-link-quiet" href={st.link2.href}>{st.link2.label}<svg viewBox="0 0 12 16" aria-hidden="true"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></a>}
                       </>
                     )}
                   </div>
@@ -265,10 +289,57 @@ const stops: Stop[] = [
     })();
   </script>
 
+  <script is:inline>
+    // Timeline scenes: the painted background follows the stop at the marker. IntersectionObserver only, no scroll listeners.
+    (function () {
+      var sec = document.querySelector('[data-hx]');
+      if (!sec || !('IntersectionObserver' in window)) return;
+      var scenes = [].slice.call(sec.querySelectorAll('.hx-scene'));
+      var caps = [].slice.call(sec.querySelectorAll('[data-cap]'));
+      var stops = [].slice.call(sec.querySelectorAll('.stop'));
+      var intro = sec.querySelector('.hx-intro');
+      var title = sec.querySelector('.hx-title');
+      var current = 0;
+      var inJourney = false;
+      // the caption follows the scene and is shown only once the journey has started
+      function syncCaps() {
+        caps.forEach(function (c, i) {
+          var on = inJourney && i === current;
+          c.classList.toggle('on', on);
+          c.setAttribute('aria-hidden', on ? 'false' : 'true');
+        });
+      }
+      function show(k, journey) {
+        if (k === current && !!journey === inJourney) return;
+        if (k !== current) {
+          scenes[current].classList.remove('on');
+          scenes[k].classList.add('on');
+          current = k;
+        }
+        inJourney = !!journey;
+        syncCaps();
+      }
+      var seen = {}; // index (-1 = intro and title) -> true while it overlaps the band
+      function pick() {
+        var best = -2;
+        for (var key in seen) if (seen[key] && +key > best) best = +key;
+        if (best === -2) return; // nothing in the band: keep what is showing
+        if (best < 0) show(0, false);
+        else show(+stops[best].getAttribute('data-scene'), true);
+      }
+      // a narrow band around the 60% marker the line fills to
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { seen[e.target.__i] = e.isIntersecting; });
+        pick();
+      }, { rootMargin: '0px -39.5% 0px -39.5%', threshold: 0 });
+      [intro, title].forEach(function (el) { if (el) { el.__i = -1; io.observe(el); } });
+      stops.forEach(function (el, i) { el.__i = i; io.observe(el); });
+    })();
+  </script>
+
   <section class="sec zone z-c" id="now">
     <div class="wrap rv">
       <div class="sec-head">
-        <p class="eyebrow">02 / Now</p>
         <h2 class="h2">Building ELO Collective</h2>
       </div>
       <p class="now-line">ELO turns how people behave in games and online communities into lessons for the real world.</p>
@@ -323,7 +394,6 @@ const stops: Stop[] = [
 
   <section class="hi zone z-heat" id="contact">
     <div class="wrap rv hi-in">
-      <p class="eyebrow">03 / Say hi</p>
       <h2 class="h1">Say hi.</h2>
       <p class="sub">The best way to reach me is X, LinkedIn or email.</p>
       <Buttons />

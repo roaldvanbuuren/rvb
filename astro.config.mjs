@@ -1,4 +1,5 @@
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 
 // Absolute URLs are needed for og:image, canonical links and the RSS feed.
 // Set SITE_URL in Vercel (Project Settings > Environment Variables) once the
@@ -13,4 +14,5 @@ export default defineConfig({
   site,
   output: 'static',
   trailingSlash: 'never',
+  integrations: [sitemap({ filter: (page) => !/\/404$/.test(page) })],
 });
