@@ -71,6 +71,7 @@ type Stop = {
   link3?: { href: string; label: string };
   /** Where this stop's "Read the story" link goes. */
   story?: string;
+  logo?: { src: string; w: number; h: number; dh: number; alt?: string; replaces?: boolean };
 };
 // Painted background scenes behind the timeline (public/timeline/<file>.webp with .jpg fallback).
 // `from` is the index of the first stop each scene sits behind.
@@ -84,24 +85,36 @@ const scenes = [
 const sceneOf = (i: number) => scenes.reduce((a, sc, k) => (sc.from <= i ? k : a), 0);
 const fStart = () => stops.findIndex((x) => x.faceit);
 const fEnd = () => stops.length - 1 - [...stops].reverse().findIndex((x) => x.faceit);
+// Logos on the timeline. Bone-coloured PNGs in public/images/logos. w/h are the file size, dh is the display height in px.
+// `replaces` means the logo already spells the name, so it stands in for the heading instead of sitting above it.
+const tl = {
+  fourKings: { src: '/images/logos/4kings.png', w: 165, h: 165, dh: 44 },
+  fnatic: { src: '/images/logos/fnatic.png', w: 420, h: 274, dh: 32 },
+  fpsOmega: { src: '/images/logos/fps-omega.png', w: 380, h: 213, dh: 40, replaces: true },
+  faceit: { src: '/images/logos/faceit.png', w: 484, h: 71, dh: 20, replaces: true },
+  eleague: { src: '/images/logos/eleague.png', w: 406, h: 420, dh: 64, alt: 'ELEAGUE' },
+  xGames: { src: '/images/logos/x-games.png', w: 365, h: 420, dh: 64, alt: 'X Games' },
+  universalOpen: { src: '/images/logos/rocket-league-universal-open.png', w: 263, h: 275, dh: 64, alt: 'Universal Open, Rocket League' },
+  major: { src: '/images/logos/faceit-major-london-2018.png', w: 329, h: 272, dh: 60, alt: 'FACEIT Major London 2018' },
+};
 const stops: Stop[] = [
   { kind: 'life', date: '29 June 1990', text: 'Born in Doorn, the Netherlands.' },
   { kind: 'life', date: 'The 90s', text: 'A childhood spent on Pokémon, Dragon Ball Z, field hockey and games.' },
   { kind: 'life', date: 'The 2000s', text: 'Started playing multiplayer games and found esports. The tumultuous start to the naughties got me interested in politics and power.' },
   { kind: 'life', date: '2003', text: 'Started playing Call of Duty.' },
   { kind: 'life', date: '2007', text: 'Went from playing games to writing about them.' },
-  { kind: 'career', story: '/work/early-years', date: '2007 to 2008', name: '4Kings', role: 'Editor', text: "Covering Call of Duty for one of the UK's oldest esports organisations." },
-  { kind: 'career', story: '/work/fnatic', date: '2008 to 2011', name: 'Fnatic', role: 'Editor, Editor-in-Chief, General Manager', text: "Joined as an editor and worked my way up. As GM: the Own3D streaming partnership, scouting talent, the shop, and launching Fnatic's tournament platform, PLAY." },
+  { kind: 'career', story: '/work/early-years', date: '2007 to 2008', name: '4Kings', role: 'Editor', logo: tl.fourKings, text: "Covering Call of Duty for one of the UK's oldest esports organisations." },
+  { kind: 'career', story: '/work/fnatic', date: '2008 to 2011', name: 'Fnatic', role: 'Editor, Editor-in-Chief, General Manager', logo: tl.fnatic, text: "Joined as an editor and worked my way up. As GM: the Own3D streaming partnership, scouting talent, the shop, and launching Fnatic's tournament platform, PLAY." },
   { kind: 'career', story: '/work/early-years', date: '2010', name: 'Stermy.com', role: 'Head of Content and Community', text: "Content for Alessandro 'Stermy' Avallone's personal brand, my first close look at how a player's brand becomes a community." },
-  { kind: 'career', story: '/work/early-years', date: '2011 to 2013', name: 'FPS Omega', role: 'Founder', text: 'English-language community media for competitive shooters, including ShootManiaEsports.com and OverwatchEsports.com.' },
+  { kind: 'career', story: '/work/early-years', date: '2011 to 2013', name: 'FPS Omega', role: 'Founder', logo: tl.fpsOmega, text: 'English-language community media for competitive shooters, including ShootManiaEsports.com and OverwatchEsports.com.' },
   { kind: 'life', date: '2012', text: 'Dropped out of college and moved to Italy for FACEIT.' },
-  { kind: 'career', faceit: true, story: '/work/faceit', date: '2012 to 2014', name: 'FACEIT', role: 'VP of Marketing, Milan', lead: "One of FACEIT's first hires, there from its first year through to its acquisition.", text: 'A broad early remit: business development, marketing, PR, community, even sales and logistics.' },
-  { kind: 'career', faceit: true, story: '/work/faceit', date: '2014 to 2016', name: 'FACEIT', role: 'VP of Events', text: 'Tournament operations, player management, logistics and live production, as FACEIT turned professional.' },
-  { kind: 'career', faceit: true, story: '/work/faceit', date: '2016 to 2022', name: 'FACEIT', role: 'VP of Esports', text: 'Players, teams and publishers across the Esports Championship Series, Rainbow Six and more, plus white-label partnerships.' },
-  { kind: 'highlight', faceit: true, date: '2016', text: 'Brought Counter-Strike and Overwatch to US TV with ELEAGUE on TBS.' },
-  { kind: 'highlight', faceit: true, date: '2017', text: 'Took Rocket League esports to the X Games with ESPN.' },
-  { kind: 'highlight', faceit: true, date: '2017 to 2018', text: 'Brought Rocket League and the NHL to NBC.' },
-  { kind: 'highlight', faceit: true, date: '2018', text: 'The London Counter-Strike Major.' },
+  { kind: 'career', faceit: true, story: '/work/faceit', date: '2012 to 2014', name: 'FACEIT', role: 'VP of Marketing, Milan', logo: tl.faceit, lead: "One of FACEIT's first hires, there from its first year through to its acquisition.", text: 'A broad early remit: business development, marketing, PR, community, even sales and logistics.' },
+  { kind: 'career', faceit: true, story: '/work/faceit', date: '2014 to 2016', name: 'FACEIT', role: 'VP of Events', logo: tl.faceit, text: 'Tournament operations, player management, logistics and live production, as FACEIT turned professional.' },
+  { kind: 'career', faceit: true, story: '/work/faceit', date: '2016 to 2022', name: 'FACEIT', role: 'VP of Esports', logo: tl.faceit, text: 'Players, teams and publishers across the Esports Championship Series, Rainbow Six and more, plus white-label partnerships.' },
+  { kind: 'highlight', faceit: true, date: '2016', logo: tl.eleague, text: 'Brought Counter-Strike and Overwatch to US TV with ELEAGUE on TBS.' },
+  { kind: 'highlight', faceit: true, date: '2017', logo: tl.xGames, text: 'Took Rocket League esports to the X Games with ESPN.' },
+  { kind: 'highlight', faceit: true, date: '2017 to 2018', logo: tl.universalOpen, text: 'Brought Rocket League and the NHL to NBC.' },
+  { kind: 'highlight', faceit: true, date: '2018', logo: tl.major, text: 'The London Counter-Strike Major.' },
   { kind: 'highlight', faceit: true, date: '2022', text: 'FACEIT acquired by Savvy Games Group, as part of a $1.5bn deal alongside ESL.' },
   { kind: 'career', date: '2024 to now', name: 'ELO', role: 'Co-founder', bright: true },
   { kind: 'life', date: 'July 2026', text: 'Moved to Turin.', link: { href: '#now', label: "See what I'm doing now" }, link2: { href: '/press', label: 'Press, talks and podcasts' }, link3: { href: '/work', label: 'Work, in more detail' } },
@@ -187,7 +200,8 @@ const stops: Stop[] = [
                   <div class="s-body">
                     {st.kind === 'career' ? (
                       <div class="s-card">
-                        <h4 class="s-name">{st.name}</h4>
+                        {st.logo && !st.logo.replaces && <img class="s-logo" src={st.logo.src} alt="" width={st.logo.w} height={st.logo.h} style={`--dh:${st.logo.dh}`} loading="lazy" decoding="async" />}
+                        <h4 class="s-name">{st.logo?.replaces ? <img class="s-logo s-logo-name" src={st.logo.src} alt={st.name} width={st.logo.w} height={st.logo.h} style={`--dh:${st.logo.dh}`} loading="lazy" decoding="async" /> : st.name}</h4>
                         {st.role && <p class="s-role">{st.role}</p>}
                         {st.lead && <p class="s-desc s-lead">{st.lead}</p>}
                         {st.text && <p class="s-desc">{st.text}</p>}
@@ -195,6 +209,7 @@ const stops: Stop[] = [
                       </div>
                     ) : (
                       <>
+                        {st.logo && <img class="s-logo" src={st.logo.src} alt={st.logo.alt ?? ''} width={st.logo.w} height={st.logo.h} style={`--dh:${st.logo.dh}`} loading="lazy" decoding="async" />}
                         <p class="s-text">{st.text}</p>
                         {st.link && <a class="s-link" href={st.link.href}>{st.link.label}<svg viewBox="0 0 12 16" aria-hidden="true"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></a>}
                         {st.link2 && <a class="s-link s-link-quiet" href={st.link2.href}>{st.link2.label}<svg viewBox="0 0 12 16" aria-hidden="true"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></a>}
