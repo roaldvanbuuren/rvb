@@ -1,0 +1,107 @@
+---
+// Hero dusk: the sky deepens to indigo as the page scrolls, the rose light goes out,
+// stars come in and a band of mist drifts low over the ridge. All of it reads one
+// number, --dusk (0 at the top of the page, 1 at full dusk), set by a CSS scroll-driven
+// animation on .hero (see global.css). The script below only runs where
+// animation-timeline is not supported.
+
+// Stars: fixed positions, generated once at build with a seeded PRNG so every build matches.
+// Percentages of the star field, which is the top 45% of the hero image box (never the mountains).
+type Star = { x: number; y: number; s: number; o: number; d?: number; dl?: number };
+
+function mulberry32(seed: number) {
+  let a = seed;
+  return () => {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const rnd = mulberry32(20261106);
+const between = (a: number, b: number) => a + rnd() * (b - a);
+
+const COUNT = 25;
+const BRIGHT = 5; // a few slightly brighter than the rest
+const TWINKLE = 4; // at most four twinkle
+const stars: Star[] = [];
+for (let i = 0, guard = 0; i < COUNT && guard < 5000; guard++) {
+  const x = between(2, 98);
+  const y = between(4, 96);
+  // keep them apart so they read as scattered, not clumped (x is wider than y on screen, so weight it)
+  if (stars.some((p) => Math.hypot((p.x - x) * 1.6, p.y - y) < 11)) continue;
+  const bright = i < BRIGHT;
+  stars.push({
+    x,
+    y,
+    s: bright && rnd() < 0.6 ? 2 : 1,
+    o: bright ? between(0.7, 0.8) : between(0.3, 0.58),
+  });
+  i++;
+}
+// twinkle on a few of the regular ones: 6 to 10 s cycle, negative delay so they are mid-cycle from the start
+stars
+  .slice(BRIGHT)
+  .sort(() => rnd() - 0.5)
+  .slice(0, TWINKLE)
+  .forEach((st) => {
+    st.d = Math.round(between(6, 10) * 10) / 10;
+    st.dl = -Math.round(between(0, st.d) * 10) / 10;
+  });
+---
+<div class="dusk" aria-hidden="true"></div>
+<div class="dusk-glow" aria-hidden="true"></div>
+<div class="stars" aria-hidden="true">
+  {stars.map((st) => (
+    <i
+      class={st.d ? 'st tw' : 'st'}
+      style={`left:${st.x.toFixed(2)}%;top:${st.y.toFixed(2)}%;--s:${st.s}px;--o:${st.o.toFixed(2)}${st.d ? `;--d:${st.d}s;--dl:${st.dl}s` : ''}`}
+    ></i>
+  ))}
+</div>
+<div class="mist" aria-hidden="true"></div>
+
+<script>
+  // Fallback for browsers without scroll-driven animations (animation-timeline).
+  // Mirrors the CSS: --dusk eases (CSS `ease`) from 0 to 1 as the hero scrolls from its top edge at the
+  // top of the viewport to half out of view. Static when the visitor prefers reduced motion.
+  const hero = document.querySelector<HTMLElement>('.hero');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (hero && !CSS.supports('animation-timeline', 'view()')) {
+    // CSS `ease`, cubic-bezier(.25,.1,.25,1), so the fallback matches the native animation
+    const ease = (x: number) => {
+      const b = (a: number, c: number, t: number) => 3 * a * (1 - t) * (1 - t) * t + 3 * c * (1 - t) * t * t + t * t * t;
+      let lo = 0;
+      let hi = 1;
+      for (let i = 0; i < 24; i++) {
+        const mid = (lo + hi) / 2;
+        if (b(0.25, 0.25, mid) < x) lo = mid;
+        else hi = mid;
+      }
+      return b(0.1, 1, (lo + hi) / 2);
+    };
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const r = hero.getBoundingClientRect();
+      const t = Math.min(1, Math.max(0, -r.top / (r.height * 0.5)));
+      hero.style.setProperty('--dusk', ease(t).toFixed(4));
+    };
+    const queue = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    const start = () => {
+      window.addEventListener('scroll', queue, { passive: true });
+      window.addEventListener('resize', queue);
+      update();
+    };
+    const stop = () => {
+      window.removeEventListener('scroll', queue);
+      window.removeEventListener('resize', queue);
+      hero.style.removeProperty('--dusk');
+    };
+    if (!reduce.matches) start();
+    reduce.addEventListener('change', () => (reduce.matches ? stop() : start()));
+  }
+</script>

@@ -82,22 +82,37 @@ img,svg{display:block;max-width:100%}
 @media (max-width:700px){.hero-in .rvb-mark{height:52px}}
 .hx-fa .portrait{width:clamp(72px,12vh,104px);height:clamp(72px,12vh,104px);margin-bottom:clamp(18px,3.4vh,30px);border-color:rgba(20,20,20,.16);background:transparent}
 
-/* hero sky: rare falling star, plane and birds (see components/Sky.astro) */
-.sky{position:absolute;left:0;right:0;top:0;height:var(--hh);z-index:-1;pointer-events:none;overflow:hidden;
-  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 55%,transparent 88%);mask-image:linear-gradient(180deg,#000 0%,#000 55%,transparent 88%)}
-.sky-el{position:absolute;left:0;top:0;will-change:transform,opacity}
-.sky-star{height:1.5px;border-radius:2px;transform-origin:100% 50%;opacity:0;
-  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.95));filter:drop-shadow(0 0 3px rgba(255,255,255,.7))}
-.sky-flock{width:0;height:0}
-.sky-bird{position:absolute;display:block;line-height:0;animation:sky-flap var(--flap,.6s) ease-in-out infinite alternate;transform-origin:50% 60%}
-.sky-bird svg{width:100%;height:auto;overflow:visible}
-.sky-bird path{fill:none;stroke:rgba(18,14,14,.62);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-@keyframes sky-flap{from{transform:scaleY(1)}to{transform:scaleY(.3)}}
-.sky-plane{opacity:0}
-.sky-plane-in{display:flex;align-items:center;transform-origin:50% 50%}
-.sky-plane-in svg{width:34px;height:auto;flex:none;fill:rgba(18,14,14,.7)}
-.sky-trail{display:block;width:200px;height:1.5px;margin-right:-4px;border-radius:2px;background:linear-gradient(90deg,rgba(232,232,219,0),rgba(232,232,219,.34))}
-@media (prefers-reduced-motion:reduce){.sky{display:none}}
+/* hero dusk (components/Dusk.astro): one number, --dusk (0 at the top of the page, 1 at full dusk), drives everything.
+   The sky deepens to indigo, the rose light goes out, stars come in, mist drifts. Layer order: image, dusk, glow, stars, mist, grain on top. */
+@property --dusk{syntax:"<number>";inherits:true;initial-value:0}
+@keyframes dusk-fall{from{--dusk:0}to{--dusk:1}}
+@supports (animation-timeline:view()){
+  /* longhands on purpose: the minifier folds a full set into the animation shorthand, and browsers reject view() there */
+  .hero{animation-name:dusk-fall;animation-duration:auto;animation-timing-function:ease;animation-fill-mode:both;animation-timeline:view(block 0px 0px);animation-range:exit 0% exit 50%}
+}
+.dusk,.dusk-glow,.stars,.mist{position:absolute;left:0;right:0;top:0;height:var(--hh);pointer-events:none}
+.dusk{z-index:-2;opacity:calc(var(--dusk) * .6);
+  background:linear-gradient(180deg,#14163a 0%,rgba(20,22,58,.92) 12%,rgba(20,22,58,.72) 26%,rgba(20,22,58,.42) 40%,rgba(20,22,58,.16) 52%,rgba(20,22,58,0) 62%)}
+/* the rose band above the ridge: cooled and dimmed as the indigo comes in, so it reads as the light going */
+.dusk-glow{z-index:-2;mix-blend-mode:multiply;opacity:calc(var(--dusk) * .9);
+  background:linear-gradient(180deg,rgba(111,116,173,0) 10%,rgba(111,116,173,.5) 30%,#6f74ad 50%,#5d63a0 66%,#6f74ad 76%,rgba(111,116,173,0) 90%)}
+.stars{z-index:-1;top:56px;height:calc(var(--hh) * .45 - 56px)}
+.st{position:absolute;width:var(--s,1px);height:var(--s,1px);border-radius:50%;background:#F5F6F2;
+  opacity:calc(clamp(0, (var(--dusk) - .15) / .85, 1) * var(--o,.5))}
+.st.tw{background:none}
+.st.tw::after{content:"";position:absolute;inset:0;border-radius:50%;background:#F5F6F2;animation:star-twinkle var(--d,8s) ease-in-out var(--dl,0s) infinite}
+@keyframes star-twinkle{0%,100%{opacity:1}50%{opacity:.55}}
+/* valley mist: one wide soft band, twice as wide as the tile so a -50% slide loops with no seam */
+.mist{z-index:-1;top:calc(var(--hh) * .62);height:calc(var(--hh) * .2);overflow:hidden;opacity:.1;
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 35%,#000 65%,transparent);mask-image:linear-gradient(180deg,transparent,#000 35%,#000 65%,transparent)}
+.mist::before{content:"";position:absolute;top:0;bottom:0;left:0;width:max(200%,2400px);will-change:transform;
+  background:
+    radial-gradient(ellipse 28% 48% at 30% 50%,rgba(255,255,255,.9) 0,rgba(255,255,255,.5) 35%,rgba(255,255,255,.15) 65%,rgba(255,255,255,0) 100%),
+    radial-gradient(ellipse 26% 40% at 70% 42%,rgba(255,255,255,.75) 0,rgba(255,255,255,.4) 35%,rgba(255,255,255,.12) 65%,rgba(255,255,255,0) 100%),
+    radial-gradient(ellipse 40% 36% at 50% 62%,rgba(255,255,255,.6) 0,rgba(255,255,255,.32) 35%,rgba(255,255,255,.1) 65%,rgba(255,255,255,0) 100%);
+  background-size:50% 100%;background-repeat:repeat-x;animation:mist-drift 80s linear infinite}
+@keyframes mist-drift{to{transform:translate3d(-50%,0,0)}}
+@media (prefers-reduced-motion:reduce){.dusk,.dusk-glow,.stars,.mist{display:none}}
 
 /* graining and fade zones: full-bleed glow plus film grain, masked to fade in and out (same values as data.elocollective.com) */
 .zone{position:relative;isolation:isolate}
