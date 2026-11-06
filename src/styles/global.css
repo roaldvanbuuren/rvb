@@ -182,14 +182,11 @@ a.prow:hover .p-desc{color:var(--accent-hover)}
 .wcard-tile .s{font-size:13.5px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .wcard-tile .rm{margin-top:auto;padding-top:8px}
 
-/* 02 Now: staircase of tone-coloured cards (after the Data site's rung cards) */
-.now-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;align-items:start;padding-top:18px}
+/* Now: one row of tone-coloured cards (after the Data site's rung cards) */
+.now-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;align-items:stretch;padding-top:18px}
 .now-grid .card{--tcr:133,133,124;position:relative;gap:12px;padding:24px 22px 20px;min-height:250px;
   background:linear-gradient(180deg,rgba(var(--tcr),.10),var(--ink-2) 62%);border:1px solid rgba(var(--tcr),.5);border-radius:var(--radius);
   box-shadow:0 0 54px -26px rgba(var(--tcr),.55);transition:border-color .25s,box-shadow .35s}
-.now-grid .card:nth-child(2){margin-top:40px}
-.now-grid .card:nth-child(3){margin-top:80px}
-.now-grid .card:nth-child(4){margin-top:120px}
 .now-grid .card.tone-accent{--tcr:107,123,255}
 .now-grid .card.tone-sand{--tcr:154,138,102}
 .now-grid .card.tone-amber{--tcr:200,132,42}
@@ -213,12 +210,9 @@ a.prow:hover .p-desc{color:var(--accent-hover)}
 .now-grid .card.lead p{font-size:16px;color:#CFCFC4}
 @media (max-width:1000px){
   .now-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:30px 18px;padding-top:14px}
-  .now-grid .card:nth-child(n){margin-top:0}
-  .now-grid .card:nth-child(even){margin-top:34px}
 }
 @media (max-width:640px){
   .now-grid{grid-template-columns:1fr;gap:30px}
-  .now-grid .card:nth-child(n){margin-top:0}
   .now-grid .card.lead .h3{font-size:34px}
 }
 
