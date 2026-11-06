@@ -2,6 +2,7 @@
 title: "No more papers, more building"
 date: 2026-09-23
 summary: "Europe has its political blueprint. Time to stop writing papers and start building."
+cover: /images/writing/generic/g-ideas.jpg
 originally_posted: https://x.com/roaldvanbuuren/status/2102662306135986395
 draft: false
 ---

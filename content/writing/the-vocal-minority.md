@@ -2,6 +2,7 @@
 title: "The Vocal Minority"
 date: 2026-01-12
 summary: "How to avoid building for the loudest 1% and ignoring the silent 90%, with lessons from FACEIT."
+cover: /images/writing/generic/g-arena.jpg
 originally_posted: https://elocollective.com/logs/the-vocal-minority
 draft: false
 ---

@@ -154,6 +154,8 @@ a.prow:hover .p-desc{color:var(--accent-hover)}
 .wcard-img{position:relative;min-height:230px;background:#121211}
 .wcard-img .art,.wcard-img > img{position:absolute;inset:0;width:100%;height:100%}
 .wcard-img > img{object-fit:cover}
+.wcard-img > picture{position:absolute;inset:0;display:block}
+.wcard-img > picture img{width:100%;height:100%;object-fit:cover}
 .wcard-img .art svg{width:100%;height:100%}
 .wcard-img::after{content:"";position:absolute;inset:0;background-image:var(--noise);background-size:180px;opacity:.14;mix-blend-mode:overlay;filter:grayscale(1);pointer-events:none}
 .wcard-body{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:12px;padding:clamp(22px,3vw,38px)}
@@ -401,6 +403,7 @@ body > footer{position:relative;border-top:1px solid var(--hair)}
 .meta{margin:22px 0 0;font:400 12px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
 .cover{max-width:960px;margin:40px auto 0;padding:0 24px}
 .cover img{width:100%;height:auto;border:1px solid var(--hair);border-radius:var(--radius)}
+.cover picture{display:block}
 .prose{max-width:680px;margin:0 auto;padding:44px 24px 0;font-size:17px;line-height:1.75;color:var(--body)}
 .prose > *:first-child{margin-top:0}
 .prose p{margin:0 0 1.35em}

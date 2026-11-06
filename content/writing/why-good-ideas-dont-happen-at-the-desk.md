@@ -2,6 +2,7 @@
 title: "Why good ideas don't happen at the desk"
 date: 2026-05-31
 summary: "The info-gathering mind and the processing mind, and how a Thursday off triggered ELO's biggest pivot."
+cover: /images/writing/generic/g-ideas.jpg
 originally_posted: https://x.com/roaldvanbuuren/status/2060993977810084112
 draft: false
 ---

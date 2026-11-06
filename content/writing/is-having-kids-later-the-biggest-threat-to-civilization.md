@@ -2,6 +2,7 @@
 title: "Is having kids later the biggest threat to civilization?"
 date: 2026-09-30
 summary: "When the now matters for longer, the sacrifices that build a better future get harder to make."
+cover: /images/writing/generic/g-family.jpg
 originally_posted: https://x.com/roaldvanbuuren/status/2105196664084427062
 draft: false
 ---

@@ -2,6 +2,7 @@
 title: "Playtests Are The New Trailers"
 date: 2025-06-21
 summary: "Closed alphas and playtests now give players their first real taste of a game, and turn access into feedback and engagement."
+cover: /images/writing/generic/g-stage.jpg
 originally_posted: https://elocollective.com/logs/playtests-are-the-new-trailers
 draft: false
 ---

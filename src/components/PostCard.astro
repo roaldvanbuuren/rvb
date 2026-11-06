@@ -1,16 +1,19 @@
 ---
 import CoverArt from './CoverArt.astro';
-import { formatDate, isoDate, postUrl, type Post } from '../lib/posts';
+import { formatDate, isoDate, postUrl, coverWebp, type Post } from '../lib/posts';
 interface Props { post: Post; index?: number; variant?: 'row' | 'tile' }
 const { post, index = 0, variant = 'row' } = Astro.props;
 const tones = ['accent', 'amber', 'bone'];
 const tone = tones[index % tones.length];
 const { title, summary, date, cover } = post.data;
+const webp = coverWebp(cover);
 ---
 <a class={`wcard tone-${tone}${variant === 'tile' ? ' wcard-tile' : ''}`} href={postUrl(post)}>
   <div class="wcard-img">
     {cover
-      ? <img src={cover} alt="" width="480" height="360" loading="lazy" />
+      ? webp
+        ? <picture><source type="image/webp" srcset={webp} /><img src={cover} alt="" width="480" height="360" loading="lazy" /></picture>
+        : <img src={cover} alt="" width="480" height="360" loading="lazy" />
       : <CoverArt id={post.id} title={title} summary={summary} />}
   </div>
   <div class="wcard-body">

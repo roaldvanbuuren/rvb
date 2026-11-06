@@ -2,6 +2,7 @@
 title: "Esports, Time To Start From A Clean Slate"
 date: 2025-06-18
 summary: "A panel remark about starting from a blank sheet of paper, and why gaming can lead innovation instead of copying sport."
+cover: /images/writing/generic/g-arena.jpg
 originally_posted: https://elocollective.com/logs/esports-time-to-start-from-a-clean-slate
 draft: false
 ---

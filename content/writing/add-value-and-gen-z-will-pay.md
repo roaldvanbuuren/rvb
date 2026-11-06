@@ -2,6 +2,7 @@
 title: "Add Value and Gen Z Will Pay"
 date: 2025-06-17
 summary: "Gen Z and Millennials pay for what they believe in. If an esports audience is hard to monetise, look at the value on offer."
+cover: /images/writing/generic/g-market.jpg
 originally_posted: https://elocollective.com/logs/add-value-and-gen-z-will-pay
 draft: false
 ---

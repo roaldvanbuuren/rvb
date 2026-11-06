@@ -2,6 +2,7 @@
 title: "Gaming Sits at the Epicenter of the New Entertainment Industry"
 date: 2025-06-17
 summary: "Notes from a London Games Festival panel: gaming is becoming the connective tissue between film, music, literature and competition."
+cover: /images/writing/generic/g-market.jpg
 originally_posted: https://elocollective.com/logs/gaming-sits-at-the-epicenter-of-the-new-entertainment-industry
 draft: false
 ---

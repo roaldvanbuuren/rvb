@@ -2,6 +2,7 @@
 title: "Why No New IP?"
 date: 2025-06-17
 summary: "AAA studios lean on old IP because the market has changed. With nearly 20,000 releases in 2024, community has to be built before launch."
+cover: /images/writing/generic/g-stage.jpg
 originally_posted: https://elocollective.com/logs/why-no-new-ip
 draft: false
 ---

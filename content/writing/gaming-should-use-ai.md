@@ -2,6 +2,7 @@
 title: "Gaming should use AI"
 date: 2026-10-22
 summary: "AI is a tool like any other, and gaming communities that believe in grassroots should use it to build the games players want."
+cover: /images/writing/generic/g-automaton.jpg
 originally_posted: https://x.com/roaldvanbuuren/status/2113324536712065054
 draft: false
 ---
