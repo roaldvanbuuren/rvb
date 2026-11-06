@@ -1,0 +1,24 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getPosts } from '../../lib/posts';
+
+const posts = await getPosts();
+---
+<Base
+  title="Writing · Roald van Buuren"
+  description="Writing by Roald van Buuren on AI, community, Europe and what games show us about how people decide."
+>
+  <section class="zone z-a">
+    <div class="wrap page-head">
+      <p class="eyebrow">Writing</p>
+      <h1 class="h1">All writing</h1>
+      <p class="sub">Newest first.</p>
+    </div>
+  </section>
+  <section class="wrap wlist" style="padding-bottom:clamp(90px,10vw,140px)">
+    {posts.length > 0
+      ? posts.map((p, i) => <PostCard post={p} index={i} />)
+      : <p class="empty">Nothing published yet.</p>}
+  </section>
+</Base>

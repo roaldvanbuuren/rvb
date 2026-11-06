@@ -1,0 +1,332 @@
+---
+import Base from '../layouts/Base.astro';
+import Buttons from '../components/Buttons.astro';
+import PostCard from '../components/PostCard.astro';
+import Sky from '../components/Sky.astro';
+import { getPosts, links, postUrl } from '../lib/posts';
+
+const all = await getPosts();
+const latest = all.slice(0, 5);
+
+// Pull quote: must be a verbatim line from one of the articles. The build fails if it drifts.
+const quoteSlug = 'gaming-is-a-lens-for-human-behaviour-and-we-re-barely-scratching-the-surface';
+const quote = 'We have built, almost by accident, the most heavily instrumented environment for studying human behaviour that has ever existed, and we mostly use it to sell battle passes.';
+const quotePost = all.find((p) => p.id === quoteSlug);
+if (!quotePost || !quotePost.body?.includes(quote)) throw new Error('Pull quote is not a verbatim line of its article');
+
+const products = [
+  { name: 'Lumen', logo: { src: '/images/logos/lumen.png', w: 200, h: 200, dh: 44 }, text: 'Community intelligence for Discord. Shows community teams what to fix and why.', href: links.lumen, host: 'trylumen.io', lead: true, tone: 'accent' },
+  { name: 'ELO Collective', logo: { src: '/images/logos/elo-collective.png', w: 200, h: 200, dh: 44 }, text: 'Builds communities that grow themselves.', href: links.elo, host: 'elocollective.com', tone: 'sand' },
+  { name: 'ELO Labs', logo: { src: '/images/logos/elo-labs.png', w: 149, h: 240, dh: 60 }, text: 'Finds out how people behave in them, together and under pressure.', href: links.labs, host: 'labs.elocollective.com', tone: 'amber' },
+  { name: 'ELO Data', logo: { src: '/images/logos/elo-data.png', w: 131, h: 160, dh: 60 }, text: 'Turns what holds up into data for AI.', href: links.data, host: 'data.elocollective.com', tone: 'grey' },
+];
+
+// "ELO works with" logo row in 02 / Now. Logos are bone-coloured PNGs in public/images/logos. h = display height in px.
+const worksWith = {
+  title: 'ELO works with',
+  more: 'and many more',
+  logos: [
+    { name: 'McLaren', url: 'https://www.mclaren.com', src: '/images/logos/mclaren.png', w: 640, nh: 94, h: 24 },
+    { name: 'Torpor Games', url: 'https://www.torporgames.com', src: '/images/logos/torpor-games.png', w: 344, nh: 170, h: 60 },
+    { name: 'NASCAR', url: 'https://www.nascar.com', src: '/images/logos/nascar.png', w: 640, nh: 114, h: 26 },
+    { name: 'Team Liquid', url: 'https://www.teamliquid.com', src: '/images/logos/team-liquid.png', w: 176, nh: 200, h: 64 },
+    { name: 'NSE', url: 'https://nse.gg', src: '/images/logos/nse.png', w: 188, nh: 62, h: 30 },
+    { name: 'Burda Principal Investments', url: 'https://burdaprincipalinvestments.com', src: '/images/logos/burda.svg', w: 621, nh: 135, h: 42 },
+    { name: 'TUM Venture Labs', url: 'https://www.tum-venture-labs.de', src: '/images/logos/tum-venture-labs.png', w: 292, nh: 100, h: 38 },
+    { name: 'The Wolf', url: 'https://thewolfsimulator.com', src: '/images/logos/the-wolf.png', w: 366, nh: 164, h: 40 },
+  ],
+};
+
+// "When I'm not working" strip under Now: tags and the one dim line under them.
+const offDuty = {
+  title: "When I'm not working",
+  tags: [
+    'History, mostly Rome and Egypt',
+    'Statecraft, politics and power',
+    'Science fiction',
+    'Big-idea non-fiction',
+    'AI that makes us more human',
+    'Europe',
+    'English legend and folklore',
+    'PC games',
+    'Rain, with a good coat',
+  ],
+  playing: "Assassin's Creed Odyssey",
+};
+
+// Timeline for 01 / About, oldest first. Copy is as supplied; nothing added.
+type Stop = {
+  kind: 'life' | 'career' | 'highlight';
+  date: string;
+  text?: string;
+  lead?: string;
+  name?: string;
+  role?: string;
+  faceit?: boolean;
+  bright?: boolean;
+  link?: { href: string; label: string };
+};
+const fStart = () => stops.findIndex((x) => x.faceit);
+const fEnd = () => stops.length - 1 - [...stops].reverse().findIndex((x) => x.faceit);
+const stops: Stop[] = [
+  { kind: 'life', date: '29 June 1990', text: 'Born in Doorn, the Netherlands.' },
+  { kind: 'life', date: 'The 90s', text: 'A childhood spent on Pokémon, Dragon Ball Z, field hockey and games.' },
+  { kind: 'life', date: 'The 2000s', text: 'Started playing multiplayer games and found esports. The tumultuous start to the naughties got me interested in politics and power.' },
+  { kind: 'life', date: '2003', text: 'Started playing Call of Duty.' },
+  { kind: 'life', date: '2007', text: 'Went from playing games to writing about them.' },
+  { kind: 'career', date: '2007 to 2008', name: '4Kings', role: 'Editor', text: "Covering Call of Duty for one of the UK's oldest esports organisations." },
+  { kind: 'career', date: '2008 to 2011', name: 'Fnatic', role: 'Editor, Editor-in-Chief, General Manager', text: "Joined as an editor and worked my way up. As GM: the Own3D streaming partnership, scouting talent, the shop, and launching Fnatic's tournament platform, PLAY." },
+  { kind: 'career', date: '2010', name: 'Stermy.com', role: 'Head of Content and Community', text: "Content for Alessandro 'Stermy' Avallone's personal brand, my first close look at how a player's brand becomes a community." },
+  { kind: 'career', date: '2011 to 2013', name: 'FPS Omega', role: 'Founder', text: 'English-language community media for competitive shooters, including ShootManiaEsports.com and OverwatchEsports.com.' },
+  { kind: 'life', date: '2012', text: 'Dropped out of college and moved to Italy for FACEIT.' },
+  { kind: 'career', faceit: true, date: '2012 to 2014', name: 'FACEIT', role: 'VP of Marketing, Milan', lead: "One of FACEIT's first hires, there from its first year through to its acquisition.", text: 'A broad early remit: business development, marketing, PR, community, even sales and logistics.' },
+  { kind: 'career', faceit: true, date: '2014 to 2016', name: 'FACEIT', role: 'VP of Events', text: 'Tournament operations, player management, logistics and live production, as FACEIT turned professional.' },
+  { kind: 'career', faceit: true, date: '2016 to 2022', name: 'FACEIT', role: 'VP of Esports', text: 'Players, teams and publishers across the Esports Championship Series, Rainbow Six and more, plus white-label partnerships.' },
+  { kind: 'highlight', faceit: true, date: '2016', text: 'Brought Counter-Strike and Overwatch to US TV with ELEAGUE on TBS.' },
+  { kind: 'highlight', faceit: true, date: '2017', text: 'Took Rocket League esports to the X Games with ESPN.' },
+  { kind: 'highlight', faceit: true, date: '2017 to 2018', text: 'Brought Rocket League and the NHL to NBC.' },
+  { kind: 'highlight', faceit: true, date: '2018', text: 'The London Counter-Strike Major.' },
+  { kind: 'highlight', faceit: true, date: '2022', text: 'FACEIT acquired by Savvy Games Group, as part of a $1.5bn deal alongside ESL.' },
+  { kind: 'career', date: '2024 to now', name: 'ELO', role: 'Co-founder', bright: true },
+  { kind: 'life', date: 'July 2026', text: 'Moved to Turin.', link: { href: '#now', label: "See what I'm doing now" } },
+];
+---
+<Base
+  title="Roald van Buuren · Co-founder of ELO Collective"
+  description="Co-founder of ELO Collective. Community, fandom and behavioural intelligence. Based in Turin."
+>
+  <section class="hero" id="top">
+    <div class="hero-img" aria-hidden="true"></div>
+    <Sky />
+    <div class="grain" aria-hidden="true"></div>
+    <div class="wrap hero-in">
+      <img class="portrait" src="/images/roald.jpg" width="96" height="96" alt="Portrait of Roald van Buuren" />
+      <h1 class="h1">Roald van Buuren</h1>
+      <p class="sub">Co-founder of ELO Collective. Community, fandom and behavioural intelligence.</p>
+      <Buttons />
+    </div>
+  </section>
+
+  {latest.length > 0 && (
+    <section class="latest zone z-w" id="writing">
+      <div class="wrap rv">
+        <div class="latest-head">
+          <p class="eyebrow">Latest writing</p>
+        </div>
+      </div>
+      <div class="wrap">
+        <div class="tiles">
+          {latest.map((p, i) => <PostCard post={p} index={i} variant="tile" />)}
+        </div>
+      </div>
+      <div class="wrap rv">
+        <div class="after-rows"><a class="more" href="/writing">See all writing →</a></div>
+      </div>
+    </section>
+  )}
+
+  <section id="about" class="hx" data-hx aria-label="About Roald">
+    <div class="hx-skipwrap"><a class="hx-skip" href="#now" data-skip aria-label="Skip the About scroll">Skip<svg viewBox="0 0 12 16" aria-hidden="true"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></a></div>
+    <div class="hx-pin" data-pin>
+      <div class="hx-bg" aria-hidden="true"></div>
+      <div class="hx-track" data-track>
+        <div class="hx-intro light">
+          <div class="light-grain" aria-hidden="true"></div>
+          <div class="hx-fa">
+            <p class="eyebrow">01 / About</p>
+            <p class="about-lead">I'm Roald. I'm Dutch, I've spent most of my working life abroad, and since July 2026 I live in Turin.</p>
+            <p class="hx-hint" aria-hidden="true">Scroll<svg viewBox="0 0 12 16"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></p>
+          </div>
+          <div class="hx-fb">
+            <p class="about-p">Fifteen years in esports and gaming left me with one conviction: communities are the most underused asset in gaming, and the tools to support them barely exist. That's why I co-founded ELO in 2024. We build Lumen, community intelligence for Discord, and we research what games and online communities can tell us about people.</p>
+            <p class="about-p">These days I mostly think and write about how AI can make us more human, about community, about Europe and why it keeps getting in its own way, and about games as a lens on how people behave. When I'm not working, I'm reading history (Rome, Egypt) or science fiction, or playing something on PC.</p>
+          </div>
+        </div>
+
+        <div class="hx-journey">
+          <h3 class="hx-title">How I got here.</h3>
+          <div class="hx-stops" data-stops>
+            <div class="hx-line" data-line aria-hidden="true"><i class="hx-fill"></i></div>
+            <div class="hx-brk" data-brk aria-hidden="true" style={`left:calc(var(--sw) * ${fStart()});width:calc(var(--sw) * ${fEnd() - fStart()})`}><i></i><span>FACEIT</span><i></i></div>
+            <ol class="hx-list">
+              {stops.map((st, i) => (
+                <li class={`stop ${st.kind}${i % 2 === 0 ? ' up' : ' down'}${st.bright ? ' bright' : ''}`} data-f={i === fStart() ? '' : undefined}>
+                  <span class="node" aria-hidden="true"></span>
+                  <p class="s-date">{st.date}</p>
+                  <div class="s-body">
+                    {st.kind === 'career' ? (
+                      <div class="s-card">
+                        <h4 class="s-name">{st.name}</h4>
+                        {st.role && <p class="s-role">{st.role}</p>}
+                        {st.lead && <p class="s-desc s-lead">{st.lead}</p>}
+                        {st.text && <p class="s-desc">{st.text}</p>}
+                      </div>
+                    ) : (
+                      <>
+                        <p class="s-text">{st.text}</p>
+                        {st.link && <a class="s-link" href={st.link.href}>{st.link.label}<svg viewBox="0 0 12 16" aria-hidden="true"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></a>}
+                      </>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+          <div class="hx-end" aria-hidden="true"></div>
+        </div>
+      </div>
+      <div class="hx-hud" aria-hidden="true"><span data-hud-date></span><span data-hud-count></span></div>
+    </div>
+  </section>
+  <script is:inline>
+    (function () {
+      var sec = document.querySelector('[data-hx]');
+      if (!sec) return;
+      var pin = sec.querySelector('[data-pin]');
+      var track = sec.querySelector('[data-track]');
+      var line = sec.querySelector('[data-line]');
+      var fill = line.querySelector('.hx-fill');
+      var stops = [].slice.call(sec.querySelectorAll('.stop'));
+      var nodes = stops.map(function (s) { return s.querySelector('.node'); });
+      var brk = sec.querySelector('[data-brk]');
+      var firstF = sec.querySelector('.stop[data-f]');
+      var hud = sec.querySelector('.hx-hud');
+      var hudDate = sec.querySelector('[data-hud-date]');
+      var hudCount = sec.querySelector('[data-hud-count]');
+      var dates = stops.map(function (s) { var d = s.querySelector('.s-date'); return d ? d.textContent : ''; });
+      function pad(n) { return (n < 10 ? '0' : '') + n; }
+      var skip = sec.querySelector('[data-skip]');
+      if (skip) skip.addEventListener('click', function (e) {
+        var n = document.getElementById('now');
+        if (!n) return;
+        e.preventDefault();
+        window.scrollTo({ top: n.getBoundingClientRect().top + window.scrollY, behavior: 'instant' });
+        n.setAttribute('tabindex', '-1');
+        n.focus({ preventScroll: true });
+      });
+      var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+      if (reduce) {
+        sec.classList.add('hx-static');
+        pin.setAttribute('tabindex', '0');
+        pin.setAttribute('role', 'region');
+        pin.setAttribute('aria-label', 'About, scrolls sideways');
+        stops.forEach(function (s) { s.classList.add('in', 'lit'); });
+        if (brk) brk.classList.add('in');
+        fill.style.transform = 'scaleX(1)';
+        return;
+      }
+      var dist = 0, ticking = false, lastLit = -1;
+      function size() {
+        dist = Math.max(0, track.offsetWidth - window.innerWidth);
+        sec.style.height = (dist + window.innerHeight) + 'px';
+      }
+      function update() {
+        ticking = false;
+        var top = sec.getBoundingClientRect().top;
+        var p = dist ? Math.min(1, Math.max(0, -top / dist)) : 0;
+        track.style.transform = 'translate3d(' + (-p * dist).toFixed(1) + 'px,0,0)';
+        var vw = window.innerWidth, marker = vw * 0.6;
+        var lr = line.getBoundingClientRect();
+        var w = Math.max(0, Math.min(lr.width, marker - lr.left));
+        fill.style.transform = 'scaleX(' + (lr.width ? w / lr.width : 0).toFixed(4) + ')';
+        var lit = 0;
+        stops.forEach(function (s, i) {
+          var nr = nodes[i].getBoundingClientRect();
+          var cx = nr.left + nr.width / 2;
+          var on = cx <= marker + 0.5;
+          s.classList.toggle('lit', on);
+          if (on) lit = i + 1;
+          if (cx < vw * 0.94 && !s.classList.contains('in')) s.classList.add('in');
+        });
+        if (brk && firstF && firstF.classList.contains('in')) brk.classList.add('in');
+        if (lit !== lastLit) {
+          lastLit = lit;
+          hud.classList.toggle('on', lit > 0);
+          if (lit > 0) { hudDate.textContent = dates[lit - 1]; hudCount.textContent = pad(lit) + ' / ' + pad(stops.length); }
+        }
+      }
+      function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+      function onResize() { size(); onScroll(); }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onResize);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+      pin.addEventListener('focusin', function (e) {
+        pin.scrollLeft = 0;
+        var t = e.target.getBoundingClientRect();
+        if (t.left < 0 || t.right > window.innerWidth) {
+          var secTop = sec.getBoundingClientRect().top + window.scrollY;
+          var cur = Math.min(dist, Math.max(0, window.scrollY - secTop));
+          var want = Math.min(dist, Math.max(0, cur + t.left - window.innerWidth * 0.2));
+          window.scrollTo({ top: secTop + want, behavior: 'auto' });
+        }
+      });
+      size();
+      update();
+    })();
+  </script>
+
+  <section class="sec zone z-c" id="now">
+    <div class="wrap rv">
+      <div class="sec-head">
+        <p class="eyebrow">02 / Now</p>
+        <h2 class="h2">Building ELO Collective</h2>
+      </div>
+      <p class="now-line">ELO turns how people behave in games and online communities into lessons for the real world.</p>
+      <div class="now-grid">
+        {products.map((p, i) => (
+          <a class={`card tone-${p.tone}${p.lead ? ' lead' : ''}`} href={p.href} target="_blank" rel="noopener">
+            <span class="pill">{p.host}</span>
+            <span class="num">{String(i + 1).padStart(2, '0')}</span>
+            <img class="c-logo" src={p.logo.src} alt="" width={p.logo.w} height={p.logo.h} style={`--dh:${p.logo.dh}`} loading="lazy" decoding="async" />
+            <span class="h3">{p.name}</span>
+            <p>{p.text}</p>
+            <span class="c-foot">Visit<svg viewBox="0 0 12 16" aria-hidden="true"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></span>
+          </a>
+        ))}
+      </div>
+      <div class="works">
+        <p class="eyebrow">{worksWith.title}</p>
+        <ul class="works-logos">
+          {worksWith.logos.map((l) => (
+            <li><a href={l.url} target="_blank" rel="noopener" aria-label={`${l.name} (opens in a new tab)`}><img src={l.src} alt={l.name} width={l.w} height={l.nh} style={`--h:${l.h}`} loading="lazy" decoding="async" /></a></li>
+          ))}
+        </ul>
+        <p class="works-more">{worksWith.more}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="strip" aria-label={offDuty.title}>
+    <div class="wrap rv">
+      <p class="eyebrow">{offDuty.title}</p>
+      <ul class="strip-tags">
+        {offDuty.tags.map((t) => <li>{t}</li>)}
+      </ul>
+      <p class="strip-playing">Currently (re-)playing: {offDuty.playing}.</p>
+    </div>
+  </section>
+
+  <section class="band" aria-label="From the writing">
+    <svg class="band-grain" aria-hidden="true">
+      <filter id="band-grain">
+        <feTurbulence type="fractalNoise" baseFrequency="0.68" numOctaves="2" stitchTiles="stitch" />
+        <feColorMatrix type="saturate" values="0" />
+        <feComponentTransfer><feFuncA type="linear" slope="0.85" /></feComponentTransfer>
+      </filter>
+      <rect width="100%" height="100%" filter="url(#band-grain)" />
+    </svg>
+    <figure class="band-in rv">
+      <blockquote class="band-q"><p>{quote}</p></blockquote>
+      <figcaption><a href={postUrl(quotePost)}>From: {quotePost.data.title}<svg viewBox="0 0 12 16" aria-hidden="true"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></a></figcaption>
+    </figure>
+  </section>
+
+  <section class="hi zone z-heat" id="contact">
+    <div class="wrap rv hi-in">
+      <p class="eyebrow">03 / Say hi</p>
+      <h2 class="h1">Say hi.</h2>
+      <p class="sub">The best way to reach me is X, LinkedIn or email.</p>
+      <Buttons />
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,79 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { getPosts, formatDate, isoDate, readingTime, postUrl, originalPlatform } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getPosts(); // newest first
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    // "previous" is the older article, "next" the newer one
+    props: { post, older: posts[i + 1], newer: posts[i - 1] },
+  }));
+}
+
+const { post, older, newer } = Astro.props;
+const { Content } = await render(post);
+const { title, date, summary, cover, originally_posted } = post.data;
+const minutes = readingTime(post.body);
+---
+<Base
+  title={`${title} · Roald van Buuren`}
+  description={summary}
+  image={cover}
+  type="article"
+  themeable
+  publishedTime={date.toISOString()}
+>
+  <article>
+    <div class="zone z-a">
+      <header class="article-head">
+        <h1 class="h1">{title}</h1>
+        <div class="meta-row">
+          <p class="meta"><time datetime={isoDate(date)}>{formatDate(date)}</time> · {minutes} min read</p>
+          <button class="theme-toggle" type="button" aria-pressed="false" aria-label="Switch between dark and light reading mode"><span class="tt-dot" aria-hidden="true"></span><span class="tt-label">Light</span></button>
+        </div>
+      </header>
+      <div style="height:40px"></div>
+    </div>
+    {cover && (
+      <div class="cover"><img src={cover} alt="" width="1200" height="900" loading="eager" /></div>
+    )}
+    <div class="prose">
+      <Content />
+    </div>
+    <footer class="article-end">
+      {originally_posted && (
+        <p class="origin">Originally posted on <a href={originally_posted} target="_blank" rel="noopener">{originalPlatform(originally_posted)}</a></p>
+      )}
+      <nav class="pn" aria-label="More writing">
+        {older
+          ? <a class="card" href={postUrl(older)}><span class="lbl">← Previous</span><span class="t">{older.data.title}</span></a>
+          : <span class="ghost" aria-hidden="true"></span>}
+        {newer
+          ? <a class="card next" href={postUrl(newer)}><span class="lbl">Next →</span><span class="t">{newer.data.title}</span></a>
+          : <span class="ghost" aria-hidden="true"></span>}
+      </nav>
+      <a class="more" href="/writing">← All writing</a>
+    </footer>
+  </article>
+  <script is:inline>
+    (function () {
+      var root = document.documentElement, btn = document.querySelector('.theme-toggle');
+      if (!btn) return;
+      var label = btn.querySelector('.tt-label');
+      function sync() {
+        var light = root.dataset.theme === 'light';
+        btn.setAttribute('aria-pressed', light ? 'true' : 'false');
+        label.textContent = light ? 'Dark' : 'Light';
+      }
+      btn.addEventListener('click', function () {
+        var light = root.dataset.theme !== 'light';
+        if (light) root.dataset.theme = 'light'; else delete root.dataset.theme;
+        try { localStorage.setItem('rvb-article-theme', light ? 'light' : 'dark'); } catch (e) {}
+        sync();
+      });
+      sync();
+    })();
+  </script>
+</Base>

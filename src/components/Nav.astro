@@ -1,0 +1,14 @@
+---
+import { links } from '../lib/posts';
+const path = Astro.url.pathname;
+const onWriting = path === '/writing' || path.startsWith('/writing/');
+---
+<header class="enav">
+  <div class="enav-bar">
+    <a class="enav-logo" href="/" aria-label="Roald van Buuren, home">Roald van Buuren</a>
+    <nav class="enav-right" aria-label="Main">
+      <a class="enav-link" href="/writing" aria-current={onWriting ? 'page' : undefined}>Writing</a>
+      <a class="enav-link" href={links.x} target="_blank" rel="noopener">X</a>
+    </nav>
+  </div>
+</header>

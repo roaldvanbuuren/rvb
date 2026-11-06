@@ -1,0 +1,22 @@
+---
+import CoverArt from './CoverArt.astro';
+import { formatDate, isoDate, postUrl, type Post } from '../lib/posts';
+interface Props { post: Post; index?: number; variant?: 'row' | 'tile' }
+const { post, index = 0, variant = 'row' } = Astro.props;
+const tones = ['accent', 'amber', 'bone'];
+const tone = tones[index % tones.length];
+const { title, summary, date, cover } = post.data;
+---
+<a class={`wcard tone-${tone}${variant === 'tile' ? ' wcard-tile' : ''}`} href={postUrl(post)}>
+  <div class="wcard-img">
+    {cover
+      ? <img src={cover} alt="" width="480" height="360" loading="lazy" />
+      : <CoverArt id={post.id} title={title} summary={summary} />}
+  </div>
+  <div class="wcard-body">
+    <time datetime={isoDate(date)}>{formatDate(date)}</time>
+    <h3 class="t">{title}</h3>
+    <p class="s">{summary}</p>
+    <span class="rm">Read<svg viewBox="0 0 12 16" aria-hidden="true"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></span>
+  </div>
+</a>

@@ -1,0 +1,151 @@
+---
+// Generated cover art for articles without a cover image.
+// Deterministic: the same article always gets the same picture. The motif follows the topic
+// (network for community, contour lines for Europe, bracket for esports, and so on); the
+// layout is seeded from the article id. Drawn in the site palette, no external assets.
+interface Props { id: string; title: string; summary?: string }
+const { id, title, summary = '' } = Astro.props;
+
+const W = 480, H = 320;
+const BONE = '#E8E8DB', ACC = '#6B7BFF', AMB = '#C8842A';
+
+function hash(s: string) { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+function rng(seed: number) {
+  return () => {
+    seed |= 0; seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const r = rng(hash(id));
+const between = (a: number, b: number) => a + (b - a) * r();
+const f = (n: number) => Math.round(n * 10) / 10;
+
+const text = `${title} ${summary}`.toLowerCase();
+const rules: [RegExp, string][] = [
+  [/wealth|econom|returns|gen z|\bpay\b|value/, 'bars'],
+  [/europe|brexit|britain|serbia|dutch|italy|civiliz|kids|protest/, 'contour'],
+  [/esports|matchmaking|faceit|competitive|tournament/, 'bracket'],
+  [/transmedia|trailer|marvel|cyberpunk|\bip\b|playtest|shaped me/, 'frames'],
+  [/\bai\b|intelligence|epic|laborator|behaviour|reality|aviation|gamers|gene pool/, 'lattice'],
+  [/sport/, 'bars'],
+  [/communit|vocal|indie|fanbase|elo|world|desk|building/, 'network'],
+];
+const motif = rules.find(([re]) => re.test(text))?.[1] ?? 'rings';
+
+// glow positions and colours
+const glowA = { x: between(0.1, 0.9) * W, y: between(0.1, 0.9) * H, c: r() < 0.6 ? ACC : AMB };
+const glowB = { x: between(0.1, 0.9) * W, y: between(0.1, 0.9) * H, c: r() < 0.5 ? BONE : (glowA.c === ACC ? AMB : ACC) };
+
+let art = '';
+const line = (op: number, w = 1) => `fill="none" stroke="${BONE}" stroke-opacity="${op}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"`;
+
+if (motif === 'network') {
+  const pts: [number, number][] = [];
+  let guard = 0;
+  while (pts.length < 17 && guard++ < 400) {
+    const p: [number, number] = [between(30, W - 30), between(28, H - 28)];
+    if (pts.every((q) => Math.hypot(p[0] - q[0], p[1] - q[1]) > 52)) pts.push(p);
+  }
+  const edges = new Set<string>();
+  pts.forEach((p, i) => {
+    const near = pts.map((q, j) => ({ j, d: Math.hypot(p[0] - q[0], p[1] - q[1]) })).filter((o) => o.j !== i).sort((a, b) => a.d - b.d).slice(0, 2);
+    near.forEach((o) => edges.add(i < o.j ? `${i}-${o.j}` : `${o.j}-${i}`));
+  });
+  const hub = Math.floor(r() * pts.length);
+  art += [...edges].map((e) => { const [a, b] = e.split('-').map(Number); return `<path d="M${f(pts[a][0])} ${f(pts[a][1])}L${f(pts[b][0])} ${f(pts[b][1])}" ${line(0.28)}/>`; }).join('');
+  art += pts.map((p, i) => `<circle cx="${f(p[0])}" cy="${f(p[1])}" r="${i === hub ? 5 : f(between(2, 3.8))}" fill="${i === hub ? ACC : BONE}" fill-opacity="${i === hub ? 1 : 0.75}"/>`).join('');
+  art += `<circle cx="${f(pts[hub][0])}" cy="${f(pts[hub][1])}" r="16" ${`fill="none" stroke="${ACC}" stroke-opacity=".55"`}/>`;
+} else if (motif === 'contour') {
+  const cx = between(0.35, 0.65) * W, cy = between(0.35, 0.65) * H;
+  const ph = [r() * 6.28, r() * 6.28, r() * 6.28];
+  const hi = 2 + Math.floor(r() * 5);
+  for (let k = 0; k < 11; k++) {
+    const base = 14 + k * 17;
+    let d = '';
+    for (let a = 0; a <= 64; a++) {
+      const t = (a / 64) * Math.PI * 2;
+      const n = 1 + 0.16 * Math.sin(2 * t + ph[0]) + 0.1 * Math.sin(3 * t + ph[1]) + 0.06 * Math.sin(5 * t + ph[2]);
+      const rad = base * n;
+      d += `${a ? 'L' : 'M'}${f(cx + Math.cos(t) * rad * 1.35)} ${f(cy + Math.sin(t) * rad)}`;
+    }
+    art += k === hi
+      ? `<path d="${d}Z" fill="none" stroke="${ACC}" stroke-opacity=".9" stroke-width="1.6"/>`
+      : `<path d="${d}Z" ${line(0.14 + (11 - k) * 0.022)}/>`;
+  }
+} else if (motif === 'bracket') {
+  const rounds = 3, rows = 8, x0 = 40, x1 = W - 56, top = 30, bot = H - 30;
+  const colX = (c: number) => x0 + ((x1 - x0) * c) / rounds;
+  const rowY = (c: number, i: number) => top + ((bot - top) / (rows / 2 ** c)) * (i + 0.5);
+  const winRow = Math.floor(r() * rows);
+  for (let c = 0; c < rounds; c++) {
+    const n = rows / 2 ** c;
+    const wc = Math.floor(winRow / 2 ** c);
+    for (let i = 0; i < n; i += 2) {
+      const y1 = rowY(c, i), y2 = rowY(c, i + 1), ym = (y1 + y2) / 2;
+      const xa = colX(c) + (colX(c + 1) - colX(c)) * 0.55, xb = colX(c + 1);
+      art += `<path d="M${f(colX(c))} ${f(y1)}H${f(xa)}V${f(ym)}H${f(xb)}M${f(colX(c))} ${f(y2)}H${f(xa)}V${f(ym)}" ${line(0.3)}/>`;
+      if (wc === i || wc === i + 1) {
+        const yw = wc === i ? y1 : y2;
+        art += `<path d="M${f(colX(c))} ${f(yw)}H${f(xa)}V${f(ym)}H${f(xb)}" fill="none" stroke="${ACC}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`;
+      }
+    }
+  }
+  art += `<circle cx="${f(colX(rounds))}" cy="${f(rowY(rounds, 0))}" r="5" fill="${ACC}"/>`;
+} else if (motif === 'frames') {
+  const n = 6, ang = between(-10, 10);
+  for (let i = 0; i < n; i++) {
+    const w = 150 + i * 22, h = 96 + i * 14;
+    const x = W / 2 - w / 2 + (i - n / 2) * between(10, 16), y = H / 2 - h / 2 + (i - n / 2) * between(5, 9);
+    const rot = ang * (i - 2) * 0.35;
+    const last = i === n - 1;
+    art += `<rect x="${f(x)}" y="${f(y)}" width="${w}" height="${h}" rx="2" transform="rotate(${f(rot)} ${f(W / 2)} ${f(H / 2)})" ${last ? `fill="${ACC}" fill-opacity=".14" stroke="${ACC}" stroke-opacity=".9" stroke-width="1.6"` : `fill="${i === 2 ? AMB : BONE}" fill-opacity="${i === 2 ? 0.07 : 0.02}" stroke="${BONE}" stroke-opacity="${0.16 + i * 0.05}"`}/>`;
+  }
+} else if (motif === 'lattice') {
+  const layers = [3, 5, 6, 5, 3];
+  const nodes = layers.map((n, li) => Array.from({ length: n }, (_, i) => [50 + li * ((W - 100) / (layers.length - 1)), (H / (n + 1)) * (i + 1) + between(-8, 8)] as [number, number]));
+  const path: number[] = layers.map((n) => Math.floor(r() * n));
+  nodes.forEach((layer, li) => {
+    if (li === nodes.length - 1) return;
+    layer.forEach((a) => nodes[li + 1].forEach((b) => { art += `<path d="M${f(a[0])} ${f(a[1])}L${f(b[0])} ${f(b[1])}" ${line(0.1)}/>`; }));
+  });
+  for (let li = 0; li < nodes.length - 1; li++) {
+    const a = nodes[li][path[li]], b = nodes[li + 1][path[li + 1]];
+    art += `<path d="M${f(a[0])} ${f(a[1])}L${f(b[0])} ${f(b[1])}" fill="none" stroke="${ACC}" stroke-width="1.6" stroke-opacity=".95"/>`;
+  }
+  nodes.forEach((layer, li) => layer.forEach((p, i) => { art += `<circle cx="${f(p[0])}" cy="${f(p[1])}" r="${path[li] === i ? 5 : 3}" fill="${path[li] === i ? ACC : BONE}" fill-opacity="${path[li] === i ? 1 : 0.7}"/>`; }));
+} else if (motif === 'bars') {
+  const n = 14, bw = 20, gap = (W - 80 - n * bw) / (n - 1), base = H - 44;
+  let trend = '';
+  for (let i = 0; i < n; i++) {
+    const h = 30 + (i / (n - 1)) * 120 + between(-22, 40);
+    const x = 40 + i * (bw + gap);
+    art += `<rect x="${f(x)}" y="${f(base - h)}" width="${bw}" height="${f(h)}" rx="1" fill="${BONE}" fill-opacity="${f(0.06 + (i / n) * 0.1)}" stroke="${BONE}" stroke-opacity=".18"/>`;
+    trend += `${i ? 'L' : 'M'}${f(x + bw / 2)} ${f(base - h - 14)}`;
+  }
+  art += `<path d="M40 ${base}H${W - 40}" ${line(0.4)}/><path d="${trend}" fill="none" stroke="${ACC}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`;
+} else {
+  const cx = between(0.3, 0.7) * W, cy = between(0.3, 0.7) * H, start = r() * 360;
+  for (let k = 1; k <= 9; k++) {
+    const rad = k * 21;
+    art += `<circle cx="${f(cx)}" cy="${f(cy)}" r="${rad}" ${line(0.08 + (10 - k) * 0.025)}${k % 3 === 0 ? ' stroke-dasharray="2 7"' : ''}/>`;
+  }
+  const rad = 4 * 21, a0 = (start * Math.PI) / 180, a1 = a0 + 1.7;
+  art += `<path d="M${f(cx + Math.cos(a0) * rad)} ${f(cy + Math.sin(a0) * rad)}A${rad} ${rad} 0 0 1 ${f(cx + Math.cos(a1) * rad)} ${f(cy + Math.sin(a1) * rad)}" fill="none" stroke="${ACC}" stroke-width="2" stroke-linecap="round"/>`;
+  art += `<circle cx="${f(cx + Math.cos(a1) * rad)}" cy="${f(cy + Math.sin(a1) * rad)}" r="4.5" fill="${ACC}"/>`;
+}
+
+const uid = `g${hash(id).toString(36)}`;
+const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+<defs>
+<radialGradient id="${uid}a" cx="${f(glowA.x)}" cy="${f(glowA.y)}" r="${f(between(190, 260))}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${glowA.c}" stop-opacity=".30"/><stop offset="1" stop-color="${glowA.c}" stop-opacity="0"/></radialGradient>
+<radialGradient id="${uid}b" cx="${f(glowB.x)}" cy="${f(glowB.y)}" r="${f(between(150, 220))}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${glowB.c}" stop-opacity=".16"/><stop offset="1" stop-color="${glowB.c}" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="${W}" height="${H}" fill="#121211"/>
+<rect width="${W}" height="${H}" fill="url(#${uid}a)"/>
+<rect width="${W}" height="${H}" fill="url(#${uid}b)"/>
+${art}
+</svg>`;
+---
+<div class="art" data-motif={motif} set:html={svg}></div>
