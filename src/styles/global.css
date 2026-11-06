@@ -311,6 +311,9 @@ a.prow:hover .p-desc{color:var(--accent-hover)}
 .s-link-quiet:hover{color:var(--warm);border-color:rgba(232,232,219,.35)}
 .s-card{text-align:left;padding:20px 22px 22px;background:var(--ink-2);border:1px solid var(--hair);border-radius:var(--radius)}
 .s-name{margin:0;font:600 26px/1.1 var(--disp);letter-spacing:.005em;color:var(--warm)}
+.s-logo{display:block;width:auto;max-width:100%;height:calc(var(--dh) * 1px);margin:0 0 14px;opacity:.92}
+.s-card .s-logo-name{margin:0}
+.s-name:has(.s-logo-name){line-height:0}
 .s-role{margin:6px 0 0;font-size:14px;line-height:1.4;color:var(--dim)}
 .s-desc{margin:12px 0 0;font-size:15px;line-height:1.6;color:var(--body)}
 .stop.bright .s-card{border-color:rgba(var(--accent-rgb),.55);background:linear-gradient(180deg,rgba(var(--accent-rgb),.10),var(--ink-2) 72%);box-shadow:0 0 54px -22px rgba(var(--accent-rgb),.6)}
@@ -361,6 +364,7 @@ html.js .stop.in{opacity:1;transform:none}
 }
 @media (max-height:780px) and (min-width:761px){
   .s-desc{font-size:14px;line-height:1.5}
+  .s-logo{height:calc(var(--dh) * .8px)}
   .s-lead{margin-top:8px}
 }
 /* reduced motion and no JS: a calm sideways scroller, everything visible and lit */
