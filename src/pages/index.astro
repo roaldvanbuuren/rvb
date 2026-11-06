@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import Buttons from '../components/Buttons.astro';
 import PostCard from '../components/PostCard.astro';
 import Sky from '../components/Sky.astro';
+import Logo from '../components/Logo.astro';
 import { getPosts, links, postUrl } from '../lib/posts';
 
 const all = await getPosts();
@@ -113,7 +114,7 @@ const stops: Stop[] = [
     <Sky />
     <div class="grain" aria-hidden="true"></div>
     <div class="wrap hero-in">
-      <img class="portrait" src="/images/roald.jpg" width="96" height="96" alt="Portrait of Roald van Buuren" />
+      <Logo />
       <h1 class="h1">Roald van Buuren</h1>
       <p class="sub">Co-founder of ELO Collective. Community, fandom and behavioural intelligence.</p>
       <Buttons />
@@ -159,6 +160,7 @@ const stops: Stop[] = [
         <div class="hx-intro light">
           <div class="light-grain" aria-hidden="true"></div>
           <div class="hx-fa">
+            <img class="portrait" src="/images/roald.jpg" width="96" height="96" alt="Portrait of Roald van Buuren" loading="lazy" decoding="async" />
             <p class="about-lead">I'm Roald. I'm Dutch, I've spent most of my working life abroad, and since July 2026 I live in Turin.</p>
             <p class="hx-hint" aria-hidden="true">Scroll<svg viewBox="0 0 12 16"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></p>
           </div>

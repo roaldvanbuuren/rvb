@@ -77,6 +77,10 @@ img,svg{display:block;max-width:100%}
 .hero .h1{text-wrap:balance}
 .hero .ctas{justify-content:center}
 @media (max-width:700px){.portrait{width:80px;height:80px}}
+/* hero mark (replaces the portrait there); the portrait now lives in About, on the light intro frame */
+.hero-in .rvb-mark{height:64px}
+@media (max-width:700px){.hero-in .rvb-mark{height:52px}}
+.hx-fa .portrait{width:clamp(72px,12vh,104px);height:clamp(72px,12vh,104px);margin-bottom:clamp(18px,3.4vh,30px);border-color:rgba(20,20,20,.16);background:transparent}
 
 /* hero sky: rare falling star, plane and birds (see components/Sky.astro) */
 .sky{position:absolute;left:0;right:0;top:0;height:var(--hh);z-index:-1;pointer-events:none;overflow:hidden;
