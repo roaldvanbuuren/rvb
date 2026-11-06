@@ -72,12 +72,10 @@ img,svg{display:block;max-width:100%}
   background-image:var(--noise);background-size:180px;
   -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 50%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 50%,transparent 100%)}
 .hero-in{padding:clamp(250px,29vw,430px) 24px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:22px}
-.portrait{width:96px;height:96px;border-radius:50%;object-fit:cover;border:1px solid rgba(232,232,219,.22);background:var(--ink-2)}
 .hero .sub{max-width:640px;margin:0 auto;color:#CFCFC4;font-size:clamp(18px,1.6vw,21px)}
 .hero .h1{text-wrap:balance}
 .hero .ctas{justify-content:center}
-@media (max-width:700px){.portrait{width:80px;height:80px}}
-/* hero mark (replaces the portrait there); the portrait now lives in About, on the light intro frame */
+/* hero mark */
 .hero-in .rvb-mark{height:84px}
 @media (max-width:700px){.hero-in .rvb-mark{height:68px}}
 /* hero clover: leaves bloom in from the centre one by one, the accent leaf last; the stem follows */
@@ -86,7 +84,8 @@ img,svg{display:block;max-width:100%}
 @keyframes lf-in{from{opacity:0;transform:scale(.15)}to{opacity:1;transform:none}}
 @keyframes lf-fade{to{opacity:1}}
 @media (prefers-reduced-motion:reduce){.hero-in .rvb-mark .lf,.hero-in .rvb-mark .stem{animation:none;opacity:1}}
-.hx-fa .portrait{width:clamp(72px,12vh,104px);height:clamp(72px,12vh,104px);margin-bottom:clamp(18px,3.4vh,30px);border-color:rgba(20,20,20,.16);background:transparent}
+/* About portrait: the clover holds the photo (components/CloverPortrait.astro) */
+.clover-portrait{width:clamp(130px,27vh,240px);height:auto;margin-bottom:clamp(14px,3vh,28px);overflow:visible}
 
 /* hero dusk (components/Dusk.astro): one number, --dusk (0 at the top of the page, 1 at full dusk), drives everything.
    The sky deepens to indigo, the rose light goes out, stars come in, mist drifts. Layer order: image, dusk, glow, stars, mist, grain on top. */
