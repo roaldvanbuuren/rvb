@@ -66,7 +66,7 @@ img,svg{display:block;max-width:100%}
 .hero{--hh:max(clamp(420px,46vw,700px),68svh);position:relative;isolation:isolate;overflow:hidden}
 .hero-img{position:absolute;left:0;right:0;top:0;height:var(--hh);z-index:-3;background:url("/images/alps-x-brown.png") center bottom/cover no-repeat;
   -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 52%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 52%,transparent 100%)}
-.hero::before{content:"";position:absolute;left:0;right:0;top:0;height:var(--hh);z-index:-2;
+.hero-art::before{content:"";position:absolute;left:0;right:0;top:0;height:var(--hh);z-index:-2;
   background:linear-gradient(180deg,rgba(14,14,14,.45) 0,rgba(14,14,14,0) 30%,rgba(14,14,14,0) 62%,var(--ink) 100%)}
 .hero .grain{position:absolute;left:0;right:0;top:0;height:var(--hh);z-index:-1;pointer-events:none;opacity:.16;mix-blend-mode:overlay;filter:grayscale(1);
   background-image:var(--noise);background-size:180px;
@@ -88,14 +88,19 @@ img,svg{display:block;max-width:100%}
 .clover-portrait{width:clamp(130px,27vh,240px);height:auto;margin-bottom:clamp(14px,3vh,28px);overflow:visible}
 
 /* hero dusk (components/Dusk.astro): one number, --dusk (0 at the top of the page, 1 at full dusk), drives everything.
-   The sky deepens to indigo, the rose light goes out, stars come in, mist drifts. Layer order: image, dusk, glow, stars, mist, grain on top. */
+   The sky deepens to indigo, the rose light goes out, stars come in. Layer order: image, dusk, glow, stars, grain on top. */
 @property --dusk{syntax:"<number>";inherits:true;initial-value:0}
 @keyframes dusk-fall{from{--dusk:0}to{--dusk:1}}
+/* the sky (image, dusk, stars, grain) rides in .hero-art and drifts down at half the scroll speed, so the dusk and
+   the stars stay on screen about twice as long. --par runs 0 to 1 while the hero scrolls out; 50% of its own height is half the hero. */
+@property --par{syntax:"<number>";inherits:true;initial-value:0}
+@keyframes art-par{from{--par:0}to{--par:1}}
+.hero-art{position:absolute;left:0;right:0;top:0;bottom:0;z-index:-1;pointer-events:none;transform:translateY(calc(var(--par) * 50%));will-change:transform}
 @supports (animation-timeline:view()){
   /* longhands on purpose: the minifier folds a full set into the animation shorthand, and browsers reject view() there */
-  .hero{animation-name:dusk-fall;animation-duration:auto;animation-timing-function:ease;animation-fill-mode:both;animation-timeline:view(block 0px 0px);animation-range:exit 0% exit 50%}
+  .hero{animation-name:dusk-fall,art-par;animation-duration:auto,auto;animation-timing-function:ease,linear;animation-fill-mode:both,both;animation-timeline:view(block 0px 0px),view(block 0px 0px);animation-range:exit 0% exit 50%,exit 0% exit 100%}
 }
-.dusk,.dusk-glow,.stars,.mist{position:absolute;left:0;right:0;top:0;height:var(--hh);pointer-events:none}
+.dusk,.dusk-glow,.stars{position:absolute;left:0;right:0;top:0;height:var(--hh);pointer-events:none}
 .dusk{z-index:-2;opacity:calc(var(--dusk) * .6);
   background:linear-gradient(180deg,#14163a 0%,rgba(20,22,58,.92) 12%,rgba(20,22,58,.72) 26%,rgba(20,22,58,.42) 40%,rgba(20,22,58,.16) 52%,rgba(20,22,58,0) 62%)}
 /* the rose band above the ridge: cooled and dimmed as the indigo comes in, so it reads as the light going */
@@ -107,21 +112,7 @@ img,svg{display:block;max-width:100%}
 .st.tw{background:none}
 .st.tw::after{content:"";position:absolute;inset:0;border-radius:50%;background:#F5F6F2;animation:star-twinkle var(--d,8s) ease-in-out var(--dl,0s) infinite}
 @keyframes star-twinkle{0%,100%{opacity:1}50%{opacity:.2}}
-/* valley mist: sits BEHIND the near ridge. The .mist box is the hero image box, masked by a ridge-line mask cut from the
-   image (same cover/bottom fit), so fog fills the notches between the peaks and stops dead at the silhouette. Two
-   noise-based fog layers slide at different speeds with slow, unequal breathing; each slides exactly one tile, so it loops
-   with no seam. Textures: public/images/mist-a.webp, mist-b.webp (tileable). */
-.mist{z-index:-1;overflow:hidden;opacity:.34;
-  -webkit-mask:url(/images/alps-ridge-mask.webp) center bottom/cover no-repeat;mask:url(/images/alps-ridge-mask.webp) center bottom/cover no-repeat}
-.mist::before,.mist::after{content:"";position:absolute;left:0;top:30%;height:64%;width:calc(100% + var(--tile));will-change:transform,opacity}
-.mist::before{--tile:1500px;background:url(/images/mist-a.webp) 0 0/var(--tile) 100% repeat-x;
-  animation:mist-slide 95s linear infinite,mist-breathe 23s ease-in-out -7s infinite alternate,mist-sway 41s ease-in-out infinite alternate}
-.mist::after{--tile:2200px;top:26%;height:66%;background:url(/images/mist-b.webp) 0 0/var(--tile) 100% repeat-x;
-  animation:mist-slide 70s linear infinite,mist-breathe 31s ease-in-out -19s infinite alternate-reverse,mist-sway 53s ease-in-out -11s infinite alternate-reverse}
-@keyframes mist-slide{from{transform:translate3d(calc(var(--tile) * -1),0,0)}to{transform:translate3d(0,0,0)}}
-@keyframes mist-breathe{from{opacity:.55}to{opacity:1}}
-@keyframes mist-sway{from{translate:0 -1.5%}to{translate:0 1.5%}}
-@media (prefers-reduced-motion:reduce){.dusk,.dusk-glow,.stars,.mist{display:none}}
+@media (prefers-reduced-motion:reduce){.dusk,.dusk-glow,.stars{display:none}}
 
 /* graining and fade zones: full-bleed glow plus film grain, masked to fade in and out (same values as data.elocollective.com) */
 .zone{position:relative;isolation:isolate}

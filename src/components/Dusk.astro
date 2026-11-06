@@ -1,6 +1,6 @@
 ---
-// Hero dusk: the sky deepens to indigo as the page scrolls, the rose light goes out,
-// stars come in and a band of mist drifts low over the ridge. All of it reads one
+// Hero dusk: the sky deepens to indigo as the page scrolls, the rose light goes out
+// and stars come in. All of it reads one
 // number, --dusk (0 at the top of the page, 1 at full dusk), set by a CSS scroll-driven
 // animation on .hero (see global.css). The script below only runs where
 // animation-timeline is not supported.
@@ -61,7 +61,6 @@ stars
     ></i>
   ))}
 </div>
-<div class="mist" aria-hidden="true"></div>
 
 <script>
   // Fallback for browsers without scroll-driven animations (animation-timeline).
@@ -89,6 +88,7 @@ stars
       const r = hero.getBoundingClientRect();
       const t = Math.min(1, Math.max(0, -r.top / (r.height * 0.5)));
       hero.style.setProperty('--dusk', ease(t).toFixed(4));
+      hero.style.setProperty('--par', Math.min(1, Math.max(0, -r.top / r.height)).toFixed(4)); // sky drifts at half speed
     };
     const queue = () => {
       if (!frame) frame = requestAnimationFrame(update);
@@ -102,6 +102,7 @@ stars
       window.removeEventListener('scroll', queue);
       window.removeEventListener('resize', queue);
       hero.style.removeProperty('--dusk');
+      hero.style.removeProperty('--par');
     };
     if (!reduce.matches) start();
     reduce.addEventListener('change', () => (reduce.matches ? stop() : start()));
