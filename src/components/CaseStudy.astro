@@ -28,7 +28,6 @@ const { title, description, image, meta, prev, next } = Astro.props;
         <h1 class="h1">{title}</h1>
         <p class="meta">{meta}</p>
       </div>
-      <p class="fx-cap">AI-generated in an old-master style.</p>
     </header>
 
     <div class="fx-body">
@@ -63,7 +62,6 @@ const { title, description, image, meta, prev, next } = Astro.props;
   .fx-back:hover{color:#fff;border-color:#fff}
   .fx-head .h1{font-size:clamp(40px,5.4vw,66px);line-height:1.04;text-wrap:balance}
   .fx-head .meta{margin:22px 0 0}
-  .fx-cap{position:absolute;right:clamp(16px,3vw,32px);bottom:14px;margin:0;font:400 10px/1.4 var(--mono);letter-spacing:.02em;color:var(--dim);text-align:right}
 
   /* Reading column. Page content arrives through the slot, so it is styled with :global. */
   .fx-body{max-width:680px;margin:0 auto;padding:44px 24px clamp(90px,10vw,140px);font-size:17px;line-height:1.75;color:var(--body)}
