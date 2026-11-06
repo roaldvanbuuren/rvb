@@ -55,7 +55,8 @@ img,svg{display:block;max-width:100%}
 .enav{position:fixed;top:0;left:0;right:0;z-index:100}
 .enav-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;height:48px;padding:0 32px;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .enav a{text-decoration:none}
-.enav-logo{font:600 21px/1 var(--disp);letter-spacing:.005em;color:var(--bone)}
+.enav-logo{font:600 21px/1 var(--disp);letter-spacing:.005em;color:var(--bone);display:inline-flex;align-items:center;gap:12px}
+.rvb-mark{height:16px;width:auto;flex:none;color:var(--bone)}
 .enav-right{display:flex;align-items:center;gap:28px}
 .enav-link{font:500 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#fff;transition:color .15s}
 .enav-link:hover,.enav-link[aria-current="page"]{color:var(--accent-hover)}
