@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import { links } from '../../lib/posts';
 
 // Oldest first, matching the timeline. Images live in public/timeline/ (.webp with .jpg fallback).
 const stories = [
@@ -33,6 +34,7 @@ const stories = [
         </div>
       </a>
     ))}
+    <p class="meta wk-note">What I'm working on now, including our research, is at <a href={links.labs} target="_blank" rel="noopener">ELO Labs →<span class="vh"> (opens in a new tab)</span></a></p>
   </section>
 </Base>
 
@@ -45,4 +47,8 @@ const stories = [
   /* Small dim caption over the image, on a soft dark strip so it stays legible */
   .wk-cap{position:absolute;left:0;right:0;bottom:0;z-index:1;padding:22px 12px 8px;font:400 10px/1.4 var(--mono);letter-spacing:.02em;color:var(--dim);text-align:right;
     background:linear-gradient(180deg,transparent,rgba(10,10,10,.72))}
+  /* One dim line under the cards, in the site's meta text style */
+  .wk-note{margin:14px 0 0}
+  .wk-note a{color:var(--warm);text-underline-offset:3px}
+  .wk-note a:hover{color:#fff}
 </style>
