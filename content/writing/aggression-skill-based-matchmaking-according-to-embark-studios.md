@@ -2,6 +2,7 @@
 title: "Aggression > Skill Based Matchmaking, According to Embark Studios"
 date: 2026-01-09
 summary: "Toxicity is often mismatched intent between players. Aggression-based matchmaking in Arc Raiders is a first sign of matching on the vibe of a community."
+cover: /images/writing/generic/g-arena.jpg
 originally_posted: https://elocollective.com/logs/aggression-skill-based-matchmaking-according-to-embark-studios
 draft: false
 ---

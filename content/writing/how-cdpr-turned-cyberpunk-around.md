@@ -2,6 +2,7 @@
 title: "How CDPR Turned Cyberpunk Around"
 date: 2025-06-20
 summary: "Cyberpunk 2077's disastrous launch, and how listening, patches, Edgerunners and Phantom Liberty brought the game back."
+cover: /images/writing/generic/g-stage.jpg
 originally_posted: https://elocollective.com/logs/how-cdpr-turned-cyberpunk-around
 draft: false
 ---

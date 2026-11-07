@@ -2,6 +2,7 @@
 title: "We’re Betting On Community Economy"
 date: 2025-06-23
 summary: "ELO's view that the future of gaming is built by communities working together: the Community Economy."
+cover: /images/writing/generic/g-market.jpg
 originally_posted: https://elocollective.com/logs/we-re-betting-on-community-economy
 draft: false
 ---

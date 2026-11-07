@@ -4,7 +4,7 @@ import Logo from './Logo.astro';
 const path = Astro.url.pathname;
 const onWriting = path === '/writing' || path.startsWith('/writing/');
 const onPress = path === '/press';
-const onFaceit = path === '/work/faceit';
+const onWork = path === '/work' || path.startsWith('/work/');
 ---
 <header class="enav">
   <div class="enav-bar">
@@ -12,7 +12,7 @@ const onFaceit = path === '/work/faceit';
     <nav class="enav-right" aria-label="Main">
       <a class="enav-link" href="/writing" aria-current={onWriting ? 'page' : undefined}>Writing</a>
       <a class="enav-link" href="/press" aria-current={onPress ? 'page' : undefined}>Press</a>
-      <a class="enav-link" href="/work/faceit" aria-current={onFaceit ? 'page' : undefined}>FACEIT</a>
+      <a class="enav-link" href="/work" aria-current={onWork ? 'page' : undefined}>Work</a>
       <a class="enav-link" href={links.x} target="_blank" rel="noopener">X</a>
     </nav>
   </div>
@@ -24,7 +24,7 @@ const onFaceit = path === '/work/faceit';
     .enav-bar{gap:12px}
     .enav-logo{font-size:17px;white-space:nowrap}
     .enav-name{display:none}
-    .rvb-mark{height:20px}
+    .rvb-mark{height:26px}
     .enav-right{gap:14px}
     .enav-link{font-size:11px;letter-spacing:.08em}
   }

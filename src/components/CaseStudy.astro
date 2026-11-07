@@ -1,0 +1,85 @@
+---
+import Base from '../layouts/Base.astro';
+
+interface Story { href: string; title: string }
+interface Props {
+  /** Page heading and, with the site suffix, the page title. */
+  title: string;
+  description: string;
+  /** File stem under public/timeline/ (a .webp with a .jpg fallback). */
+  image: string;
+  meta: string;
+  prev?: Story;
+  next?: Story;
+}
+
+const { title, description, image, meta, prev, next } = Astro.props;
+---
+<Base title={`${title} – Roald van Buuren`} description={description}>
+  <article class="fx">
+    <header class="fx-hero">
+      <picture class="fx-img" aria-hidden="true">
+        <source type="image/webp" srcset={`/timeline/${image}.webp`} />
+        <img src={`/timeline/${image}.jpg`} alt="" width="1584" height="672" loading="eager" decoding="async" />
+      </picture>
+      <div class="fx-shade" aria-hidden="true"></div>
+      <div class="fx-head">
+        <a class="fx-back" href="/work">← Work</a>
+        <h1 class="h1">{title}</h1>
+        <p class="meta">{meta}</p>
+      </div>
+    </header>
+
+    <div class="fx-body">
+      <slot />
+
+      {(prev || next) && (
+        <nav class="pn fx-pn" aria-label="More stories">
+          {prev
+            ? <a class="card" href={prev.href}><span class="lbl">← Previous</span><span class="t">{prev.title}</span></a>
+            : <span class="ghost" aria-hidden="true"></span>}
+          {next
+            ? <a class="card next" href={next.href}><span class="lbl">Next →</span><span class="t">{next.title}</span></a>
+            : <span class="ghost" aria-hidden="true"></span>}
+        </nav>
+      )}
+
+      <p class="fx-end"><a class="more" href="/#now">See what I'm doing now →</a></p>
+    </div>
+  </article>
+</Base>
+
+<style>
+  /* Header: painted scene, cropped wide, darkened so the title reads. Static: no drift, no fades. */
+  .fx-hero{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:flex-end;
+    min-height:clamp(380px,40vw,520px);padding:clamp(104px,12vw,150px) 24px 56px}
+  .fx-img{position:absolute;inset:0;z-index:-2;display:block}
+  .fx-img img{width:100%;height:100%;object-fit:cover;object-position:center}
+  .fx-shade{position:absolute;inset:0;z-index:-1;
+    background:linear-gradient(180deg,rgba(10,10,10,.6),rgba(10,10,10,.82) 70%,var(--ink))}
+  .fx-head{width:100%;max-width:680px;margin:0 auto}
+  .fx-back{display:inline-block;margin-bottom:clamp(28px,5vw,48px);font:500 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--warm);text-decoration:none;border-bottom:1px solid rgba(232,232,219,.3);padding-bottom:4px;transition:color .15s,border-color .15s}
+  .fx-back:hover{color:#fff;border-color:#fff}
+  .fx-head .h1{font-size:clamp(40px,5.4vw,66px);line-height:1.04;text-wrap:balance}
+  .fx-head .meta{margin:22px 0 0}
+
+  /* Reading column. Page content arrives through the slot, so it is styled with :global. */
+  .fx-body{max-width:680px;margin:0 auto;padding:44px 24px clamp(90px,10vw,140px);font-size:17px;line-height:1.75;color:var(--body)}
+  .fx-body :global(p){margin:0 0 1.35em}
+  .fx-body :global(h2){margin:2em 0 .6em;font-family:var(--disp);font-weight:600;font-size:34px;line-height:1.15;letter-spacing:.005em;text-transform:uppercase;color:var(--warm)}
+  .fx-body > :global(p:first-child){margin-top:0}
+
+  /* Gold rule, as on the timeline's highlights (opt in with these classes) */
+  .fx-body :global(.fx-tv){list-style:none;margin:0 0 1.35em;padding:0;display:flex;flex-direction:column;gap:14px}
+  .fx-body :global(.fx-tv li){margin:0;padding-left:18px;border-left:2px solid #D9B45A}
+  .fx-body :global(.fx-gold){padding-left:18px;border-left:2px solid #D9B45A}
+
+  /* Previous / next between the stories */
+  .fx-pn{margin:2.6em 0 0}
+
+  .fx-end{margin:2.4em 0 0!important}
+  @media (max-width:560px){
+    .fx-body :global(h2){font-size:30px}
+    .fx-hero{padding-bottom:60px}
+  }
+</style>

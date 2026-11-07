@@ -2,6 +2,7 @@
 title: "How Marvel Rivals Proves the Power of Transmedia"
 date: 2025-06-18
 summary: "How Marvel Rivals pulled a non-Marvel fan into the universe, and what that shows about transmedia."
+cover: /images/writing/generic/g-stage.jpg
 originally_posted: https://elocollective.com/logs/how-marvel-rivals-proves-the-power-of-transmedia
 draft: false
 ---

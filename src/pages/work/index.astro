@@ -1,0 +1,47 @@
+---
+import Base from '../../layouts/Base.astro';
+import { links } from '../../lib/posts';
+
+// Oldest first, matching the timeline. Images live in public/timeline/ (.webp with .jpg fallback).
+const stories = [
+  { href: '/work/early-years', title: 'Early years', years: '2003–2013', line: 'From Call of Duty clan writer to running my own esports site.', image: 'tl-02-call-of-duty', tone: 'accent' },
+  { href: '/work/fnatic', title: 'Fnatic', years: '2008–2011', line: 'From $200 a month as an editor to General Manager.', image: 'tl-03-fnatic-lan', tone: 'amber' },
+  { href: '/work/faceit', title: 'FACEIT', years: '2012–2022', line: 'Ten years, from Quake Live to the London Major.', image: 'tl-04-faceit-arena', tone: 'bone' },
+];
+---
+<Base title="Work – Roald van Buuren" description="The longer stories behind the timeline.">
+  <section class="zone z-a">
+    <div class="wrap page-head">
+      <h1 class="h1">Work.</h1>
+      <p class="sub">The longer stories behind the timeline.</p>
+    </div>
+  </section>
+  <section class="wrap wlist" style="padding-bottom:clamp(90px,10vw,140px)">
+    {stories.map((s) => (
+      <a class={`wcard tone-${s.tone}`} href={s.href}>
+        <div class="wcard-img">
+          <picture>
+            <source type="image/webp" srcset={`/timeline/${s.image}.webp`} />
+            <img src={`/timeline/${s.image}.jpg`} alt="" width="1584" height="672" loading="lazy" decoding="async" />
+          </picture>
+        </div>
+        <div class="wcard-body">
+          <span class="wk-years">{s.years}</span>
+          <h3 class="t">{s.title}</h3>
+          <p class="s">{s.line}</p>
+          <span class="rm">Read<svg viewBox="0 0 12 16" aria-hidden="true"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></span>
+        </div>
+      </a>
+    ))}
+    <p class="meta wk-note">What I'm working on now, including our research, is at <a href={links.labs} target="_blank" rel="noopener">ELO Labs →<span class="vh"> (opens in a new tab)</span></a></p>
+  </section>
+</Base>
+
+<style>
+  /* Years, in the same dim mono as the date on a Writing card */
+  .wk-years{font:400 12px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+  /* One dim line under the cards, in the site's meta text style */
+  .wk-note{margin:14px 0 0}
+  .wk-note a{color:var(--warm);text-underline-offset:3px}
+  .wk-note a:hover{color:#fff}
+</style>

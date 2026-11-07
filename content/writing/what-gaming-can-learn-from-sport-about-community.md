@@ -2,6 +2,7 @@
 title: "What gaming can learn from sport about community"
 date: 2026-10-16
 summary: "In sport, community is a boardroom conversation. In gaming it is often left to a junior until launch week."
+cover: /images/writing/generic/g-community.jpg
 originally_posted: https://x.com/roaldvanbuuren/status/2111049528048488867
 draft: false
 ---

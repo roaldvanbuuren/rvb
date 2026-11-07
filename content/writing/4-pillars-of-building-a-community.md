@@ -2,6 +2,7 @@
 title: "4 Pillars of Building a Community"
 date: 2025-06-22
 summary: "Purpose, belonging, participation and structure: four pillars for building a community around a game."
+cover: /images/writing/generic/g-community.jpg
 originally_posted: https://elocollective.com/logs/4-pillars-of-building-a-community
 draft: false
 ---

@@ -2,6 +2,7 @@
 title: "Communities Aren’t A Marketing Tool"
 date: 2025-06-19
 summary: "Studios that align development, marketing and community from day one win long-term. Community is more than a button to push before launch."
+cover: /images/writing/generic/g-community.jpg
 originally_posted: https://elocollective.com/logs/communities-aren-t-a-marketing-tool
 draft: false
 ---

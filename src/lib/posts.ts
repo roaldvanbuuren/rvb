@@ -30,6 +30,16 @@ export function isoDate(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
 
+/**
+ * WebP twin of a cover image, if one exists. The generic cover images in
+ * public/images/writing/generic/ ship as .jpg + .webp pairs; the older per-article covers are .jpg only.
+ */
+export function coverWebp(cover?: string): string | undefined {
+  return cover && cover.startsWith('/images/writing/generic/') && cover.endsWith('.jpg')
+    ? cover.replace(/\.jpg$/, '.webp')
+    : undefined;
+}
+
 export function postUrl(p: Post): string {
   return `/writing/${p.id}`;
 }

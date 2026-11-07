@@ -2,6 +2,7 @@
 title: "Build for the world your customers will live in"
 date: 2026-05-31
 summary: "Customers describe the world as it is today. A founder has to hold both today and the world 12 to 18 months out."
+cover: /images/writing/generic/g-ideas.jpg
 originally_posted: https://x.com/roaldvanbuuren/status/2061123632881913979
 draft: false
 ---

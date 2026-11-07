@@ -2,6 +2,7 @@
 title: "The Federal Aviation Administration Hires 2000 Gamers"
 date: 2026-08-27
 summary: "The FAA hired over 2000 people from a gaming campaign. Games show how people decide under pressure directly in data, which surveys and CVs cannot."
+cover: /images/writing/generic/g-play.jpg
 originally_posted: https://elocollective.com/logs/the-federal-aviation-administration-hires-2000-gamers
 draft: false
 ---

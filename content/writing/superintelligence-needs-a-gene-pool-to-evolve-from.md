@@ -2,6 +2,7 @@
 title: "Superintelligence needs a gene pool to evolve from."
 date: 2026-10-12
 summary: "Why a diverse population of models, rather than one lab's clones, is the route to superintelligence, and where real community behaviour fits in."
+cover: /images/writing/generic/g-automaton.jpg
 originally_posted: https://x.com/roaldvanbuuren/status/2109636575252381980
 draft: false
 ---

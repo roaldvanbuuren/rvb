@@ -56,7 +56,7 @@ img,svg{display:block;max-width:100%}
 .enav-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;height:48px;padding:0 32px;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .enav a{text-decoration:none}
 .enav-logo{font:600 21px/1 var(--disp);letter-spacing:.005em;color:var(--bone);display:inline-flex;align-items:center;gap:12px}
-.rvb-mark{height:16px;width:auto;flex:none;color:var(--bone)}
+.rvb-mark{height:23px;width:auto;flex:none;color:var(--bone)}
 .enav-right{display:flex;align-items:center;gap:28px}
 .enav-link{font:500 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#fff;transition:color .15s}
 .enav-link:hover,.enav-link[aria-current="page"]{color:var(--accent-hover)}
@@ -66,38 +66,55 @@ img,svg{display:block;max-width:100%}
 .hero{--hh:max(clamp(420px,46vw,700px),68svh);position:relative;isolation:isolate;overflow:hidden}
 .hero-img{position:absolute;left:0;right:0;top:0;height:var(--hh);z-index:-3;background:url("/images/alps-x-brown.png") center bottom/cover no-repeat;
   -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 52%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 52%,transparent 100%)}
-.hero::before{content:"";position:absolute;left:0;right:0;top:0;height:var(--hh);z-index:-2;
+.hero-art::before{content:"";position:absolute;left:0;right:0;top:0;height:var(--hh);z-index:-2;
   background:linear-gradient(180deg,rgba(14,14,14,.45) 0,rgba(14,14,14,0) 30%,rgba(14,14,14,0) 62%,var(--ink) 100%)}
 .hero .grain{position:absolute;left:0;right:0;top:0;height:var(--hh);z-index:-1;pointer-events:none;opacity:.16;mix-blend-mode:overlay;filter:grayscale(1);
   background-image:var(--noise);background-size:180px;
   -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 50%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 50%,transparent 100%)}
 .hero-in{padding:clamp(250px,29vw,430px) 24px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:22px}
-.portrait{width:96px;height:96px;border-radius:50%;object-fit:cover;border:1px solid rgba(232,232,219,.22);background:var(--ink-2)}
 .hero .sub{max-width:640px;margin:0 auto;color:#CFCFC4;font-size:clamp(18px,1.6vw,21px)}
 .hero .h1{text-wrap:balance}
 .hero .ctas{justify-content:center}
-@media (max-width:700px){.portrait{width:80px;height:80px}}
-/* hero mark (replaces the portrait there); the portrait now lives in About, on the light intro frame */
-.hero-in .rvb-mark{height:64px}
-@media (max-width:700px){.hero-in .rvb-mark{height:52px}}
-.hx-fa .portrait{width:clamp(72px,12vh,104px);height:clamp(72px,12vh,104px);margin-bottom:clamp(18px,3.4vh,30px);border-color:rgba(20,20,20,.16);background:transparent}
+/* hero mark */
+.hero-in .rvb-mark{height:84px}
+@media (max-width:700px){.hero-in .rvb-mark{height:68px}}
+/* hero clover: leaves bloom in from the centre one by one, the accent leaf last; the stem follows */
+.hero-in .rvb-mark .lf{transform-box:fill-box;transform-origin:50% 100%;opacity:0;animation:lf-in .7s cubic-bezier(.2,.8,.2,1) forwards;animation-delay:calc(.15s + var(--i) * .13s)}
+.hero-in .rvb-mark .stem{opacity:0;animation:lf-fade .5s ease-out .75s forwards}
+@keyframes lf-in{from{opacity:0;transform:scale(.15)}to{opacity:1;transform:none}}
+@keyframes lf-fade{to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.hero-in .rvb-mark .lf,.hero-in .rvb-mark .stem{animation:none;opacity:1}}
+/* About portrait: the clover holds the photo (components/CloverPortrait.astro) */
+.clover-portrait{width:clamp(130px,27vh,240px);height:auto;margin-bottom:clamp(14px,3vh,28px);overflow:visible}
 
-/* hero sky: rare falling star, plane and birds (see components/Sky.astro) */
-.sky{position:absolute;left:0;right:0;top:0;height:var(--hh);z-index:-1;pointer-events:none;overflow:hidden;
-  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 55%,transparent 88%);mask-image:linear-gradient(180deg,#000 0%,#000 55%,transparent 88%)}
-.sky-el{position:absolute;left:0;top:0;will-change:transform,opacity}
-.sky-star{height:1.5px;border-radius:2px;transform-origin:100% 50%;opacity:0;
-  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.95));filter:drop-shadow(0 0 3px rgba(255,255,255,.7))}
-.sky-flock{width:0;height:0}
-.sky-bird{position:absolute;display:block;line-height:0;animation:sky-flap var(--flap,.6s) ease-in-out infinite alternate;transform-origin:50% 60%}
-.sky-bird svg{width:100%;height:auto;overflow:visible}
-.sky-bird path{fill:none;stroke:rgba(18,14,14,.62);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-@keyframes sky-flap{from{transform:scaleY(1)}to{transform:scaleY(.3)}}
-.sky-plane{opacity:0}
-.sky-plane-in{display:flex;align-items:center;transform-origin:50% 50%}
-.sky-plane-in svg{width:34px;height:auto;flex:none;fill:rgba(18,14,14,.7)}
-.sky-trail{display:block;width:200px;height:1.5px;margin-right:-4px;border-radius:2px;background:linear-gradient(90deg,rgba(232,232,219,0),rgba(232,232,219,.34))}
-@media (prefers-reduced-motion:reduce){.sky{display:none}}
+/* hero dusk (components/Dusk.astro): one number, --dusk (0 at the top of the page, 1 at full dusk), drives everything.
+   The sky deepens to indigo, the rose light goes out, stars come in. Layer order: image, dusk, glow, stars, grain on top. */
+@property --dusk{syntax:"<number>";inherits:true;initial-value:0}
+@keyframes dusk-fall{from{--dusk:0}to{--dusk:1}}
+/* the sky (image, dusk, stars, grain) rides in .hero-art and drifts down at half the scroll speed, so the dusk and
+   the stars stay on screen about twice as long. --par runs 0 to 1 while the hero scrolls out; 50% of its own height is half the hero. */
+@property --par{syntax:"<number>";inherits:true;initial-value:0}
+@keyframes art-par{from{--par:0}to{--par:1}}
+.hero-art{position:absolute;left:0;right:0;top:0;bottom:0;z-index:-1;pointer-events:none;transform:translateY(calc(var(--par) * 50%));will-change:transform}
+@supports (animation-timeline:view()){
+  /* longhands on purpose: the minifier folds a full set into the animation shorthand, and browsers reject view() there */
+  .hero{animation-name:dusk-fall,art-par;animation-duration:auto,auto;animation-timing-function:ease,linear;animation-fill-mode:both,both;animation-timeline:view(block 0px 0px),view(block 0px 0px);animation-range:exit 0% exit 50%,exit 0% exit 100%}
+}
+.dusk,.dusk-glow,.stars{position:absolute;left:0;right:0;top:0;height:var(--hh);pointer-events:none}
+.dusk{z-index:-2;opacity:calc(var(--dusk) * .6);
+  background:linear-gradient(180deg,#14163a 0%,rgba(20,22,58,.92) 12%,rgba(20,22,58,.72) 26%,rgba(20,22,58,.42) 40%,rgba(20,22,58,.16) 52%,rgba(20,22,58,0) 62%)}
+/* the rose band above the ridge: cooled and dimmed as the indigo comes in, so it reads as the light going */
+.dusk-glow{z-index:-2;mix-blend-mode:multiply;opacity:calc(var(--dusk) * .9);
+  background:linear-gradient(180deg,rgba(111,116,173,0) 10%,rgba(111,116,173,.5) 30%,#6f74ad 50%,#5d63a0 66%,#6f74ad 76%,rgba(111,116,173,0) 90%)}
+/* stars: the window is the top 45% of the image box under the nav. .sk is a zero-size pivot at its bottom centre and turns once
+   every 800s; each .sg is a 1px box whose box-shadows are the stars (offsets in em, font-size = disc radius, so they scale) */
+.stars{z-index:-1;top:56px;height:calc(var(--hh) * .45 - 56px);overflow:hidden;opacity:clamp(0, var(--dusk) * 6, 1)}
+.sk{position:absolute;left:50%;top:100%;width:0;height:0;animation:sky-turn 800s linear infinite}
+.sg{position:absolute;left:0;top:0;width:1px;height:1px;font-size:hypot(50vw, calc(var(--hh) * .45 - 56px));animation:star-twinkle var(--d,8s) ease-in-out var(--dl,0s) infinite}
+@keyframes sky-turn{to{transform:rotate(-360deg)}}
+@keyframes star-twinkle{0%,100%{opacity:1}50%{opacity:var(--lo,.35)}}
+@media (max-width:700px){.sg:nth-child(n+6){display:none}} /* smaller window: fewer groups keeps about 25 in view */
+@media (prefers-reduced-motion:reduce){.dusk,.dusk-glow,.stars{display:none}}
 
 /* graining and fade zones: full-bleed glow plus film grain, masked to fade in and out (same values as data.elocollective.com) */
 .zone{position:relative;isolation:isolate}
@@ -159,6 +176,8 @@ a.prow:hover .p-desc{color:var(--accent-hover)}
 .wcard-img{position:relative;min-height:230px;background:#121211}
 .wcard-img .art,.wcard-img > img{position:absolute;inset:0;width:100%;height:100%}
 .wcard-img > img{object-fit:cover}
+.wcard-img > picture{position:absolute;inset:0;display:block}
+.wcard-img > picture img{width:100%;height:100%;object-fit:cover}
 .wcard-img .art svg{width:100%;height:100%}
 .wcard-img::after{content:"";position:absolute;inset:0;background-image:var(--noise);background-size:180px;opacity:.14;mix-blend-mode:overlay;filter:grayscale(1);pointer-events:none}
 .wcard-body{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:12px;padding:clamp(22px,3vw,38px)}
@@ -254,7 +273,6 @@ a.prow:hover .p-desc{color:var(--accent-hover)}
 .hx-shade{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(10,10,10,.55),rgba(10,10,10,.85))}
 .hx-cap{position:absolute;z-index:3;right:clamp(24px,6vw,96px);bottom:calc(clamp(14px,3.4vh,30px) + 24px);width:min(320px,calc(100% - 48px));margin:0;font:400 11px/1.55 var(--mono);letter-spacing:.02em;color:var(--dim);opacity:0;transition:opacity .6s ease;pointer-events:none}
 .hx-cap.on{opacity:1}
-.hx-cap-ai{display:block;margin-top:6px;font-size:10px;line-height:1.4;opacity:.75}
 .hx-track{position:relative;display:flex;width:max-content;height:100%;will-change:transform}
 /* skip: jumps past the whole pinned scroll */
 .hx-skipwrap{position:sticky;top:0;height:0;z-index:6}
@@ -313,7 +331,6 @@ a.prow:hover .p-desc{color:var(--accent-hover)}
 .s-name{margin:0;font:600 26px/1.1 var(--disp);letter-spacing:.005em;color:var(--warm)}
 .s-logo{display:block;width:auto;max-width:100%;height:calc(var(--dh) * 1px);margin:0 0 14px;opacity:.92}
 .s-card .s-logo-name{margin:0}
-.s-name:has(.s-logo-name){line-height:0}
 .s-role{margin:6px 0 0;font-size:14px;line-height:1.4;color:var(--dim)}
 .s-desc{margin:12px 0 0;font-size:15px;line-height:1.6;color:var(--body)}
 .stop.bright .s-card{border-color:rgba(var(--accent-rgb),.55);background:linear-gradient(180deg,rgba(var(--accent-rgb),.10),var(--ink-2) 72%);box-shadow:0 0 54px -22px rgba(var(--accent-rgb),.6)}
@@ -411,6 +428,7 @@ body > footer{position:relative;border-top:1px solid var(--hair)}
 .meta{margin:22px 0 0;font:400 12px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
 .cover{max-width:960px;margin:40px auto 0;padding:0 24px}
 .cover img{width:100%;height:auto;border:1px solid var(--hair);border-radius:var(--radius)}
+.cover picture{display:block}
 .prose{max-width:680px;margin:0 auto;padding:44px 24px 0;font-size:17px;line-height:1.75;color:var(--body)}
 .prose > *:first-child{margin-top:0}
 .prose p{margin:0 0 1.35em}

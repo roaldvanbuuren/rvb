@@ -2,6 +2,7 @@
 title: "Building a Community Isn’t Just For Indies"
 date: 2025-06-19
 summary: "Larian built Baldur's Gate 3 in Early Access with its players for three years. Five things they did well."
+cover: /images/writing/generic/g-community.jpg
 originally_posted: https://elocollective.com/logs/building-a-community-isn-t-just-for-indies
 draft: false
 ---

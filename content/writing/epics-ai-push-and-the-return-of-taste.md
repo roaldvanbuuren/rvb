@@ -2,6 +2,7 @@
 title: "Epic's AI push and the return of taste"
 date: 2026-10-14
 summary: "As engines and AI make building cheaper, what is left is taste: the vision, the world and the story."
+cover: /images/writing/generic/g-automaton.jpg
 originally_posted: https://x.com/roaldvanbuuren/status/2110291784576180645
 draft: false
 ---

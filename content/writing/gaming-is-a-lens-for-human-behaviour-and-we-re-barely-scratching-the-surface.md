@@ -2,6 +2,7 @@
 title: "Gaming is a lens for human behaviour, and we’re barely scratching the surface"
 date: 2026-06-05
 summary: "Games log thousands of decisions about trust, risk and status, and the industry mostly treats that data as exhaust. Why that matters for communities."
+cover: /images/writing/generic/g-play.jpg
 originally_posted: https://elocollective.com/logs/gaming-is-a-lens-for-human-behaviour-and-we-re-barely-scratching-the-surface
 draft: false
 ---

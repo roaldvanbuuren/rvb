@@ -2,6 +2,7 @@
 title: "From Games to Reality"
 date: 2026-08-25
 summary: "Games are becoming one of the most useful environments for observing human behaviour: train, observe, measure, model, simulate."
+cover: /images/writing/generic/g-play.jpg
 originally_posted: https://elocollective.com/logs/from-games-to-reality
 draft: false
 ---

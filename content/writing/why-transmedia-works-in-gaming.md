@@ -2,6 +2,7 @@
 title: "Why Transmedia Works in Gaming"
 date: 2025-07-05
 summary: "How the Arcane show, rather than Riot's esports ecosystem, pulled the author into the League of Legends universe, and what that says about transmedia."
+cover: /images/writing/generic/g-stage.jpg
 originally_posted: https://elocollective.com/logs/why-transmedia-works-in-gaming
 draft: false
 ---

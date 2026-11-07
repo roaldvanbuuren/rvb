@@ -2,6 +2,7 @@
 title: "Esports and the publisher's side of the story"
 date: 2026-06-26
 summary: "\"Publishers should do more\" is a complaint, not a strategy. The question is what esports can offer that publishers cannot get elsewhere."
+cover: /images/writing/generic/g-arena.jpg
 originally_posted: https://x.com/roaldvanbuuren/status/2070454230045925492
 draft: false
 ---

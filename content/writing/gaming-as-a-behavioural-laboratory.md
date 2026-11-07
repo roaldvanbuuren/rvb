@@ -2,6 +2,7 @@
 title: "Gaming as a behavioural laboratory"
 date: 2026-09-16
 summary: "Studies keep showing the benefits of gaming. A deeper dive into gaming as a behavioural laboratory."
+cover: /images/writing/generic/g-play.jpg
 originally_posted: https://x.com/roaldvanbuuren/status/2100158530326057068
 draft: false
 ---
