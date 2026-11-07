@@ -23,19 +23,21 @@ const products = [
   { name: 'ELO Data', logo: { src: '/images/logos/elo-data.png', w: 131, h: 160, dh: 60 }, text: 'Turns what holds up into data for AI.', href: links.data, host: 'data.elocollective.com', tone: 'grey' },
 ];
 
+// Hover glow: one soft radial wash per brand colour, spread across the tile.
+const glowCss = (cols: string[] = []) => cols.map((c, i) => `radial-gradient(ellipse 70% 120% at ${cols.length === 1 ? 50 : 18 + (64 * i) / (cols.length - 1)}% 100%, ${c}, transparent 70%)`).join(',');
 // "ELO works with" logo row in 02 / Now. Logos are bone-coloured PNGs in public/images/logos. h = display height in px.
 const worksWith = {
   title: 'ELO works with',
   more: 'and many more',
   logos: [
-    { name: 'McLaren', url: 'https://www.mclaren.com', src: '/images/logos/mclaren.png', w: 640, nh: 94, h: 24 },
+    { name: 'McLaren', url: 'https://www.mclaren.com', src: '/images/logos/mclaren.png', w: 640, nh: 94, h: 24, glow: ['#FF8000'] },
     { name: 'Torpor Games', url: 'https://www.torporgames.com', src: '/images/logos/torpor-games.png', w: 344, nh: 170, h: 60 },
-    { name: 'NASCAR', url: 'https://www.nascar.com', src: '/images/logos/nascar.png', w: 640, nh: 114, h: 26 },
-    { name: 'Team Liquid', url: 'https://www.teamliquid.com', src: '/images/logos/team-liquid.png', w: 176, nh: 200, h: 64 },
-    { name: 'NSE', url: 'https://nse.gg', src: '/images/logos/nse.png', w: 188, nh: 62, h: 30 },
-    { name: 'Burda Principal Investments', url: 'https://burdaprincipalinvestments.com', src: '/images/logos/burda.svg', w: 621, nh: 135, h: 42 },
-    { name: 'TUM Venture Labs', url: 'https://www.tum-venture-labs.de', src: '/images/logos/tum-venture-labs.png', w: 292, nh: 100, h: 38 },
-    { name: 'The Wolf', url: 'https://thewolfsimulator.com', src: '/images/logos/the-wolf.png', w: 366, nh: 164, h: 40 },
+    { name: 'NASCAR', url: 'https://www.nascar.com', src: '/images/logos/nascar.png', w: 640, nh: 114, h: 26, glow: ['#FFD100', '#E4002B', '#1E5BFF'] },
+    { name: 'Team Liquid', url: 'https://www.teamliquid.com', src: '/images/logos/team-liquid.png', w: 176, nh: 200, h: 64, glow: ['#1F7BFF'] },
+    { name: 'NSE', url: 'https://nse.gg', src: '/images/logos/nse.png', w: 188, nh: 62, h: 30, glow: ['#FFE600', '#FF2E93', '#00E5FF'] },
+    { name: 'Burda Principal Investments', url: 'https://burdaprincipalinvestments.com', src: '/images/logos/burda.svg', w: 621, nh: 135, h: 42, glow: ['#00B7E6'] },
+    { name: 'TUM Venture Labs', url: 'https://www.tum-venture-labs.de', src: '/images/logos/tum-venture-labs.png', w: 292, nh: 100, h: 38, glow: ['#0A6BD6'] },
+    { name: 'The Wolf', url: 'https://thewolfsimulator.com', src: '/images/logos/the-wolf.png', w: 366, nh: 164, h: 40, glow: ['#8B5A2B'] },
   ],
 };
 
@@ -122,7 +124,7 @@ const stops: Stop[] = [
   { kind: 'highlight', faceit: true, date: '2017 to 2018', logo: tl.universalOpen, text: 'Brought Rocket League and the NHL to NBC.' },
   { kind: 'highlight', faceit: true, date: '2018', logo: tl.major, text: 'The London Counter-Strike Major.' },
   { kind: 'highlight', faceit: true, date: '2022', text: 'FACEIT acquired by Savvy Games Group, as part of a $1.5bn deal alongside ESL.' },
-  { kind: 'career', date: '2024 to now', name: 'ELO', role: 'Co-founder', logo: tl.elo, bright: true },
+  { kind: 'career', date: '2024 to now', name: 'ELO', role: 'Co-founder', logo: tl.elo, bright: true, text: 'We saw a common thread in all success in gaming: community. Very few were doing it right, so we started delivering agency services around community strategy for brands and games.' },
   { kind: 'highlight', date: 'March 2026', logo: tl.lumen, text: 'Lumen first launched with design partners, pivoting from an agency to a tech company.' },
   { kind: 'life', date: 'July 2026', logo: tl.turin, text: 'Moved to Turin.', link: { href: '#now', label: "See what I'm doing now" }, link2: { href: '/press', label: 'Press, talks and podcasts' }, link3: { href: '/work', label: 'Work, in more detail' } },
 ];
@@ -391,7 +393,7 @@ const stops: Stop[] = [
         <p class="eyebrow">{worksWith.title}</p>
         <ul class="works-logos">
           {worksWith.logos.map((l) => (
-            <li><a href={l.url} target="_blank" rel="noopener" aria-label={`${l.name} (opens in a new tab)`}><img src={l.src} alt={l.name} width={l.w} height={l.nh} style={`--h:${l.h}`} loading="lazy" decoding="async" /></a></li>
+            <li style={l.glow ? `--glow:${glowCss(l.glow)}` : undefined}><a href={l.url} target="_blank" rel="noopener" aria-label={`${l.name} (opens in a new tab)`}><img src={l.src} alt={l.name} width={l.w} height={l.nh} style={`--h:${l.h}`} loading="lazy" decoding="async" /></a></li>
           ))}
         </ul>
         <p class="works-more">{worksWith.more}</p>
