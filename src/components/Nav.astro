@@ -1,5 +1,4 @@
 ---
-import { links } from '../lib/posts';
 import Logo from './Logo.astro';
 const path = Astro.url.pathname;
 const onWriting = path === '/writing' || path.startsWith('/writing/');
@@ -15,13 +14,12 @@ const onProjects = path === '/projects' || path.startsWith('/projects/');
       <a class="enav-link" href="/press" aria-current={onPress ? 'page' : undefined}>Press</a>
       <a class="enav-link" href="/work" aria-current={onWork ? 'page' : undefined}>Work</a>
       <a class="enav-link" href="/projects" aria-current={onProjects ? 'page' : undefined}>Side projects</a>
-      <a class="enav-link" href={links.x} target="_blank" rel="noopener">X</a>
     </nav>
   </div>
 </header>
 
 <style>
-  /* Five links now sit in the bar: tighten the small-screen spacing so it still fits at 375px. */
+  /* Four links now sit in the bar: tighten the small-screen spacing so it still fits at 375px. */
   @media (max-width:560px){
     .enav-bar{gap:12px}
     .enav-logo{font-size:17px;white-space:nowrap}
