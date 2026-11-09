@@ -1,0 +1,66 @@
+---
+import Base from '../layouts/Base.astro';
+
+// One entry per card, in display order. To add a project, add an object here.
+// `image` is optional: leave it out for the plain ink card with the title in large type.
+// `note` is the small dim second line and is optional too.
+// External projects open in a new tab.
+const projects = [
+  {
+    href: 'https://mecenas-ledger.vercel.app/',
+    external: true,
+    title: 'Mecenas',
+    meta: '2026 · In progress',
+    line: 'An interactive map of who AI companies give to, and how.',
+    note: "Named after Maecenas, Augustus's patron of the arts.",
+    cta: 'Open →',
+    tone: 'accent',
+    image: undefined as string | undefined,
+  },
+];
+---
+<Base title="Side projects – Roald van Buuren" description="Things Roald van Buuren builds on the side.">
+  <section class="zone z-a">
+    <div class="wrap page-head">
+      <h1 class="h1">Side projects.</h1>
+      <p class="sub">Things I build on the side.</p>
+    </div>
+  </section>
+  <section class="wrap wlist" style="padding-bottom:clamp(90px,10vw,140px)">
+    {projects.map((p) => (
+      <a
+        class={`wcard tone-${p.tone}${p.image ? '' : ' pcard-plain'}`}
+        href={p.href}
+        target={p.external ? '_blank' : undefined}
+        rel={p.external ? 'noopener' : undefined}
+      >
+        {p.image && (
+          <div class="wcard-img">
+            <picture>
+              <source type="image/webp" srcset={`${p.image}.webp`} />
+              <img src={`${p.image}.jpg`} alt="" width="1584" height="672" loading="lazy" decoding="async" />
+            </picture>
+          </div>
+        )}
+        <div class="wcard-body">
+          <span class="pj-meta">{p.meta}</span>
+          <h3 class="t pj-title">{p.title}</h3>
+          <p class="s">{p.line}</p>
+          {p.note && <p class="pj-note">{p.note}</p>}
+          <span class="rm">{p.cta}{p.external && <span class="vh"> (opens in a new tab)</span>}</span>
+        </div>
+      </a>
+    ))}
+  </section>
+</Base>
+
+<style>
+  /* Meta line: the same dim mono as the date on a Writing card and the years on a Work card */
+  .pj-meta{font:400 12px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+  /* Small dim second line */
+  .pj-note{margin:0;font-size:13px;line-height:1.5;color:var(--dim);max-width:560px}
+  /* No image: a plain ink card, one column, with the title in large type */
+  .pcard-plain{grid-template-columns:minmax(0,1fr);background:var(--ink)}
+  .pcard-plain .pj-title{font-size:clamp(48px,7vw,88px);line-height:.95}
+  .pcard-plain .wcard-body{padding:clamp(26px,4vw,52px);gap:14px}
+</style>
