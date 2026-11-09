@@ -119,6 +119,9 @@ img,svg{display:block;max-width:100%}
 .zone::before,.zone::after{content:"";position:absolute;top:0;bottom:0;left:50%;width:100vw;margin-left:-50vw;z-index:-1;pointer-events:none;
   -webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 24%,#000 76%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0%,#000 24%,#000 76%,transparent 100%)}
 .zone::after{background-image:var(--noise);background-size:180px;opacity:.12;filter:grayscale(1);mix-blend-mode:screen}
+/* seams with the About pin: the pin carries full-strength grain edge to edge, so the zones either side keep theirs to the edge instead of fading out/in */
+.z-w::before,.z-w::after{-webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 24%,#000 100%);mask-image:linear-gradient(180deg,transparent 0%,#000 24%,#000 100%)}
+.z-c::before,.z-c::after{-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 76%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 76%,transparent 100%)}
 .z-a::before{background:radial-gradient(70% 60% at 50% 50%,rgba(232,232,219,.07),transparent 72%)}
 .z-b::before{background:radial-gradient(60% 55% at 22% 40%,rgba(232,232,219,.06),transparent 70%),radial-gradient(50% 50% at 85% 70%,rgba(200,132,42,.07),transparent 70%)}
 .z-w::before{background:radial-gradient(55% 60% at 18% 45%,rgba(var(--accent-rgb),.10),transparent 70%),radial-gradient(50% 55% at 88% 60%,rgba(200,132,42,.08),transparent 70%),radial-gradient(40% 40% at 55% 20%,rgba(232,232,219,.05),transparent 70%)}
