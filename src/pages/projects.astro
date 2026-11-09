@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 
 // One entry per card, in display order. To add a project, add an object here.
-// `image` is optional: leave it out for the plain ink card with the title in large type.
+// `image` (a webp screenshot in /public/projects) and its `alt` are optional: leave them out for the plain ink card with the title in large type.
 // `note` is the small dim second line and is optional too.
 // External projects open in a new tab.
 const projects = [
@@ -15,7 +15,8 @@ const projects = [
     note: "Named after Maecenas, Augustus's patron of the arts.",
     cta: 'Open →',
     tone: 'accent',
-    image: undefined as string | undefined,
+    image: '/projects/mecenas.webp' as string | undefined,
+    alt: 'Screenshot of the Mecenas map',
   },
   {
     href: 'https://promissa.vercel.app/',
@@ -26,7 +27,8 @@ const projects = [
     note: 'Latin for promises.',
     cta: 'Open →',
     tone: 'accent',
-    image: undefined as string | undefined,
+    image: '/projects/promissa.webp' as string | undefined,
+    alt: 'Screenshot of the Promissa ledger',
   },
 ];
 ---
@@ -38,28 +40,27 @@ const projects = [
     </div>
   </section>
   <section class="wrap wlist" style="padding-bottom:clamp(90px,10vw,140px)">
-    {projects.map((p) => (
+    {projects.map((p, i) => (
       <a
-        class={`wcard tone-${p.tone}${p.image ? '' : ' pcard-plain'}`}
+        class={`wcard tone-${p.tone}${p.image ? ' pcard' : ' pcard-plain'}`}
         href={p.href}
         target={p.external ? '_blank' : undefined}
         rel={p.external ? 'noopener' : undefined}
       >
-        {p.image && (
-          <div class="wcard-img">
-            <picture>
-              <source type="image/webp" srcset={`${p.image}.webp`} />
-              <img src={`${p.image}.jpg`} alt="" width="1584" height="672" loading="lazy" decoding="async" />
-            </picture>
-          </div>
-        )}
         <div class="wcard-body">
           <span class="pj-meta">{p.meta}</span>
           <h3 class="t pj-title">{p.title}</h3>
           <p class="s">{p.line}</p>
           {p.note && <p class="pj-note">{p.note}</p>}
-          <span class="rm">{p.cta}{p.external && <span class="vh"> (opens in a new tab)</span>}</span>
+          <span class="rm">{p.cta.replace(' →', '')}{p.cta.endsWith('→') && <span class="arr" aria-hidden="true">→</span>}{p.external && <span class="vh"> (opens in a new tab)</span>}</span>
         </div>
+        {p.image && (
+          <div class="pj-media">
+            <div class="pj-frame">
+              <img src={p.image} alt={p.alt ?? ''} width="1600" height="1000" loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
+            </div>
+          </div>
+        )}
       </a>
     ))}
   </section>
@@ -67,11 +68,37 @@ const projects = [
 
 <style>
   /* Meta line: the same dim mono as the date on a Writing card and the years on a Work card */
-  .pj-meta{font:400 12px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+  .pj-meta{display:inline-flex;align-items:center;font:400 12px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+  /* Small accent dot before "In progress", the same dot as the eyebrow on other pages */
+  .pj-meta::before{content:"";flex:none;width:7px;height:7px;margin-right:10px;background:var(--accent)}
   /* Small dim second line */
   .pj-note{margin:0;font-size:13px;line-height:1.5;color:var(--dim);max-width:560px}
   /* No image: a plain ink card, one column, with the title in large type */
   .pcard-plain{grid-template-columns:minmax(0,1fr);background:var(--ink)}
   .pcard-plain .pj-title{font-size:clamp(48px,7vw,88px);line-height:.95}
   .pcard-plain .wcard-body{padding:clamp(26px,4vw,52px);gap:14px}
+
+  /* Card with a preview: text left (40%), screenshot right (60%); stacked on mobile with the preview on top */
+  .pcard{grid-template-columns:minmax(0,1fr);background:var(--ink);align-items:stretch}
+  .pcard .pj-title{font-size:clamp(48px,7vw,88px);line-height:.95}
+  .pcard .wcard-body{padding:22px clamp(22px,4vw,52px) 26px;gap:14px}
+  .pcard .pj-media{order:-1;display:flex;padding:12px 12px 0}
+  .pcard .pj-frame{position:relative;flex:1;aspect-ratio:16/10;overflow:hidden;border:1px solid rgba(var(--accent-rgb),.22);border-radius:var(--radius);background:var(--ink-2)}
+  .pcard .pj-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;transform-origin:center top;transition:transform .3s ease}
+  .pcard .rm .arr{display:inline-block;transition:transform .3s ease}
+  @media (min-width:900px){
+    .pcard{grid-template-columns:minmax(0,.4fr) minmax(0,.6fr)}
+    .pcard .wcard-body{padding:clamp(18px,2vw,26px) clamp(26px,4vw,52px)}
+    .pcard .pj-media{order:0;padding:14px 14px 14px 0}
+    .pcard .pj-frame{aspect-ratio:auto;min-height:clamp(220px,19vw,260px)}
+  }
+  @media (hover:hover) and (pointer:fine){
+    .pcard:hover{border-color:var(--accent)}
+    .pcard:hover .pj-frame img{transform:scale(1.02)}
+    .pcard:hover .rm .arr{transform:translateX(4px)}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .pcard .pj-frame img,.pcard .rm .arr{transition:none}
+    .pcard:hover .pj-frame img,.pcard:hover .rm .arr{transform:none}
+  }
 </style>
