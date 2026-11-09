@@ -238,10 +238,6 @@ a.prow:hover .p-desc{color:var(--accent-hover)}
   .now-grid .card.lead .h3{font-size:34px}
 }
 
-/* light section: ELO Labs light register (bone paper, ink text) */
-.light{position:relative;isolation:isolate;background:var(--bone);color:#1B1B1B;--l-ink:#141414;--l-body:#4A4A44;--l-dim:#77776E;--l-acc:#3D4DE0}
-.light-grain{position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:var(--noise);background-size:180px;opacity:.07;mix-blend-mode:multiply}
-.light .eyebrow{color:var(--l-dim)}
 /* statement band: electric blue with film grain (from data.elocollective.com, grain kept still) */
 .band{position:relative;overflow:hidden;isolation:isolate;padding:clamp(100px,12vw,170px) 24px;background:#0F2AE6;text-align:center}
 .band-grain{position:absolute;inset:0;width:100%;height:100%;z-index:0;mix-blend-mode:soft-light;opacity:.6;pointer-events:none}
@@ -277,13 +273,13 @@ a.prow:hover .p-desc{color:var(--accent-hover)}
 .hx-skip{position:absolute;top:64px;right:clamp(20px,5vw,80px);display:inline-flex;align-items:center;gap:10px;padding:10px 14px;font:500 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--warm);text-decoration:none;background:rgba(14,14,14,.82);border:1px solid rgba(232,232,219,.22);border-radius:var(--radius);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:border-color .2s,color .2s}
 .hx-skip:hover{border-color:rgba(232,232,219,.5);color:var(--bone)}
 .hx-skip svg{width:8px;height:11px}
-/* frame 1: the intro (light) */
+/* frame 1: the intro (on the same dark ground as the rest of About) */
 .hx-intro{--pad:max(24px,calc((100vw - 1152px) / 2));position:relative;flex:none;width:100vw;height:100%;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(32px,6vw,96px);align-items:center;padding:56px var(--pad) 24px}
 .hx-intro .eyebrow{margin-bottom:clamp(14px,3vh,28px)}
-.about-lead{margin:0;max-width:760px;font:600 clamp(28px,min(3.7vw,6.2vh),54px)/1.14 var(--disp);letter-spacing:.005em;color:var(--l-ink)}
-.about-p{margin:0 0 1.1em;max-width:520px;font-size:clamp(16px,min(1.5vw,2.5vh),20px);line-height:1.62;color:#2B2B27}
+.about-lead{margin:0;max-width:760px;font:600 clamp(28px,min(3.7vw,6.2vh),54px)/1.14 var(--disp);letter-spacing:.005em;color:var(--bone)}
+.about-p{margin:0 0 1.1em;max-width:520px;font-size:clamp(16px,min(1.5vw,2.5vh),20px);line-height:1.62;color:var(--body)}
 .about-p:last-child{margin-bottom:0}
-.hx-hint{position:absolute;left:var(--pad);bottom:clamp(20px,5vh,44px);display:flex;align-items:center;gap:10px;margin:0;font:500 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--l-dim)}
+.hx-hint{position:absolute;left:var(--pad);bottom:clamp(20px,5vh,44px);display:flex;align-items:center;gap:10px;margin:0;font:500 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
 .hx-hint svg{width:8px;height:11px}
 /* the journey (dark) */
 .hx-journey{--sw:330px;position:relative;flex:none;display:flex;height:100%;padding-left:clamp(32px,6vw,96px)}
