@@ -78,12 +78,10 @@ img,svg{display:block;max-width:100%}
 /* hero mark */
 .hero-in .rvb-mark{height:84px}
 @media (max-width:700px){.hero-in .rvb-mark{height:68px}}
-/* hero clover: leaves bloom in from the centre one by one, the accent leaf last; the stem follows */
+/* hero clover: leaves bloom in from the centre one by one, the accent leaf last */
 .hero-in .rvb-mark .lf{transform-box:fill-box;transform-origin:50% 100%;opacity:0;animation:lf-in .7s cubic-bezier(.2,.8,.2,1) forwards;animation-delay:calc(.15s + var(--i) * .13s)}
-.hero-in .rvb-mark .stem{opacity:0;animation:lf-fade .5s ease-out .75s forwards}
 @keyframes lf-in{from{opacity:0;transform:scale(.15)}to{opacity:1;transform:none}}
-@keyframes lf-fade{to{opacity:1}}
-@media (prefers-reduced-motion:reduce){.hero-in .rvb-mark .lf,.hero-in .rvb-mark .stem{animation:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.hero-in .rvb-mark .lf{animation:none;opacity:1}}
 /* About portrait: the clover holds the photo (components/CloverPortrait.astro) */
 .clover-portrait{width:clamp(130px,27vh,240px);height:auto;margin-bottom:clamp(14px,3vh,28px);overflow:visible}
 
