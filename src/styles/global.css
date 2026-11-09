@@ -100,10 +100,10 @@ img,svg{display:block;max-width:100%}
 }
 .dusk,.dusk-glow,.stars{position:absolute;left:0;right:0;top:0;height:var(--hh);pointer-events:none}
 .dusk{z-index:-2;opacity:calc(var(--dusk) * .6);
-  background:linear-gradient(180deg,#14163a 0%,rgba(20,22,58,.92) 12%,rgba(20,22,58,.72) 26%,rgba(20,22,58,.42) 40%,rgba(20,22,58,.16) 52%,rgba(20,22,58,0) 62%)}
+  background:linear-gradient(180deg,#0a1a3f 0%,rgba(10,26,63,.92) 12%,rgba(10,26,63,.72) 26%,rgba(10,26,63,.42) 40%,rgba(10,26,63,.16) 52%,rgba(10,26,63,0) 62%)}
 /* the rose band above the ridge: cooled and dimmed as the indigo comes in, so it reads as the light going */
 .dusk-glow{z-index:-2;mix-blend-mode:multiply;opacity:calc(var(--dusk) * .9);
-  background:linear-gradient(180deg,rgba(111,116,173,0) 10%,rgba(111,116,173,.5) 30%,#6f74ad 50%,#5d63a0 66%,#6f74ad 76%,rgba(111,116,173,0) 90%)}
+  background:linear-gradient(180deg,rgba(86,120,170,0) 10%,rgba(86,120,170,.5) 30%,#5678aa 50%,#46689a 66%,#5678aa 76%,rgba(86,120,170,0) 90%)}
 /* stars: the window is the top 45% of the image box under the nav. .sk is a zero-size pivot at its bottom centre and turns once
    every 800s; each .sg is a 1px box whose box-shadows are the stars (offsets in em, font-size = disc radius, so they scale) */
 .stars{z-index:-1;top:56px;height:calc(var(--hh) * .45 - 56px);overflow:hidden;opacity:clamp(0, var(--dusk) * 6, 1)}
