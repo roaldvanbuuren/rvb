@@ -1,7 +1,7 @@
 ---
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import { getPosts, formatDate, isoDate, readingTime, postUrl, originalPlatform, coverWebp } from '../../lib/posts';
+import { getPosts, formatDate, isoDate, readingTime, postUrl, originalPlatform, coverWebp, binaryCover } from '../../lib/posts';
 
 export async function getStaticPaths() {
   const posts = await getPosts(); // newest first
@@ -17,6 +17,7 @@ const { Content } = await render(post);
 const { title, date, summary, cover, originally_posted } = post.data;
 const minutes = readingTime(post.body);
 const webp = coverWebp(cover);
+const binary = binaryCover(cover, 'hero');
 ---
 <Base
   title={`${title} · Roald van Buuren`}
@@ -39,7 +40,9 @@ const webp = coverWebp(cover);
     </div>
     {cover && (
       <div class="cover">
-        {webp
+        {binary
+          ? <img class="binary" src={binary} alt="" width="1200" height="900" loading="eager" />
+          : webp
           ? <picture><source type="image/webp" srcset={webp} /><img src={cover} alt="" width="1200" height="900" loading="eager" /></picture>
           : <img src={cover} alt="" width="1200" height="900" loading="eager" />}
       </div>
