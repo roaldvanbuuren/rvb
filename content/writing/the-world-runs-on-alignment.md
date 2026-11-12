@@ -24,6 +24,6 @@ As a European, I was hopeful that at least one good thing could come out of the 
 
 Unfortunately, personal and national interests, bureaucracy, weak leadership and messaging, all seem too strong to use this tragic but unique opportunity to our benefit.
 
-Even in the riots that took hold in European cities over the last weeks, they seem not to have taken hold. What was missing? Alignment. The anger was shared, but it never became a shared goal. One city's uprising was against fascism, the next against tuition fees, the other against education budgets, and another against cost of petrol. There was no aligned goal that all could rally behind.
+Even the riots that took place in European cities over the last weeks seem not to have taken hold. What was missing? Alignment. The anger was shared, but it never became a shared goal. One city's uprising was against fascism, the next against tuition fees, the other against education budgets, and another against cost of petrol. There was no aligned goal that all could rally behind.
 
 So if there is something where you see a shift or a change in posture, by businesses, institutions, or governments, look at alignment; whether that has been lost or gained. The entire NVIDIA/Jensen Huang saga is an interesting one to follow on this topic right now. Who did he never align with, and who is lining up now?
