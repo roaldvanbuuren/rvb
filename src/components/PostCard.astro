@@ -1,5 +1,6 @@
 ---
 import CoverArt from './CoverArt.astro';
+import BinaryMotion from './BinaryMotion.astro';
 import { formatDate, isoDate, postUrl, coverWebp, binaryCover, type Post } from '../lib/posts';
 interface Props { post: Post; index?: number; variant?: 'row' | 'tile' }
 const { post, index = 0, variant = 'row' } = Astro.props;
@@ -26,3 +27,4 @@ const binary = binaryCover(cover, 'card');
     <span class="rm">Read<svg viewBox="0 0 12 16" aria-hidden="true"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></span>
   </div>
 </a>
+{binary && <BinaryMotion />}

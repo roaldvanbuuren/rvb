@@ -1,6 +1,7 @@
 ---
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import BinaryMotion from '../../components/BinaryMotion.astro';
 import { getPosts, formatDate, isoDate, readingTime, postUrl, originalPlatform, coverWebp, binaryCover } from '../../lib/posts';
 
 export async function getStaticPaths() {
@@ -45,6 +46,7 @@ const binary = binaryCover(cover, 'hero');
           : webp
           ? <picture><source type="image/webp" srcset={webp} /><img src={cover} alt="" width="1200" height="900" loading="eager" /></picture>
           : <img src={cover} alt="" width="1200" height="900" loading="eager" />}
+        {binary && <BinaryMotion />}
       </div>
     )}
     <div class="prose">

@@ -1,0 +1,113 @@
+---
+// Makes the binary (0s and 1s) covers shimmer: a few digits flip between 0 and 1 every moment.
+//
+// It works on the static binary image already on the page, so nothing extra is downloaded.
+// The image is copied onto a canvas laid exactly over it; a flipped digit is redrawn in the
+// colour of the digit it replaces, and flipping back restores the original pixels exactly, so
+// the picture never drifts. Only covers on screen animate, nothing runs in background tabs,
+// and people who ask their system for reduced motion keep the still image.
+//
+// The grid must match scripts/binary-covers.mjs (8 x 10 px cells, 5 x 7 px digits).
+// Include this component anywhere a binary cover appears; Astro bundles the script once.
+---
+<script>
+  const CW = 8, CH = 10, OX = 1, OY = 1;
+  const GLYPHS: Record<'0' | '1', string[]> = {
+    '0': ['.###.', '#...#', '#..##', '#.#.#', '##..#', '#...#', '.###.'],
+    '1': ['..#..', '.##..', '..#..', '..#..', '..#..', '..#..', '.###.'],
+  };
+  const MASK = { '0': GLYPHS['0'].map((r) => [...r].map((ch) => ch === '#')), '1': GLYPHS['1'].map((r) => [...r].map((ch) => ch === '#')) };
+  // Share of all digits that flip per second (each flip turns back a moment later).
+  const RATE = 0.03;
+
+  type Cover = { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D; orig: Uint8ClampedArray; cur: ImageData; W: number; cols: number; rows: number; flipped: Map<number, number>; visible: boolean; budget: number };
+  const covers: Cover[] = [];
+
+  const lum = (d: Uint8ClampedArray, i: number) => 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2];
+
+  function setup(img: HTMLImageElement) {
+    const W = img.naturalWidth, H = img.naturalHeight;
+    if (!W || !H || W % CW || H % CH) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    canvas.className = img.className;
+    canvas.setAttribute('aria-hidden', 'true');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    if (!ctx) return;
+    ctx.drawImage(img, 0, 0);
+    let cur: ImageData;
+    try { cur = ctx.getImageData(0, 0, W, H); } catch { return; }
+    img.after(canvas);
+    img.classList.add('binary-live');
+    const c: Cover = { canvas, ctx, orig: new Uint8ClampedArray(cur.data), cur, W, cols: W / CW, rows: H / CH, flipped: new Map(), visible: false, budget: 0 };
+    covers.push(c);
+    io.observe(canvas);
+    (canvas as any).__cover = c;
+  }
+
+  // Redraw one cell as the other digit, in the colour of the digit that is there now.
+  function flip(c: Cover, cell: number) {
+    const { orig, cur, W } = c;
+    const d = cur.data;
+    const x0 = (cell % c.cols) * CW, y0 = Math.floor(cell / c.cols) * CH;
+    const at = (gx: number, gy: number) => ((y0 + OY + gy) * W + x0 + OX + gx) * 4;
+
+    if (c.flipped.has(cell)) {
+      // flip back: restore the original pixels exactly
+      for (let y = 0; y < CH; y++) { const i = ((y0 + y) * W + x0) * 4; d.set(orig.subarray(i, i + CW * 4), i); }
+      c.flipped.delete(cell);
+    } else {
+      const was: '0' | '1' = lum(orig, at(0, 1)) > lum(orig, at(1, 1)) ? '0' : '1';
+      const now = was === '0' ? '1' : '0';
+      // average colour of the lit pixels (the digit) and of the unlit ones (the wash behind it)
+      const ink = [0, 0, 0], bg = [0, 0, 0]; let ni = 0, nb = 0;
+      for (let gy = 0; gy < 7; gy++) for (let gx = 0; gx < 5; gx++) {
+        const i = at(gx, gy), t = MASK[was][gy][gx] ? ink : bg;
+        t[0] += orig[i]; t[1] += orig[i + 1]; t[2] += orig[i + 2];
+        MASK[was][gy][gx] ? ni++ : nb++;
+      }
+      for (let gy = 0; gy < 7; gy++) for (let gx = 0; gx < 5; gx++) {
+        const on = MASK[now][gy][gx], before = MASK[was][gy][gx];
+        if (on === before) continue;
+        const i = at(gx, gy), src = on ? ink : bg, n = on ? ni : nb;
+        d[i] = src[0] / n; d[i + 1] = src[1] / n; d[i + 2] = src[2] / n;
+      }
+      c.flipped.set(cell, performance.now() + 400 + Math.random() * 1600);
+    }
+    c.ctx.putImageData(cur, 0, 0, x0, y0, CW, CH);
+  }
+
+  let last = 0, running = false;
+  function tick(t: number) {
+    const dt = Math.min(0.1, (t - (last || t)) / 1000);
+    last = t;
+    let any = false;
+    for (const c of covers) {
+      if (!c.visible) continue;
+      any = true;
+      for (const [cell, until] of c.flipped) if (t >= until) flip(c, cell);
+      c.budget += c.cols * c.rows * RATE * dt;
+      while (c.budget >= 1) {
+        c.budget--;
+        const cell = Math.floor(Math.random() * c.cols * c.rows);
+        if (!c.flipped.has(cell)) flip(c, cell);
+      }
+    }
+    if (any && !document.hidden) requestAnimationFrame(tick);
+    else { running = false; last = 0; }
+  }
+  function start() { if (!running && !document.hidden && covers.some((c) => c.visible)) { running = true; requestAnimationFrame(tick); } }
+
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) { const c = (e.target as any).__cover as Cover | undefined; if (c) c.visible = e.isIntersecting; }
+    start();
+  }, { rootMargin: '100px' });
+  document.addEventListener('visibilitychange', start);
+
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    for (const img of document.querySelectorAll<HTMLImageElement>('img.binary')) {
+      if (img.complete && img.naturalWidth) setup(img);
+      else img.addEventListener('load', () => setup(img), { once: true });
+    }
+  }
+</script>

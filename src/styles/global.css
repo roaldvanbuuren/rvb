@@ -177,6 +177,9 @@ a.prow:hover .p-desc{color:var(--accent-hover)}
 .wcard-img{position:relative;min-height:230px;background:#121211}
 .wcard-img .art,.wcard-img > img{position:absolute;inset:0;width:100%;height:100%}
 .wcard-img > img{object-fit:cover}
+/* live (shimmering) binary covers: the canvas takes the place of the still image, see BinaryMotion.astro */
+img.binary-live{display:none !important}
+.wcard-img > canvas.binary{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .wcard-img > picture{position:absolute;inset:0;display:block}
 .wcard-img > picture img{width:100%;height:100%;object-fit:cover}
 .wcard-img .art svg{width:100%;height:100%}
@@ -431,6 +434,7 @@ body > footer{position:relative;border-top:1px solid var(--hair)}
 .cover{max-width:960px;margin:40px auto 0;padding:0 24px}
 .cover img{width:100%;height:auto;border:1px solid var(--hair);border-radius:var(--radius)}
 .cover picture{display:block}
+.cover canvas{display:block;width:100%;height:auto;border:1px solid var(--hair);border-radius:var(--radius)}
 .prose{max-width:680px;margin:0 auto;padding:44px 24px 0;font-size:17px;line-height:1.75;color:var(--body)}
 .prose > *:first-child{margin-top:0}
 .prose p{margin:0 0 1.35em}
@@ -481,7 +485,7 @@ html[data-theme="light"] .zone::before,html[data-theme="light"] .zone::after{dis
 html[data-theme="light"] .theme-toggle:hover{border-color:rgba(20,20,20,.32)}
 html[data-theme="light"] .prose pre{background:#E9E9E0}
 html[data-theme="light"] .prose blockquote{border-left-color:rgba(20,20,20,.3)}
-html[data-theme="light"] .prose img,html[data-theme="light"] .cover img{border-color:rgba(20,20,20,.12)}
+html[data-theme="light"] .prose img,html[data-theme="light"] .cover img,html[data-theme="light"] .cover canvas{border-color:rgba(20,20,20,.12)}
 html[data-theme="light"] .origin a:hover{color:#000}
 html[data-theme="light"] a.card:hover{border-color:rgba(20,20,20,.3)}
 html[data-theme="light"] a.card:hover .h3{color:#000}
