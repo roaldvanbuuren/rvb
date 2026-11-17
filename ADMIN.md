@@ -12,10 +12,9 @@ saved with `draft: true`, so they never publish.
 | Name | Value |
 | --- | --- |
 | `ADMIN_PASSWORD` | A long random password (this is your login). |
-| `SESSION_SECRET` | A random string of 32+ characters, e.g. `openssl rand -base64 32`. |
 | `GITHUB_TOKEN` | Fine-grained personal access token, repository `rvb` only, permission Contents: Read and write. |
 
-Optional: `GITHUB_OWNER` (default `roaldvanbuuren`), `GITHUB_REPO` (default `rvb`), `GITHUB_BRANCH` (default `main`).
+Optional: `SESSION_SECRET` (overrides the derived cookie-signing key), `GITHUB_OWNER` (default `roaldvanbuuren`), `GITHUB_REPO` (default `rvb`), `GITHUB_BRANCH` (default `main`).
 
 Redeploy after adding them.
 

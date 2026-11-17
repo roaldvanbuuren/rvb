@@ -25,8 +25,18 @@ function env(name) {
 const COOKIE = 'rvb_admin';
 const MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
+// The cookie signing key is derived from the password and the GitHub token, so no separate
+// secret is needed (SESSION_SECRET still overrides it if set). The token is high-entropy,
+// which keeps the password from being guessed offline from a stolen cookie.
+function sessionKey() {
+  return (
+    process.env.SESSION_SECRET ||
+    crypto.createHash('sha256').update(`rvb-admin:${env('ADMIN_PASSWORD')}:${env('GITHUB_TOKEN')}`).digest('hex')
+  );
+}
+
 function sign(payload) {
-  return crypto.createHmac('sha256', env('SESSION_SECRET')).update(payload).digest('base64url');
+  return crypto.createHmac('sha256', sessionKey()).update(payload).digest('base64url');
 }
 
 function safeEqual(a, b) {
