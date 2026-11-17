@@ -14,5 +14,5 @@ export default defineConfig({
   site,
   output: 'static',
   trailingSlash: 'never',
-  integrations: [sitemap({ filter: (page) => !/\/404$/.test(page) })],
+  integrations: [sitemap({ filter: (page) => !/\/(404|admin)$/.test(page) })],
 });

@@ -1,0 +1,255 @@
+---
+import '../styles/global.css';
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Admin</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <style>
+    .adm{max-width:760px;margin:0 auto;padding:48px 20px 96px;color:var(--body);font-family:var(--text)}
+    .adm h1{font-family:var(--disp);color:var(--bone);font-weight:600;font-size:2rem;margin:0 0 24px;letter-spacing:.01em}
+    .adm label{display:block;font-size:.8rem;color:var(--dim);margin:18px 0 6px;text-transform:uppercase;letter-spacing:.06em}
+    .adm input[type=text],.adm input[type=password],.adm input[type=date],.adm input[type=url],.adm textarea{
+      width:100%;box-sizing:border-box;background:var(--ink-2);border:1px solid var(--hair);color:var(--bone);
+      padding:10px 12px;font:inherit;border-radius:6px}
+    .adm textarea{min-height:420px;font-family:var(--mono);font-size:.9rem;line-height:1.55;resize:vertical}
+    .adm button{background:var(--bone);color:var(--ink);border:0;border-radius:6px;padding:10px 16px;font:inherit;font-weight:600;cursor:pointer}
+    .adm button.ghost{background:transparent;color:var(--body);border:1px solid var(--hair)}
+    .adm button:disabled{opacity:.5;cursor:default}
+    .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .row>*{flex:0 0 auto}.grow{flex:1 1 200px!important}
+    .list a{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--hair);color:var(--bone);text-decoration:none;cursor:pointer}
+    .list small{color:var(--dim);white-space:nowrap}
+    .msg{margin:16px 0;padding:10px 12px;border-radius:6px;border:1px solid var(--hair);background:var(--ink-3)}
+    .msg.err{color:#ff9b8f}.msg.ok{color:#9be3a6}
+    .thumb{max-width:240px;border-radius:6px;margin-top:8px;display:block}
+    .hint{font-size:.8rem;color:var(--dim);margin-top:6px}
+    .hidden{display:none!important}
+  </style>
+</head>
+<body>
+<main class="adm">
+  <section id="login" class="hidden">
+    <h1>Admin</h1>
+    <form id="login-form">
+      <label for="pw">Password</label>
+      <input id="pw" type="password" autocomplete="current-password" required />
+      <p class="row"><button type="submit">Log in</button></p>
+    </form>
+  </section>
+
+  <section id="list" class="hidden">
+    <div class="row"><h1 class="grow">Journal</h1><button id="new" type="button">New post</button><button id="logout" type="button" class="ghost">Log out</button></div>
+    <div id="posts" class="list"></div>
+  </section>
+
+  <section id="editor" class="hidden">
+    <div class="row"><h1 class="grow" id="editor-title">New post</h1><button id="back" type="button" class="ghost">All posts</button></div>
+    <form id="post-form">
+      <label for="title">Title</label>
+      <input id="title" type="text" maxlength="200" required />
+      <label for="slug">Slug (URL: /writing/slug)</label>
+      <input id="slug" type="text" maxlength="120" pattern="[a-z0-9]+(-[a-z0-9]+)*" required />
+      <label for="date">Date</label>
+      <input id="date" type="date" required />
+      <label for="summary">Summary (shown in lists and link previews)</label>
+      <input id="summary" type="text" maxlength="400" required />
+      <label for="cover">Cover image</label>
+      <div class="row">
+        <input id="cover" type="text" class="grow" placeholder="/images/writing/... or https://..." />
+        <button id="cover-btn" type="button" class="ghost">Upload</button>
+      </div>
+      <img id="cover-preview" class="thumb hidden" alt="" />
+      <label for="orig">Originally posted (optional URL)</label>
+      <input id="orig" type="url" placeholder="https://x.com/..." />
+      <label for="body">Body (Markdown)</label>
+      <textarea id="body" required></textarea>
+      <div class="row" style="margin-top:8px"><button id="img-btn" type="button" class="ghost">Insert image</button><span class="hint" id="img-hint">Uploads and inserts a Markdown image at the cursor.</span></div>
+      <label class="row" style="text-transform:none;letter-spacing:0;font-size:.95rem"><input id="draft" type="checkbox" /> Draft (not published, not in the feed)</label>
+      <p class="row"><button id="save" type="submit">Publish</button><span class="hint">Saving commits to main. The live site updates after the Vercel build, about a minute.</span></p>
+    </form>
+  </section>
+
+  <div id="msg" class="msg hidden" role="status"></div>
+  <input id="file" type="file" accept="image/jpeg,image/png,image/webp,image/gif" class="hidden" />
+</main>
+
+<script is:inline>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var state = { sha: null, isNew: true, pickTarget: null };
+
+  function show(id) {
+    ['login', 'list', 'editor'].forEach(function (s) { $(s).classList.toggle('hidden', s !== id); });
+    msg('');
+  }
+  function msg(text, kind) {
+    var m = $('msg');
+    m.textContent = text || '';
+    m.className = 'msg' + (kind ? ' ' + kind : '') + (text ? '' : ' hidden');
+  }
+  async function api(path, method, body) {
+    var r = await fetch('/api/' + path, {
+      method: method || 'GET',
+      headers: body ? { 'Content-Type': 'application/json' } : undefined,
+      body: body ? JSON.stringify(body) : undefined,
+      credentials: 'same-origin'
+    });
+    var j = {};
+    try { j = await r.json(); } catch (e) {}
+    if (r.status === 401 && path !== 'login') { show('login'); throw new Error('Please log in.'); }
+    if (!r.ok) throw new Error(j.error || 'Request failed (' + r.status + ')');
+    return j;
+  }
+  function slugify(s) {
+    return s.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/['’]/g, '')
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80);
+  }
+  function today() { return new Date().toISOString().slice(0, 10); }
+
+  async function loadList() {
+    show('list');
+    var box = $('posts');
+    box.textContent = 'Loading...';
+    try {
+      var j = await api('posts');
+      box.textContent = '';
+      j.posts.forEach(function (p) {
+        var a = document.createElement('a');
+        var t = document.createElement('span');
+        t.textContent = p.title || p.slug;
+        var s = document.createElement('small');
+        s.textContent = (p.draft ? 'draft · ' : '') + p.date;
+        a.appendChild(t); a.appendChild(s);
+        a.addEventListener('click', function () { openPost(p.slug); });
+        box.appendChild(a);
+      });
+    } catch (e) { box.textContent = ''; msg(e.message, 'err'); }
+  }
+
+  function fill(p) {
+    $('title').value = p.title || '';
+    $('slug').value = p.slug || '';
+    $('date').value = p.date || today();
+    $('summary').value = p.summary || '';
+    $('cover').value = p.cover || '';
+    $('orig').value = p.originally_posted || '';
+    $('body').value = p.body || '';
+    $('draft').checked = !!p.draft;
+    previewCover();
+  }
+  function previewCover() {
+    var v = $('cover').value.trim(), img = $('cover-preview');
+    if (v) { img.src = v; img.classList.remove('hidden'); } else { img.classList.add('hidden'); }
+  }
+
+  function newPost() {
+    state.sha = null; state.isNew = true;
+    $('editor-title').textContent = 'New post';
+    $('slug').readOnly = false;
+    fill({ draft: true });
+    show('editor');
+  }
+  async function openPost(slug) {
+    try {
+      var p = await api('posts?slug=' + encodeURIComponent(slug));
+      state.sha = p.sha; state.isNew = false;
+      $('editor-title').textContent = 'Edit post';
+      $('slug').readOnly = true;
+      fill(p);
+      show('editor');
+    } catch (e) { msg(e.message, 'err'); }
+  }
+
+  // Resize big images in the browser so they fit the upload limit and load fast.
+  function toBase64(file) {
+    return new Promise(function (resolve, reject) {
+      if (file.type === 'image/gif') {
+        var fr = new FileReader();
+        fr.onload = function () { resolve(String(fr.result).split(',')[1]); };
+        fr.onerror = reject; fr.readAsDataURL(file); return;
+      }
+      var url = URL.createObjectURL(file), img = new Image();
+      img.onload = function () {
+        var max = 1800, scale = Math.min(1, max / Math.max(img.width, img.height));
+        var c = document.createElement('canvas');
+        c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        var type = file.type === 'image/png' && scale === 1 ? 'image/png' : 'image/jpeg';
+        resolve(c.toDataURL(type, 0.86).split(',')[1]);
+      };
+      img.onerror = function () { reject(new Error('Could not read that image.')); };
+      img.src = url;
+    });
+  }
+  async function upload(file) {
+    var slug = $('slug').value.trim();
+    if (!slug) throw new Error('Set the slug first (images are stored under it).');
+    var data = await toBase64(file);
+    var j = await api('upload', 'POST', { slug: slug, name: file.name, data: data });
+    return j.url;
+  }
+  function pick(target) { state.pickTarget = target; $('file').value = ''; $('file').click(); }
+
+  $('file').addEventListener('change', async function () {
+    var f = $('file').files[0];
+    if (!f) return;
+    msg('Uploading...');
+    try {
+      var url = await upload(f);
+      if (state.pickTarget === 'cover') { $('cover').value = url; previewCover(); }
+      else {
+        var ta = $('body'), pos = ta.selectionStart || ta.value.length;
+        var md = '\n\n![](' + url + ')\n\n';
+        ta.value = ta.value.slice(0, pos) + md + ta.value.slice(pos);
+      }
+      msg('Image uploaded and committed.', 'ok');
+    } catch (e) { msg(e.message, 'err'); }
+  });
+
+  $('cover-btn').addEventListener('click', function () { pick('cover'); });
+  $('img-btn').addEventListener('click', function () { pick('body'); });
+  $('cover').addEventListener('change', previewCover);
+  $('title').addEventListener('input', function () {
+    if (state.isNew && !$('slug').dataset.touched) $('slug').value = slugify($('title').value);
+  });
+  $('slug').addEventListener('input', function () { $('slug').dataset.touched = '1'; });
+  $('new').addEventListener('click', function () { delete $('slug').dataset.touched; newPost(); });
+  $('back').addEventListener('click', loadList);
+
+  $('login-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    try { await api('login', 'POST', { password: $('pw').value }); $('pw').value = ''; loadList(); }
+    catch (err) { msg(err.message, 'err'); }
+  });
+  $('logout').addEventListener('click', async function () {
+    try { await api('logout', 'POST', {}); } catch (e) {}
+    show('login');
+  });
+
+  $('post-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var btn = $('save'); btn.disabled = true; msg('Saving...');
+    try {
+      var j = await api('posts', 'POST', {
+        slug: $('slug').value.trim(), title: $('title').value, date: $('date').value,
+        summary: $('summary').value, cover: $('cover').value.trim(),
+        originally_posted: $('orig').value.trim(), body: $('body').value,
+        draft: $('draft').checked, sha: state.sha || undefined
+      });
+      state.sha = j.sha; state.isNew = false; $('slug').readOnly = true;
+      msg($('draft').checked ? 'Saved as a draft.' : 'Committed. Live at ' + j.url + ' after the build (about a minute).', 'ok');
+    } catch (err) { msg(err.message, 'err'); }
+    btn.disabled = false;
+  });
+
+  api('session').then(function (s) { if (s.authed) loadList(); else show('login'); }).catch(function () { show('login'); });
+})();
+</script>
+</body>
+</html>
