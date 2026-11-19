@@ -750,3 +750,19 @@ footer::after{content:"";position:absolute;inset:0;pointer-events:none;backgroun
 /* weights: the thin labels step up a notch */
 .enav-link{font-weight:400}
 .f-eyebrow,.f-mono,.slit,.r-date,.credit time{font-weight:500}
+
+/* hero image in the data.elocollective.com treatment: monochrome, near-black, fading in from darkness */
+.hero{background:#060606}
+.hero-img{filter:grayscale(1) brightness(.62) contrast(1.18);
+  -webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 24%,#000 76%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0%,#000 24%,#000 76%,transparent 100%)}
+.dusk-glow{display:none}
+
+/* hero: no seam where the image box ends */
+.hero{background:linear-gradient(180deg,#060606 0,#060606 calc(var(--hh) * .88),var(--ink) 100%)}
+.hero-art::before{background:linear-gradient(180deg,rgba(6,6,6,.45) 0,rgba(6,6,6,0) 30%,rgba(6,6,6,0) 76%,#060606 100%)}
+/* home footer: the grey closing fade carries on into the footer and settles into the charcoal */
+html:has(#top.hero) body > footer{border-top:0;background:linear-gradient(180deg,#3B3A36 0%,#2A2A28 38%,var(--ink) 100%)}
+html:has(#top.hero) .foot{padding-top:clamp(56px,6vw,84px)}
+html:has(#top.hero) .foot small{color:#B1B1A8}
+html:has(#top.hero) body > footer::after{opacity:.28}
+.glow-c{-webkit-mask-image:linear-gradient(180deg,#000 0,#000 20%,transparent 50%);mask-image:linear-gradient(180deg,#000 0,#000 20%,transparent 50%)}
