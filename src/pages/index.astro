@@ -1,137 +1,46 @@
 ---
 import Base from '../layouts/Base.astro';
-import Buttons from '../components/Buttons.astro';
-import PostCard from '../components/PostCard.astro';
 import Dusk from '../components/Dusk.astro';
 import Logo from '../components/Logo.astro';
-import CloverPortrait from '../components/CloverPortrait.astro';
-import { getPosts, links, postUrl } from '../lib/posts';
+import { getPosts, links, postUrl, formatDate, isoDate } from '../lib/posts';
 
 const all = await getPosts();
 const latest = all.slice(0, 5);
 
-// Pull quote: must be a verbatim line from one of the articles. The build fails if it drifts.
-const quoteSlug = 'gaming-is-a-lens-for-human-behaviour-and-we-re-barely-scratching-the-surface';
-const quote = 'We have built, almost by accident, the most heavily instrumented environment for studying human behaviour that has ever existed, and we mostly use it to sell battle passes.';
-const quotePost = all.find((p) => p.id === quoteSlug);
-if (!quotePost || !quotePost.body?.includes(quote)) throw new Error('Pull quote is not a verbatim line of its article');
+// Pull quotes: each must be a verbatim line from its article. The build fails if one drifts.
+function pull(slug: string, quote: string) {
+  const post = all.find((p) => p.id === slug);
+  if (!post || !post.body?.includes(quote)) throw new Error(`Pull quote is not a verbatim line of "${slug}"`);
+  return post;
+}
+const bandSlug = 'gaming-is-a-lens-for-human-behaviour-and-we-re-barely-scratching-the-surface';
+const bandQuote = 'We have built, almost by accident, the most heavily instrumented environment for studying human behaviour that has ever existed, and we mostly use it to sell battle passes.';
+const bandPost = pull(bandSlug, bandQuote);
+const quietSlug = 'the-world-runs-on-alignment';
+const quietQuote = "Most people don't realize the world runs on one thing: alignment.";
+const quietPost = pull(quietSlug, quietQuote);
+
+// Stops on the horizon line. Copy is from the About timeline; nothing added.
+const road = [
+  { date: '2008 to 2011', name: 'Fnatic', text: 'Joined as an editor and worked my way up.' },
+  { date: '2012 to 2022', name: 'FACEIT', text: "One of FACEIT's first hires, there from its first year through to its acquisition." },
+  { date: '2024 to now', name: 'ELO', text: 'We saw a common thread in all success in gaming: community.', lit: true },
+  { date: 'March 2026', name: 'Lumen', text: 'ELO launches Lumen with design partners, pivoting from an agency to a tech and AI-native business.' },
+  { date: 'July 2026', name: 'Turin', text: 'Moved to Turin.' },
+];
 
 const products = [
-  { name: 'Lumen', logo: { src: '/images/logos/lumen.png', w: 200, h: 200, dh: 44 }, text: 'Community intelligence for Discord. Shows community teams what to fix and why.', href: links.lumen, host: 'trylumen.io', lead: true, tone: 'accent' },
-  { name: 'ELO Collective', logo: { src: '/images/logos/elo-collective.png', w: 200, h: 200, dh: 44 }, text: 'Builds communities that grow themselves.', href: links.elo, host: 'elocollective.com', tone: 'sand' },
-  { name: 'ELO Labs', logo: { src: '/images/logos/elo-labs.png', w: 149, h: 240, dh: 60 }, text: 'Finds out how people behave in them, together and under pressure.', href: links.labs, host: 'labs.elocollective.com', tone: 'amber' },
-  { name: 'ELO Data', logo: { src: '/images/logos/elo-data.png', w: 131, h: 160, dh: 60 }, text: 'Turns what holds up into data for AI.', href: links.data, host: 'data.elocollective.com', tone: 'grey' },
+  { name: 'Lumen', text: 'Community intelligence for Discord. Shows community teams what to fix and why.', href: links.lumen, lead: true },
+  { name: 'ELO Collective', text: 'Builds communities that grow themselves.', href: links.elo },
+  { name: 'ELO Labs', text: 'Finds out how people behave in them, together and under pressure.', href: links.labs },
+  { name: 'ELO Data', text: 'Turns what holds up into data for AI.', href: links.data },
 ];
-
-// Hover glow: one soft radial wash per brand colour, spread across the tile.
-const glowCss = (cols: string[] = []) => cols.map((c, i) => `radial-gradient(ellipse 70% 120% at ${cols.length === 1 ? 50 : 18 + (64 * i) / (cols.length - 1)}% 100%, ${c}, transparent 70%)`).join(',');
-// "ELO works with" logo row in 02 / Now. Logos are bone-coloured PNGs in public/images/logos. h = display height in px.
-const worksWith = {
-  title: 'ELO works with',
-  more: 'and many more',
-  logos: [
-    { name: 'McLaren', url: 'https://www.mclaren.com', src: '/images/logos/mclaren.png', w: 640, nh: 94, h: 24, glow: ['#FF8000'] },
-    { name: 'Torpor Games', url: 'https://www.torporgames.com', src: '/images/logos/torpor-games.png', w: 344, nh: 170, h: 60 },
-    { name: 'NASCAR', url: 'https://www.nascar.com', src: '/images/logos/nascar.png', w: 640, nh: 114, h: 26, glow: ['#FFD100', '#E4002B', '#1E5BFF'] },
-    { name: 'Team Liquid', url: 'https://www.teamliquid.com', src: '/images/logos/team-liquid.png', w: 176, nh: 200, h: 64, glow: ['#1F7BFF'] },
-    { name: 'NSE', url: 'https://nse.gg', src: '/images/logos/nse.png', w: 188, nh: 62, h: 30, glow: ['#FFE600', '#FF2E93', '#00E5FF'] },
-    { name: 'Burda Principal Investments', url: 'https://burdaprincipalinvestments.com', src: '/images/logos/burda.svg', w: 621, nh: 135, h: 42, glow: ['#00B7E6'] },
-    { name: 'TUM Venture Labs', url: 'https://www.tum-venture-labs.de', src: '/images/logos/tum-venture-labs.png', w: 292, nh: 100, h: 38, glow: ['#0A6BD6'] },
-    { name: 'The Wolf', url: 'https://thewolfsimulator.com', src: '/images/logos/the-wolf.png', w: 366, nh: 164, h: 40, glow: ['#8B5A2B'] },
-  ],
-};
-
-// "When I'm not working" strip under Now: tags and the one dim line under them.
-const offDuty = {
-  title: "When I'm not working",
-  tags: [
-    'History, mostly Rome and Egypt',
-    'Statecraft, politics and power',
-    'Science fiction',
-    'Big-idea non-fiction',
-    'AI that makes us more human',
-    'Europe',
-    'English legend and folklore',
-    'PC games',
-    'Rain, with a good coat',
-  ],
-  playing: "Assassin's Creed Odyssey",
-};
-
-// Timeline for 01 / About, oldest first. Copy is as supplied; nothing added.
-type Stop = {
-  kind: 'life' | 'career' | 'highlight';
-  date: string;
-  text?: string;
-  lead?: string;
-  name?: string;
-  role?: string;
-  faceit?: boolean;
-  bright?: boolean;
-  link?: { href: string; label: string };
-  link2?: { href: string; label: string };
-  link3?: { href: string; label: string };
-  /** Where this stop's "Read the story" link goes. */
-  story?: string;
-  logo?: { src: string; w: number; h: number; dh: number; alt?: string; replaces?: boolean };
-};
-// Painted background scenes behind the timeline (public/timeline/<file>.webp with .jpg fallback).
-// `from` is the index of the first stop each scene sits behind.
-const scenes = [
-  { file: 'tl-01-doorn', from: 0, caption: 'Doorn, 1990s. Huis Doorn, where Kaiser Wilhelm II lived out his exile, painted in the manner of Ruisdael. Where it started: hockey sticks and big Dutch skies.' },
-  { file: 'tl-02-call-of-duty', from: 2, caption: '2002. A Normandy street in the style of a 19th-century battle painting, for the Call of Duty years that pulled me into online gaming.' },
-  { file: 'tl-03-fnatic-lan', from: 4, caption: '2007 to 2011. A LAN by candlelight after Georges de La Tour. Players at their screens, an editor taking notes at the side: the Fnatic years.' },
-  { file: 'tl-04-faceit-arena', from: 9, caption: '2012 to 2022. An esports final reimagined as a Veronese spectacle: the crowds, the stage, the broadcast cameras of the FACEIT decade.' },
-  { file: 'tl-05-elo-community-ai', from: 19, caption: '2024 to now. A School of Athens for ELO: communities gathered around a gentle intelligence, the Alps behind, Turin close by.' },
-];
-const sceneOf = (i: number) => scenes.reduce((a, sc, k) => (sc.from <= i ? k : a), 0);
-const fStart = () => stops.findIndex((x) => x.faceit);
-const fEnd = () => stops.length - 1 - [...stops].reverse().findIndex((x) => x.faceit);
-// Logos on the timeline. Bone-coloured PNGs in public/images/logos. w/h are the file size, dh is the display height in px.
-// `replaces` means the logo already spells the name, so it stands in for the heading instead of sitting above it.
-const tl = {
-  fourKings: { src: '/images/logos/4kings.png', w: 165, h: 165, dh: 44 },
-  fnatic: { src: '/images/logos/fnatic.png', w: 420, h: 274, dh: 32 },
-  fpsOmega: { src: '/images/logos/fps-omega.png', w: 380, h: 213, dh: 40, replaces: true },
-  faceit: { src: '/images/logos/faceit.png', w: 484, h: 71, dh: 20, replaces: true },
-  eleague: { src: '/images/logos/eleague.png', w: 406, h: 420, dh: 64, alt: 'ELEAGUE' },
-  xGames: { src: '/images/logos/x-games.png', w: 365, h: 420, dh: 64, alt: 'X Games' },
-  universalOpen: { src: '/images/logos/rocket-league-universal-open.png', w: 263, h: 275, dh: 64, alt: 'Universal Open, Rocket League' },
-  elo: { src: '/images/logos/elo-collective.png', w: 200, h: 200, dh: 44, replaces: true },
-  lumen: { src: '/images/logos/lumen.png', w: 200, h: 200, dh: 56, alt: 'Lumen' },
-  milan: { src: '/images/cities/milan.png', w: 461, h: 436, dh: 64, alt: 'Milan Cathedral' },
-  london: { src: '/images/cities/london.png', w: 126, h: 462, dh: 84, alt: 'Big Ben, London' },
-  turin: { src: '/images/cities/turin.png', w: 210, h: 462, dh: 84, alt: 'Mole Antonelliana, Turin' },
-  major: { src: '/images/logos/faceit-major-london-2018.png', w: 329, h: 272, dh: 60, alt: 'FACEIT Major London 2018' },
-};
-const stops: Stop[] = [
-  { kind: 'life', date: '29 June 1990', text: 'Born in Doorn, the Netherlands.' },
-  { kind: 'life', date: 'The 90s', text: 'A childhood spent on Pokémon, Dragon Ball Z, field hockey and games.' },
-  { kind: 'life', date: 'The 2000s', text: 'Started playing multiplayer games and found esports. The tumultuous start to the naughties got me interested in politics and power.' },
-  { kind: 'life', date: '2003', text: 'Started playing Call of Duty.' },
-  { kind: 'life', date: '2007', text: 'Went from playing games to writing about them.' },
-  { kind: 'career', story: '/work/early-years', date: '2007 to 2008', name: '4Kings', role: 'Editor', logo: tl.fourKings, text: "Covering Call of Duty for one of the UK's oldest esports organisations." },
-  { kind: 'career', story: '/work/fnatic', date: '2008 to 2011', name: 'Fnatic', role: 'Editor, Editor-in-Chief, General Manager', logo: tl.fnatic, text: "Joined as an editor and worked my way up. As GM: the Own3D streaming partnership, scouting talent, the shop, and launching Fnatic's tournament platform, PLAY." },
-  { kind: 'career', story: '/work/early-years', date: '2010', name: 'Stermy.com', role: 'Head of Content and Community', text: "Content for Alessandro 'Stermy' Avallone's personal brand, my first close look at how a player's brand becomes a community." },
-  { kind: 'career', story: '/work/early-years', date: '2011 to 2013', name: 'FPS Omega', role: 'Founder', logo: tl.fpsOmega, text: 'English-language community media for competitive shooters, including ShootManiaEsports.com and OverwatchEsports.com.' },
-  { kind: 'life', date: '2012', logo: tl.milan, text: 'Dropped out of college and moved to Italy for FACEIT.' },
-  { kind: 'career', faceit: true, story: '/work/faceit', date: '2012 to 2014', name: 'FACEIT', role: 'VP of Marketing, Milan', logo: tl.faceit, lead: "One of FACEIT's first hires, there from its first year through to its acquisition.", text: 'A broad early remit: business development, marketing, PR, community, even sales and logistics.' },
-  { kind: 'career', faceit: true, story: '/work/faceit', date: '2014 to 2016', name: 'FACEIT', role: 'VP of Events', logo: tl.faceit, text: 'Tournament operations, player management, logistics and live production, as FACEIT turned professional.' },
-  { kind: 'life', faceit: true, date: '2015', logo: tl.london, text: 'Moved to London.' },
-  { kind: 'career', faceit: true, story: '/work/faceit', date: '2016 to 2022', name: 'FACEIT', role: 'VP of Esports', logo: tl.faceit, text: 'Players, teams and publishers across the Esports Championship Series, Rainbow Six and more, plus white-label partnerships.' },
-  { kind: 'highlight', faceit: true, date: '2016', logo: tl.eleague, text: 'Brought Counter-Strike and Overwatch to US TV with ELEAGUE on TBS.' },
-  { kind: 'highlight', faceit: true, date: '2017', logo: tl.xGames, text: 'Took Rocket League esports to the X Games with ESPN.' },
-  { kind: 'highlight', faceit: true, date: '2017 to 2018', logo: tl.universalOpen, text: 'Brought Rocket League and the NHL to NBC.' },
-  { kind: 'highlight', faceit: true, date: '2018', logo: tl.major, text: 'The London Counter-Strike Major.' },
-  { kind: 'highlight', faceit: true, date: '2022', text: 'FACEIT acquired by Savvy Games Group, as part of a $1.5bn deal alongside ESL.' },
-  { kind: 'career', date: '2024 to now', name: 'ELO', role: 'Co-founder', logo: tl.elo, bright: true, text: 'We saw a common thread in all success in gaming: community. Very few were doing it right, so we started delivering agency services around community strategy for brands and games.' },
-  { kind: 'highlight', date: 'March 2026', logo: tl.lumen, text: 'ELO launches Lumen with design partners, pivoting from an agency to a tech and AI-native business.' },
-  { kind: 'life', date: 'July 2026', logo: tl.turin, text: 'Moved to Turin.', link: { href: '#now', label: "See what I'm doing now" }, link2: { href: '/press', label: 'Press, talks and podcasts' }, link3: { href: '/work', label: 'Work, in more detail' } },
-];
+const worksWith = ['McLaren', 'Torpor Games', 'NASCAR', 'Team Liquid', 'NSE', 'Burda Principal Investments', 'TUM Venture Labs', 'The Wolf'];
+const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and power', 'Science fiction', 'Big-idea non-fiction', 'AI that makes us more human', 'Europe', 'English legend and folklore', 'PC games', 'Rain, with a good coat'];
 ---
 <Base
   title="Roald van Buuren · Co-founder of ELO Collective"
-  description="Co-founder of ELO Collective. Community, fandom and behavioural intelligence. Based in Turin."
+  description="Co-founder of ELO Collective. On AI, technology, Europe, and what games reveal about people. Based in Turin."
 >
   <section class="hero" id="top">
     <div class="hero-art" aria-hidden="true">
@@ -142,271 +51,57 @@ const stops: Stop[] = [
     <div class="wrap hero-in">
       <Logo />
       <h1 class="h1">Roald van Buuren</h1>
-      <p class="sub">Co-founder of ELO Collective. Community, fandom and behavioural intelligence.</p>
-      <Buttons />
+      <p class="sub">Co-founder of ELO Collective. On AI, technology, Europe, and what games reveal about people.</p>
+      <div class="slits">
+        <a class="slit" href={links.x} target="_blank" rel="noopener">Follow on X<i></i></a>
+        <a class="slit" href={links.linkedin} target="_blank" rel="noopener">LinkedIn<i></i></a>
+        <a class="slit" href={links.email}>Email<i></i></a>
+      </div>
     </div>
   </section>
 
   {latest.length > 0 && (
-    <section class="latest zone z-w" id="writing">
+    <section class="film" id="writing">
       <div class="wrap rv">
-        <div class="latest-head">
-          <p class="eyebrow">Latest writing</p>
+        <p class="f-eyebrow">Dispatches</p>
+        <div class="credits">
+          {latest.map((p) => (
+            <a class="credit" href={postUrl(p)}>
+              <span class="c-top">
+                <time datetime={isoDate(p.data.date)}>{formatDate(p.data.date)}</time>
+                <span class="c-title">{p.data.title}</span>
+              </span>
+              <span class="c-sum">{p.data.summary}</span>
+              {p.data.cover && <img class="c-plate" src={p.data.cover} alt="" width="260" height="150" loading="lazy" decoding="async" />}
+            </a>
+          ))}
         </div>
-      </div>
-      <div class="wrap">
-        <div class="tiles">
-          {latest.map((p, i) => <PostCard post={p} index={i} variant="tile" />)}
-        </div>
-      </div>
-      <div class="wrap rv">
-        <div class="after-rows"><a class="more" href="/writing">See all writing →</a></div>
+        <p class="f-more"><a class="slit" href="/writing">See all writing<i></i></a></p>
       </div>
     </section>
   )}
 
-  <section id="about" class="hx" data-hx aria-label="About Roald">
-    <div class="hx-skipwrap"><a class="hx-skip" href="#now" data-skip aria-label="Skip the About scroll">Skip<svg viewBox="0 0 12 16" aria-hidden="true"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></a></div>
-    <div class="hx-pin" data-pin>
-      <div class="hx-bg">
-        <div class="hx-scenes" aria-hidden="true">
-          {scenes.map((sc, k) => (
-            <picture class={`hx-scene${k === 0 ? ' on' : ''}`} data-scene={k}>
-              <source type="image/webp" srcset={`/timeline/${sc.file}.webp`} />
-              <img src={`/timeline/${sc.file}.jpg`} alt="" width="1584" height="672" loading={k === 0 ? 'eager' : 'lazy'} decoding="async" />
-            </picture>
-          ))}
-        </div>
-        <div class="hx-shade" aria-hidden="true"></div>
-        {scenes.map((sc, k) => (
-          <p class="hx-cap" data-cap={k} aria-hidden="true">{sc.caption}</p>
-        ))}
-      </div>
-      <div class="hx-track" data-track>
-        <div class="hx-intro">
-          <div class="hx-fa">
-            <CloverPortrait />
-            <p class="about-lead">I'm Roald. I'm Dutch, I've spent most of my working life abroad, and since July 2026 I live in Turin.</p>
-            <p class="hx-hint" aria-hidden="true">Scroll<svg viewBox="0 0 12 16"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></p>
-          </div>
-          <div class="hx-fb">
-            <p class="about-p">Fifteen years in esports and gaming left me with one conviction: communities are the most underused asset in gaming, and the tools to support them barely exist. That's why I co-founded ELO in 2024. We build Lumen, community intelligence for Discord, and we research what games and online communities can tell us about people.</p>
-            <p class="about-p">These days I mostly think and write about how AI can make us more human, about community, about Europe and why it keeps getting in its own way, and about games as a lens on how people behave. When I'm not working, I'm reading history (Rome, Egypt) or science fiction, or playing something on PC.</p>
-          </div>
-        </div>
-
-        <div class="hx-journey">
-          <h3 class="hx-title">How I got here.</h3>
-          <div class="hx-stops" data-stops>
-            <div class="hx-line" data-line aria-hidden="true"><i class="hx-fill"></i></div>
-            <div class="hx-brk" data-brk aria-hidden="true" style={`left:calc(var(--sw) * ${fStart()});width:calc(var(--sw) * ${fEnd() - fStart()})`}><i></i><span>FACEIT</span><i></i></div>
-            <ol class="hx-list">
-              {stops.map((st, i) => (
-                <li class={`stop ${st.kind}${i % 2 === 0 ? ' up' : ' down'}${st.bright ? ' bright' : ''}`} data-f={i === fStart() ? '' : undefined} data-scene={sceneOf(i)}>
-                  <span class="node" aria-hidden="true"></span>
-                  <p class="s-date">{st.date}</p>
-                  <div class="s-body">
-                    {st.kind === 'career' ? (
-                      <div class="s-card">
-                        {st.logo && !st.logo.replaces && <img class="s-logo" src={st.logo.src} alt="" width={st.logo.w} height={st.logo.h} style={`--dh:${st.logo.dh}`} loading="lazy" decoding="async" />}
-                        <h4 class="s-name">{st.logo?.replaces ? <img class="s-logo s-logo-name" src={st.logo.src} alt={st.name} width={st.logo.w} height={st.logo.h} style={`--dh:${st.logo.dh}`} loading="lazy" decoding="async" /> : st.name}</h4>
-                        {st.role && <p class="s-role">{st.role}</p>}
-                        {st.lead && <p class="s-desc s-lead">{st.lead}</p>}
-                        {st.text && <p class="s-desc">{st.text}</p>}
-                        {st.story && <a class="s-link" href={st.story}>Read the story<svg viewBox="0 0 12 16" aria-hidden="true"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></a>}
-                      </div>
-                    ) : (
-                      <>
-                        {st.logo && <img class="s-logo" src={st.logo.src} alt={st.logo.alt ?? ''} width={st.logo.w} height={st.logo.h} style={`--dh:${st.logo.dh}`} loading="lazy" decoding="async" />}
-                        <p class="s-text">{st.text}</p>
-                        {st.link && <a class="s-link" href={st.link.href}>{st.link.label}<svg viewBox="0 0 12 16" aria-hidden="true"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></a>}
-                        {st.link2 && <a class="s-link s-link-quiet" href={st.link2.href}>{st.link2.label}<svg viewBox="0 0 12 16" aria-hidden="true"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></a>}
-                        {st.link3 && <a class="s-link s-link-quiet" href={st.link3.href}>{st.link3.label}<svg viewBox="0 0 12 16" aria-hidden="true"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></a>}
-                      </>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-          <div class="hx-end" aria-hidden="true"></div>
-        </div>
-      </div>
-      <div class="hx-hud" aria-hidden="true"><span data-hud-date></span><span data-hud-count></span></div>
-    </div>
-  </section>
-  <script is:inline>
-    (function () {
-      var sec = document.querySelector('[data-hx]');
-      if (!sec) return;
-      var pin = sec.querySelector('[data-pin]');
-      var track = sec.querySelector('[data-track]');
-      var line = sec.querySelector('[data-line]');
-      var fill = line.querySelector('.hx-fill');
-      var stops = [].slice.call(sec.querySelectorAll('.stop'));
-      var nodes = stops.map(function (s) { return s.querySelector('.node'); });
-      var brk = sec.querySelector('[data-brk]');
-      var firstF = sec.querySelector('.stop[data-f]');
-      var hud = sec.querySelector('.hx-hud');
-      var hudDate = sec.querySelector('[data-hud-date]');
-      var hudCount = sec.querySelector('[data-hud-count]');
-      var dates = stops.map(function (s) { var d = s.querySelector('.s-date'); return d ? d.textContent : ''; });
-      function pad(n) { return (n < 10 ? '0' : '') + n; }
-      var skip = sec.querySelector('[data-skip]');
-      if (skip) skip.addEventListener('click', function (e) {
-        var n = document.getElementById('now');
-        if (!n) return;
-        e.preventDefault();
-        window.scrollTo({ top: n.getBoundingClientRect().top + window.scrollY, behavior: 'instant' });
-        n.setAttribute('tabindex', '-1');
-        n.focus({ preventScroll: true });
-      });
-      var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
-      if (reduce) {
-        sec.classList.add('hx-static');
-        pin.setAttribute('tabindex', '0');
-        pin.setAttribute('role', 'region');
-        pin.setAttribute('aria-label', 'About, scrolls sideways');
-        stops.forEach(function (s) { s.classList.add('in', 'lit'); });
-        if (brk) brk.classList.add('in');
-        fill.style.transform = 'scaleX(1)';
-        return;
-      }
-      var dist = 0, ticking = false, lastLit = -1;
-      function size() {
-        dist = Math.max(0, track.offsetWidth - window.innerWidth);
-        sec.style.height = (dist + window.innerHeight) + 'px';
-      }
-      function update() {
-        ticking = false;
-        var top = sec.getBoundingClientRect().top;
-        var p = dist ? Math.min(1, Math.max(0, -top / dist)) : 0;
-        track.style.transform = 'translate3d(' + (-p * dist).toFixed(1) + 'px,0,0)';
-        var vw = window.innerWidth, marker = vw * 0.6;
-        var lr = line.getBoundingClientRect();
-        var w = Math.max(0, Math.min(lr.width, marker - lr.left));
-        fill.style.transform = 'scaleX(' + (lr.width ? w / lr.width : 0).toFixed(4) + ')';
-        var lit = 0;
-        stops.forEach(function (s, i) {
-          var nr = nodes[i].getBoundingClientRect();
-          var cx = nr.left + nr.width / 2;
-          var on = cx <= marker + 0.5;
-          s.classList.toggle('lit', on);
-          if (on) lit = i + 1;
-          if (cx < vw * 0.94 && !s.classList.contains('in')) s.classList.add('in');
-        });
-        if (brk && firstF && firstF.classList.contains('in')) brk.classList.add('in');
-        if (lit !== lastLit) {
-          lastLit = lit;
-          hud.classList.toggle('on', lit > 0);
-          if (lit > 0) { hudDate.textContent = dates[lit - 1]; hudCount.textContent = pad(lit) + ' / ' + pad(stops.length); }
-        }
-      }
-      function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
-      function onResize() { size(); onScroll(); }
-      window.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('resize', onResize);
-      if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
-      pin.addEventListener('focusin', function (e) {
-        pin.scrollLeft = 0;
-        var t = e.target.getBoundingClientRect();
-        if (t.left < 0 || t.right > window.innerWidth) {
-          var secTop = sec.getBoundingClientRect().top + window.scrollY;
-          var cur = Math.min(dist, Math.max(0, window.scrollY - secTop));
-          var want = Math.min(dist, Math.max(0, cur + t.left - window.innerWidth * 0.2));
-          window.scrollTo({ top: secTop + want, behavior: 'auto' });
-        }
-      });
-      size();
-      update();
-    })();
-  </script>
-
-  <script is:inline>
-    // Timeline scenes: the painted background follows the stop at the marker. IntersectionObserver only, no scroll listeners.
-    (function () {
-      var sec = document.querySelector('[data-hx]');
-      if (!sec || !('IntersectionObserver' in window)) return;
-      var scenes = [].slice.call(sec.querySelectorAll('.hx-scene'));
-      var caps = [].slice.call(sec.querySelectorAll('[data-cap]'));
-      var stops = [].slice.call(sec.querySelectorAll('.stop'));
-      var intro = sec.querySelector('.hx-intro');
-      var title = sec.querySelector('.hx-title');
-      var current = 0;
-      var inJourney = false;
-      // the caption follows the scene and is shown only once the journey has started
-      function syncCaps() {
-        caps.forEach(function (c, i) {
-          var on = inJourney && i === current;
-          c.classList.toggle('on', on);
-          c.setAttribute('aria-hidden', on ? 'false' : 'true');
-        });
-      }
-      function show(k, journey) {
-        if (k === current && !!journey === inJourney) return;
-        if (k !== current) {
-          scenes[current].classList.remove('on');
-          scenes[k].classList.add('on');
-          current = k;
-        }
-        inJourney = !!journey;
-        syncCaps();
-      }
-      var seen = {}; // index (-1 = intro and title) -> true while it overlaps the band
-      function pick() {
-        var best = -2;
-        for (var key in seen) if (seen[key] && +key > best) best = +key;
-        if (best === -2) return; // nothing in the band: keep what is showing
-        if (best < 0) show(0, false);
-        else show(+stops[best].getAttribute('data-scene'), true);
-      }
-      // a narrow band around the 60% marker the line fills to
-      var io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (e) { seen[e.target.__i] = e.isIntersecting; });
-        pick();
-      }, { rootMargin: '0px -39.5% 0px -39.5%', threshold: 0 });
-      [intro, title].forEach(function (el) { if (el) { el.__i = -1; io.observe(el); } });
-      stops.forEach(function (el, i) { el.__i = i; io.observe(el); });
-    })();
-  </script>
-
-  <section class="sec zone z-c" id="now">
+  <section class="scene" id="about" aria-label="About">
     <div class="wrap rv">
-      <div class="sec-head">
-        <h2 class="h2">Building ELO Collective</h2>
-      </div>
-      <p class="now-line">ELO turns how people behave in games and online communities into lessons for the real world.</p>
-      <div class="now-grid">
-        {products.map((p, i) => (
-          <a class={`card tone-${p.tone}${p.lead ? ' lead' : ''}`} href={p.href} target="_blank" rel="noopener">
-            <span class="pill">{p.host}</span>
-            <span class="num">{String(i + 1).padStart(2, '0')}</span>
-            <img class="c-logo" src={p.logo.src} alt="" width={p.logo.w} height={p.logo.h} style={`--dh:${p.logo.dh}`} loading="lazy" decoding="async" />
-            <span class="h3">{p.name}</span>
-            <p>{p.text}</p>
-            <span class="c-foot">Visit<svg viewBox="0 0 12 16" aria-hidden="true"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></span>
-          </a>
-        ))}
-      </div>
-      <div class="works">
-        <p class="eyebrow">{worksWith.title}</p>
-        <ul class="works-logos">
-          {worksWith.logos.map((l) => (
-            <li style={l.glow ? `--glow:${glowCss(l.glow)}` : undefined}><a href={l.url} target="_blank" rel="noopener" aria-label={`${l.name} (opens in a new tab)`}><img src={l.src} alt={l.name} width={l.w} height={l.nh} style={`--h:${l.h}`} loading="lazy" decoding="async" /></a></li>
-          ))}
-        </ul>
-        <p class="works-more">{worksWith.more}</p>
-      </div>
+      <p class="scene-line">Fifteen years inside the games industry, watching millions of people organise themselves. Now I study what that reveals about where AI, technology and society are heading.</p>
+      <p class="f-mono">Dutch. Based in Turin.</p>
     </div>
   </section>
 
-  <section class="strip" aria-label={offDuty.title}>
+  <section class="film film-road" id="road">
     <div class="wrap rv">
-      <p class="eyebrow">{offDuty.title}</p>
-      <ul class="strip-tags">
-        {offDuty.tags.map((t) => <li>{t}</li>)}
-      </ul>
-      <p class="strip-playing">Currently (re-)playing: {offDuty.playing}.</p>
+      <p class="f-eyebrow">The road so far</p>
+      <div class="horizon" aria-hidden="true"></div>
+      <ol class="road">
+        {road.map((s) => (
+          <li>
+            <span class="r-date">{s.date}</span>
+            <span class={`r-name${s.lit ? ' lit' : ''}`}>{s.name}</span>
+            <span class="r-text">{s.text}</span>
+          </li>
+        ))}
+      </ol>
+      <p class="f-more"><a class="slit" href="/work">Work, in more detail<i></i></a> <a class="slit" href="/press">Press, talks and podcasts<i></i></a></p>
     </div>
   </section>
 
@@ -420,16 +115,44 @@ const stops: Stop[] = [
       <rect width="100%" height="100%" filter="url(#band-grain)" />
     </svg>
     <figure class="band-in rv">
-      <blockquote class="band-q"><p>{quote}</p></blockquote>
-      <figcaption><a href={postUrl(quotePost)}>From: {quotePost.data.title}<svg viewBox="0 0 12 16" aria-hidden="true"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></a></figcaption>
+      <blockquote class="band-q"><p>{bandQuote}</p></blockquote>
+      <figcaption><a href={postUrl(bandPost)}>From: {bandPost.data.title}<svg viewBox="0 0 12 16" aria-hidden="true"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></a></figcaption>
     </figure>
   </section>
 
-  <section class="hi zone z-heat" id="contact">
-    <div class="wrap rv hi-in">
-      <h2 class="h1">Say hi.</h2>
-      <p class="sub">The best way to reach me is X, LinkedIn or email.</p>
-      <Buttons />
+  <section class="film" id="now">
+    <div class="wrap rv">
+      <p class="f-eyebrow">The work</p>
+      <p class="f-lede">ELO turns how people behave in games and online communities into lessons for the real world.</p>
+      <div class="prods">
+        {products.map((p) => (
+          <a class={`prod${p.lead ? ' lead' : ''}`} href={p.href} target="_blank" rel="noopener">
+            <span class="p-name">{p.name}</span>
+            <span class="p-text">{p.text}</span>
+          </a>
+        ))}
+      </div>
+      <p class="f-mono-block"><b>ELO works with</b><br />{worksWith.join(', ')}, and many more</p>
+      <p class="f-mono-block"><b>Beyond the work</b><br />{beyond.join(' · ')}<br />Currently (re-)playing: Assassin's Creed Odyssey.</p>
+    </div>
+  </section>
+
+  <section class="scene scene-quiet" aria-label="From the writing">
+    <figure class="wrap rv">
+      <blockquote class="scene-line scene-quote">Most people don't realize the world runs on one thing: <em>alignment.</em></blockquote>
+      <figcaption class="f-mono"><a href={postUrl(quietPost)}>From: {quietPost.data.title}</a></figcaption>
+    </figure>
+  </section>
+
+  <section class="close" id="contact">
+    <div class="wrap rv">
+      <h2 class="h1">Send word.</h2>
+      <p class="sub">Messages reach me on X, LinkedIn or email.</p>
+      <div class="slits">
+        <a class="slit" href={links.x} target="_blank" rel="noopener">Follow on X<i></i></a>
+        <a class="slit" href={links.linkedin} target="_blank" rel="noopener">LinkedIn<i></i></a>
+        <a class="slit" href={links.email}>Email<i></i></a>
+      </div>
     </div>
   </section>
 </Base>
