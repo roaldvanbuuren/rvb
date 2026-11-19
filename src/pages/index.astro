@@ -55,7 +55,7 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
     <section class="t-step" data-act="1" id="signal" aria-labelledby="h-signal">
       <div class="t-pin">
         <div class="t-card rv">
-          <p class="t-eye">01 · What I saw</p>
+          <p class="t-eye">What I saw</p>
           <h2 class="t-h2" id="h-signal">Same player. Same map. Same round. The only variable is pressure.</h2>
           <p>I spent ten years at FACEIT, a platform built around competitive Counter-Strike, and one pattern kept coming back. Up 12–3 with full money, a player holds the angle and lets the enemy come to him. Down 11–12 with nothing in the bank, the same player in the same spot peeks early and alone.</p>
           <p>Nothing about the game changed between those two rounds except the weight on his shoulders. I've come to believe that weight is one of the most important things we can measure about people.</p>
@@ -66,7 +66,7 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
     <section class="t-step" data-act="2" aria-labelledby="h-gather">
       <div class="t-pin">
         <div class="t-card rv">
-          <p class="t-eye">02 · Where people gather</p>
+          <p class="t-eye">Where people gather</p>
           <h2 class="t-h2" id="h-gather">Around every game, people build a community.</h2>
           <p>That is where they show the most. Discord servers, guilds, clans and fan groups have leaders and lurkers, in-jokes and feuds. When a patch lands, a scandal breaks or a final is lost, they react the way towns react to news, and you can watch it spread from one server to the next.</p>
           <p>I believe these communities are the closest thing we have to a living, observable model of society. They are also where most of my work is now: at ELO we build Lumen, which reads Discord communities and shows the people running them what to fix and why.</p>
@@ -77,7 +77,7 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
     <section class="t-step" data-act="3" aria-labelledby="h-scale">
       <div class="t-pin">
         <div class="t-card rv">
-          <p class="t-eye">03 · What I noticed next</p>
+          <p class="t-eye">What I noticed next</p>
           <h2 class="t-h2" id="h-scale">Now count all of it: billions of people, every day.</h2>
           <p>Fifteen years in this industry showed me how much of this is recorded: every match, every message, every trade and every argument. Almost all of it is logged, and very little of it is studied.</p>
           <figure class="t-quote">
@@ -91,7 +91,7 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
     <section class="t-step" data-act="4" aria-labelledby="h-record">
       <div class="t-pin">
         <div class="t-card rv">
-          <p class="t-eye">04 · Why it matters</p>
+          <p class="t-eye">Why it matters</p>
           <h2 class="t-h2" id="h-record">Every decision, kept with its context.</h2>
           <p>The score, the clock, the money, the people watching and the people relying on you. I believe that once you capture all of that next to what someone actually did, pressure stops being a feeling. It becomes something you can measure, person by person.</p>
         </div>
@@ -101,7 +101,7 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
     <section class="t-step" data-act="5" aria-labelledby="h-swarm">
       <div class="t-pin">
         <div class="t-card rv">
-          <p class="t-eye">05 · What I believe</p>
+          <p class="t-eye">What I believe</p>
           <h2 class="t-h2" id="h-swarm">Agents built from what people actually did.</h2>
           <p>I think every agent in a simulation should carry a response to pressure that was measured from real people: how it moves, who it follows, when it holds and when it breaks. Put thousands of them together and you get a population that behaves like the people it came from.</p>
           <p class="t-try"><span class="t-try-fine">Move through them. You are the pressure.</span><span class="t-try-touch">Touch them. You are the pressure.</span></p>
@@ -112,7 +112,7 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
     <section class="t-step" data-act="6" aria-labelledby="h-forward">
       <div class="t-pin">
         <div class="t-card rv">
-          <p class="t-eye">06 · Where this goes</p>
+          <p class="t-eye">Where this goes</p>
           <h2 class="t-h2" id="h-forward">Then run it forward, thousands of times.</h2>
           <p>Change the conditions, raise the pressure, and watch where a population fractures, where it holds and where it runs. Run it often enough and the futures start to agree with each other.</p>
           <p>I believe this is how we will learn to predict what societies do next: markets, elections, and the way people respond to the next crisis. It's what I'm working towards.</p>
@@ -295,6 +295,12 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
   html:has(.thesis) .t-after.film.grained,html:has(.thesis) .world,html:has(.thesis) .world-ground{background:transparent}
   html:has(.thesis) .t-after.grained::after,html:has(.thesis) .world-ground::after{display:none}
   html:has(.thesis) .close.grained{background:linear-gradient(180deg,rgba(14,14,14,0) 0%,rgba(35,35,34,.35) 45%,#3B3A36 100%)}
+  /* the amber lines and the sun are drawn by the swarm (Swarm.astro). CSS keeps their size and timing, so hover still
+     stretches a line; only the paint goes. */
+  html:has(.thesis) .credit::after,html:has(.thesis) .prod::after,html:has(.thesis) .slit i{background:transparent !important;box-shadow:none !important}
+  html:has(.thesis) .orb-sun,html.pin:has(.thesis) .orb-sun{background:none !important;box-shadow:none !important}
+  html:has(.thesis) .orb-sun::before,html:has(.thesis) .orb-sun::after{display:none !important}
+  html:has(.thesis) .close::before{display:none}
 </style>
 
 <script>

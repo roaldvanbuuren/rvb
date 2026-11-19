@@ -12,10 +12,12 @@
 //   5 swarm      free agents; scroll raises pressure on everyone, the cursor is local pressure
 //   6 forward    the population runs forward along branching futures
 //   7 horizon    the agents settle into the site's horizon line
-//   8 dispatches traces running along the hairlines between the articles
-//   9 road       a corona around the sun, embers rising off it
-//  10 work       one community per product, Lumen in amber
+//   8 dispatches a quiet field; the amber lines under the articles are drawn in dots (see 'lines')
+//   9 road       the sun itself, a shaded sphere of dots, with a corona and embers rising off it
+//  10 work       a quiet field; the lines under the products are drawn in dots
 //  11 close      the clover again
+// Lines: every amber line the page draws on this page (under articles, products and links) is hidden in CSS and
+// redrawn here in dots, at the width CSS is animating it to, so hover still stretches it.
 // No dependencies: raw WebGL2, a few typed arrays, two draw calls per frame.
 // Reduced motion: no loop; the swarm is drawn once, settled, whenever the act changes.
 ---
@@ -26,12 +28,12 @@
 </div>
 <div class="t-hud" aria-hidden="true"><span class="t-hud-a"></span><span class="t-hud-b"></span></div>
 <ol class="t-rail" aria-hidden="true">
-  <li data-a="1"><span>What I saw</span><b>01</b></li>
-  <li data-a="2"><span>Where people gather</span><b>02</b></li>
-  <li data-a="3"><span>What I noticed next</span><b>03</b></li>
-  <li data-a="4"><span>Why it matters</span><b>04</b></li>
-  <li data-a="5"><span>What I believe</span><b>05</b></li>
-  <li data-a="6"><span>Where this goes</span><b>06</b></li>
+  <li data-a="1"><span>What I saw</span></li>
+  <li data-a="2"><span>Where people gather</span></li>
+  <li data-a="3"><span>What I noticed next</span></li>
+  <li data-a="4"><span>Why it matters</span></li>
+  <li data-a="5"><span>What I believe</span></li>
+  <li data-a="6"><span>Where this goes</span></li>
 </ol>
 
 <style>
@@ -56,7 +58,6 @@
   .t-rail{position:fixed;right:28px;top:50%;z-index:5;transform:translateY(-50%);list-style:none;margin:0;padding:0;
     display:flex;flex-direction:column;gap:18px;pointer-events:none;opacity:0;transition:opacity .6s ease}
   .t-rail li{display:flex;align-items:center;justify-content:flex-end;gap:12px;font:500 11px/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:rgba(232,232,219,.28);transition:color .5s ease}
-  .t-rail b{font-weight:500;color:inherit}
   .t-rail li span{max-width:0;overflow:hidden;opacity:0;transition:max-width .6s ease,opacity .6s ease;white-space:nowrap}
   .t-rail li.on span{max-width:240px;opacity:1}
   .t-rail li::after{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;transition:background .5s,box-shadow .5s}
@@ -94,33 +95,15 @@
 
     // ---------- scroll: which act, how far through it, and where the page's own shapes are ----------
     let act = 0, t = 0, lastAct = -1;
-    const rowsY: number[] = []; let rowX0 = -1, rowX1 = 1;          // dispatches
     let sunX = 0, sunY = -1, sunR = 0.5;                              // road
-    const prodX = [0, 0, 0, 0], prodY = [0, 0, 0, 0], prodR = [0.1, 0.1, 0.1, 0.1]; // work
     let closeX = 0, closeY = 0;                                      // send word
-    const credits = Array.from(document.querySelectorAll<HTMLElement>('.credit'));
-    const creditsBox = document.querySelector<HTMLElement>('.credits');
     const sun = document.querySelector<HTMLElement>('.orb-sun');
-    const prods = Array.from(document.querySelectorAll<HTMLElement>('.prod')).slice(0, 4);
     const closeH = document.querySelector<HTMLElement>('#contact .h1');
 
     function measure() {
-      if (act === 8 && creditsBox) {
-        const b = creditsBox.getBoundingClientRect();
-        rowX0 = wx(b.left); rowX1 = wx(b.right);
-        rowsY.length = 0; rowsY.push(wy(b.top));
-        credits.forEach((c) => rowsY.push(wy(c.getBoundingClientRect().bottom)));
-      } else if (act === 9 && sun) {
+      if (act === 9 && sun) {
         const r = sun.getBoundingClientRect();
         sunX = wx(r.left + r.width / 2); sunY = wy(r.top + r.height / 2); sunR = (r.width / H);
-      } else if (act === 10) {
-        prods.forEach((p, k) => {
-          const r = p.getBoundingClientRect(), n = p.querySelector('.p-name')?.getBoundingClientRect(), tx = p.querySelector('.p-text')?.getBoundingClientRect();
-          let x0 = n ? n.right : r.left, x1 = tx && tx.left > x0 + 40 ? tx.left : r.right, yc = r.top + r.height / 2, hh = r.height;
-          if (!wide && n) { x0 = n.right + 8; x1 = r.right; yc = n.top + n.height / 2; hh = n.height; } // stacked rows: beside the name
-          prodX[k] = wx((x0 + x1) / 2); prodY[k] = wy(yc);
-          prodR[k] = Math.max(0.025, Math.min(hh / H * 0.9, (x1 - x0) / H * 0.42));
-        });
       } else if (act === 11 && closeH) {
         const r = closeH.getBoundingClientRect();
         closeX = wx(r.left + r.width / 2); closeY = wy(r.top + r.height / 2);
@@ -193,7 +176,8 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
 
     // ---------- the population ----------
     const N = small ? 4200 : 9000, TRAIL = 160, RING = 72, C = 7, HUBS = 16, MSG = small ? 140 : 260;
-    const oTrail = N, oHub = N + TRAIL, oMsg = oHub + HUBS, M = oMsg + MSG;
+    const LP = small ? 1600 : 2600; // dots for the page's lines
+    const oTrail = N, oHub = N + TRAIL, oMsg = oHub + HUBS, oLine = oMsg + MSG, M = oLine + LP;
     let seed = 20261119;
     const rnd = () => { seed = (seed + 0x6d2b79f5) | 0; let q = Math.imul(seed ^ (seed >>> 15), 1 | seed); q = (q + Math.imul(q ^ (q >>> 7), 61 | q)) ^ q; return ((q ^ (q >>> 14)) >>> 0) / 4294967296; };
     const gauss = () => { const u = Math.max(1e-6, rnd()), v = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
@@ -203,6 +187,7 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
     const cl = new Uint8Array(N), leaf = new Uint8Array(N), rankL = new Uint32Array(N), rankH = new Float32Array(N);
     const cfx = new Float32Array(N), cfy = new Float32Array(N), cleaf = new Uint8Array(N);
     const comm = new Uint8Array(N), hubOf = new Uint8Array(N); // network: which community, which hub in it
+    const udx = new Float32Array(N), udy = new Float32Array(N); // a point in the unit disc (the sun)
     const px = new Float32Array(N), py = new Float32Array(N), pz = new Float32Array(N), vx = new Float32Array(N), vy = new Float32Array(N);
     const ca = new Float32Array(N), ch = new Float32Array(N), cs = new Float32Array(N), hT = new Float32Array(N), lastU = new Float32Array(N);
 
@@ -225,6 +210,7 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
       leaf[i] = pick(leafP);
       comm[i] = pick(commW);
       hubOf[i] = pick(hubW);
+      { const r = Math.sqrt(rnd()), a = rnd() * Math.PI * 2; udx[i] = r * Math.cos(a); udy[i] = r * Math.sin(a); }
     }
     // the family mark (components/Logo.astro): four hearts, tips to the centre. Each heart is a diamond plus two discs
     // on its upper edges (local units, tip at 0,0, lobes up); leaf k is turned 45 + 90k degrees. Leaf 0 is the accent leaf.
@@ -333,12 +319,11 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
       return [scx + (calmX * (1 - pan) + ax * pan) * sR * 1.7, scy + (calmY * (1 - pan) + ay * pan) * sR * 1.7];
     }
 
-    // hubs: act 2 = four servers, each a main hub with three channels around it; act 10 = one community per product
-    function placeHubs(a: number, tm: number, L: number) {
+    // hubs: four servers, each a main hub with three channels around it
+    function placeHubs(_a: number, tm: number, L: number) {
       for (let k = 0; k < 4; k++) {
         let cx: number, cy: number, sub: number;
-        if (a === 10) { cx = prodX[k]; cy = prodY[k]; sub = prodR[k] * 0.55; crisis[k] = 0; }
-        else {
+        {
           const ang = k * Math.PI / 2 + Math.PI / 4 + tm * 0.02;
           cx = scx + Math.cos(ang) * sR * 0.56; cy = scy + Math.sin(ang) * sR * 0.5; sub = sR * 0.16;
           crisis[k] = sstep(0.12 + 0.17 * k, 0.3 + 0.17 * k, L);
@@ -377,18 +362,13 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
           }
           tx = prX; ty = prY; ta = 0; ts = 1; th = 0.1; return 1;
         }
-        case 2: case 10: {
+        case 2: {
           const k = comm[i], h = hubOf[i], hb = k * 4 + h, c = crisis[k];
-          const rad = a === 10 ? prodR[k] * (h === 0 ? 0.5 : 0.28) : sR * (h === 0 ? 0.085 : 0.05);
+          const rad = sR * (h === 0 ? 0.085 : 0.05);
           const rot = tm * (0.1 + 0.15 * s) * (k % 2 ? 1 : -1), co = Math.cos(rot), sn = Math.sin(rot);
           const ox = gx[i] * rad, oy = gy[i] * rad, jit = c * s * 0.02;
           tx = hubX[hb] + ox * co - oy * sn + jit * Math.sin(tm * 6 + ph[i]); ty = hubY[hb] + ox * sn + oy * co + jit * Math.cos(tm * 5.3 + ph[i]);
-          if (a === 10) {
-            const lumen = k === 0;
-            ta = (lumen ? 0.36 : 0.24) * br[i]; ts = 2.2 + (z0[i] + 1) * 0.6; th = lumen ? 0.66 + 0.12 * s : 0.3 + 0.12 * s;
-          } else {
-            ta = (0.26 + 0.2 * br[i]) * (1 + 0.4 * c); ts = 2.3 + (z0[i] + 1) * 0.6 + c * s; th = 0.08 + 0.2 * s + c * (0.2 + 0.75 * s);
-          }
+          ta = (0.26 + 0.2 * br[i]) * (1 + 0.4 * c); ts = 2.3 + (z0[i] + 1) * 0.6 + c * s; th = 0.08 + 0.2 * s + c * (0.2 + 0.75 * s);
           return 1.1;
         }
         case 3: {
@@ -433,27 +413,34 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
           ta = (0.22 + split * 1.5 * p) * br[i] * edge + 0.05 * edge; ts = 2.2 + split * p * 5;
           th = 0.38 * (1 - split) + split * (0.22 + p * 2.3); return 2.2;
         }
-        case 8: {
-          // dispatches: traces running along the hairlines between the articles, like a pen reading the list
-          const n = rowsY.length;
-          if (n && i % 3 !== 0) {
-            const row = i % n, w = rowX1 - rowX0;
-            const u = 0.5 + 0.5 * Math.sin(tm * 0.05 * (0.5 + br[i]) + ph[i]);
-            tx = rowX0 + u * w; ty = rowsY[row] + gy[i] * 0.004; tz = 0;
-            const lead = Math.exp(-((u - fract(tm * 0.04 + row * 0.17)) ** 2) / 0.004);
-            ta = (0.24 + 0.6 * lead) * br[i]; ts = 2 + 1.6 * lead; th = 0.38 + 0.4 * lead + 0.1 * s; return 1;
-          }
+        case 8: case 10: {
+          // a quiet field behind the lists; the lines are the dots that matter here
           tx = sx[i] * A * 1.05 + 0.1 * Math.sin(tm * 0.1 + sy[i] * 2 + ph[i]); ty = sy[i] * 1.05 + 0.1 * Math.cos(tm * 0.09 + sx[i] * 2);
-          ta = 0.08 * br[i]; ts = 2; th = 0.3 + 0.2 * s; return 0.8;
+          ta = 0.07 * br[i]; ts = 2; th = 0.3 + 0.25 * s; return 0.8;
         }
         case 9: {
-          // the road: a corona around the sun, and embers rising off it, as the past drifts upward
-          if (i % 5 < 3) {
+          // the road: the sun is the swarm. Six in eight agents make the sphere, one the corona, one an ember.
+          const q = i & 7;
+          if (q < 6) {
+            const rot = tm * 0.02, c = Math.cos(rot), sn = Math.sin(rot);
+            const ux = udx[i] * c - udy[i] * sn, uy = udx[i] * sn + udy[i] * c, r2 = ux * ux + uy * uy, nz = Math.sqrt(Math.max(0, 1 - r2));
+            tx = sunX + ux * sunR; ty = sunY + uy * sunR; tz = 0;
+            // one key light from the upper left that slides across as the road plays, like the old sun
+            const lx = -0.62 + 0.6 * t, ly = 0.52, lz = 0.62, ln = Math.hypot(lx, ly, lz);
+            const lam = Math.max(0, (ux * lx + uy * ly + nz * lz) / ln);
+            const band = Math.sin(uy * 9 + ux * 2.5 + tm * 0.25) * 0.5 + Math.sin(uy * 17 - ux * 4 - tm * 0.18) * 0.25;
+            const hx = ux - lx * 0.55, hy = uy - ly * 0.55, spec = Math.exp(-(hx * hx + hy * hy) / 0.05);
+            const rim = sstep(0.9, 1, Math.sqrt(r2));
+            th = clamp(0.98 - 0.4 * lam - 0.1 * spec + band * 0.05 * lam);
+            ta = (0.07 + 0.95 * Math.pow(lam, 1.15) + 0.5 * spec + 0.15 * rim * lam) * (0.8 + 0.2 * br[i]);
+            ts = (small ? 3.6 : 3.2) + 1.6 * lam + spec; return 1.4;
+          }
+          if (q < 7) {
             const ang = ph[i] + tm * 0.05 * (1 + (i % 3) * 0.3) * (i % 2 ? 1 : -1);
-            const rr = sunR * (1.02 + 0.55 * Math.pow(s, 1.4));
+            const rr = sunR * (1.03 + 0.55 * Math.pow(s, 1.4));
             tx = sunX + Math.cos(ang) * rr; ty = sunY + Math.sin(ang) * rr; tz = 0;
             const fall = 1 - clamp((rr / sunR - 1) / 0.6);
-            ta = (0.12 + 0.4 * fall) * br[i]; ts = 2 + fall; th = 0.62 + 0.25 * s; return 1.2;
+            ta = (0.1 + 0.36 * fall) * br[i]; ts = 2 + fall; th = 0.62 + 0.25 * s; return 1.2;
           }
           const u = fract(ph[i] / (Math.PI * 2) + tm * 0.02 * (0.6 + br[i]));
           tx = sunX + gx[i] * sunR * 0.8 + 0.05 * Math.sin(tm * 0.7 + ph[i]); ty = sunY + sunR * 0.4 + u * (1.4 - sunY); tz = 0;
@@ -469,7 +456,7 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
       }
     }
 
-    const DIM: Record<number, number> = { 8: 0.9, 10: 0.95 };
+    const DIM: Record<number, number> = {};
     function step(dt: number, snap = false) {
       time += dt;
       const tm = time;
@@ -478,7 +465,7 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
       const P = act === 1 ? sstep(0.34, 0.64, t) : 0;
       const G = act === 5 ? 0.05 + 0.95 * sstep(0.32, 0.66, t) : 0;
       if (act === 1) { const p = playerTarget(P, tm); prX = p[0]; prY = p[1]; }
-      const net = act === 2 || act === 10;
+      const net = act === 2;
       if (net) placeHubs(act, tm, lt());
       const cursor = mOn && !snap ? (act === 5 ? 1 : act === 4 ? 0.15 : 0.45) : 0, rad = act === 5 ? 0.32 : 0.22, r2 = rad * rad;
       const flowAmt = act === 5 ? 0.55 : act === 0 || act === 11 ? 0.08 : act === 3 ? 0.25 : 0.12;
@@ -531,8 +518,9 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
       if (act === 1) { trX[trHead] = px[0]; trY[trHead] = py[0]; trH[trHead] = ch[0]; trHead = (trHead + 1) % TRAIL; }
       writeTrail(snap);
       // the network: hubs, messages, links
-      netA += ((act === 2 ? 1 : act === 10 ? 0.55 : 0) - netA) * (snap ? 1 : Math.min(1, dt * 2));
+      netA += ((act === 2 ? 1 : 0) - netA) * (snap ? 1 : Math.min(1, dt * 2));
       writeNetwork(tm);
+      measureLines(); writeLines(tm);
     }
 
     function writeAgent(i: number, h: number) {
@@ -555,9 +543,9 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
       const on = netA > 0.01;
       // hubs
       for (let h = 0; h < HUBS; h++) {
-        const j = oHub + h, o3 = j * 3, o4 = j * 4, k = h >> 2, main = (h & 3) === 0, lumen = act === 10 && k === 0;
+        const j = oHub + h, o3 = j * 3, o4 = j * 4, k = h >> 2, main = (h & 3) === 0;
         pos[o3] = hubX[h]; pos[o3 + 1] = hubY[h]; pos[o3 + 2] = 0;
-        heatRGB(lumen ? 0.74 : 0.36 + crisis[k] * 0.55, col, o4, 1);
+        heatRGB(0.36 + crisis[k] * 0.55, col, o4, 1);
         col[o4 + 3] = on ? netA * (main ? 1.1 : 0.7) : 0; size[j] = main ? 14 : 8;
       }
       // messages: a member posts, the message travels to its hub
@@ -566,7 +554,7 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
         const cyc = tm * 0.55 + m * 0.6180339, f = fract(cyc), who = (Math.floor(cyc) * 104729 + m * 7919) % N;
         const hb = comm[who] * 4 + hubOf[who];
         pos[o3] = px[who] + (hubX[hb] - px[who]) * f; pos[o3 + 1] = py[who] + (hubY[hb] - py[who]) * f; pos[o3 + 2] = 0;
-        heatRGB(act === 10 ? (comm[who] === 0 ? 0.74 : 0.42) : 0.42 + crisis[comm[who]] * 0.5, col, o4, 1);
+        heatRGB(0.42 + crisis[comm[who]] * 0.5, col, o4, 1);
         col[o4 + 3] = on ? netA * Math.sin(Math.PI * f) * 0.9 : 0; size[j] = 4.5;
       }
       if (!on) return;
@@ -578,12 +566,53 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
         heatRGB(h, lcol, c, 1); lcol[c + 3] = a; lcol[c + 4] = lcol[c]; lcol[c + 5] = lcol[c + 1]; lcol[c + 6] = lcol[c + 2]; lcol[c + 7] = a * 0.35;
         l++;
       };
-      for (const i of linkMembers) { const k = comm[i], hb = k * 4 + hubOf[i]; put(hubX[hb], hubY[hb], px[i], py[i], act === 10 && k === 0 ? 0.72 : 0.38 + crisis[k] * 0.5, 0.16 * netA * ca[i] * 2.4); }
+      for (const i of linkMembers) { const k = comm[i], hb = k * 4 + hubOf[i]; put(hubX[hb], hubY[hb], px[i], py[i], 0.38 + crisis[k] * 0.5, 0.16 * netA * ca[i] * 2.4); }
       for (let k = 0; k < 4; k++) for (let h = 1; h < 4; h++) put(hubX[k * 4], hubY[k * 4], hubX[k * 4 + h], hubY[k * 4 + h], 0.4 + crisis[k] * 0.5, 0.4 * netA);
       if (act === 2) for (const [a, b] of bridges) put(hubX[a * 4], hubY[a * 4], hubX[b * 4], hubY[b * 4], 0.42 + Math.max(crisis[a], crisis[b]) * 0.45, 0.3 * netA);
       lineCount = l;
     }
     let lineCount = 0;
+
+    // ---------- the page's amber lines, in dots ----------
+    type Seg = { x0: number; x1: number; y: number; a: number };
+    const segs: Seg[] = [];
+    const lineSrc: { el: HTMLElement; pseudo: boolean; rv: HTMLElement | null }[] = [
+      ...Array.from(document.querySelectorAll<HTMLElement>('main .credit, main .prod')).map((el) => ({ el, pseudo: true, rv: el.closest<HTMLElement>('.rv') })),
+      ...Array.from(document.querySelectorAll<HTMLElement>('main .slit i')).map((el) => ({ el, pseudo: false, rv: el.closest<HTMLElement>('.rv') })),
+    ];
+    function measureLines() {
+      segs.length = 0;
+      for (const { el, pseudo, rv } of lineSrc) {
+        const r = el.getBoundingClientRect();
+        if (r.bottom < -40 || r.top > innerHeight + 40) continue;
+        let x0 = r.left, w = r.width, y = r.top + r.height / 2;
+        if (pseudo) { const cs = getComputedStyle(el, '::after'); w = parseFloat(cs.width) || 0; x0 = r.left + (parseFloat(cs.left) || 0); y = r.bottom - 1; }
+        if (w < 1) continue;
+        const a = rv ? Number(getComputedStyle(rv).opacity) : 1;
+        if (a <= 0.01) continue;
+        segs.push({ x0: wx(x0), x1: wx(x0 + w), y: wy(y), a });
+      }
+    }
+    function writeLines(tm: number) {
+      const px1 = 2 / H; // one CSS pixel in world units
+      let total = 0; for (const g of segs) total += g.x1 - g.x0;
+      const core = Math.max(px1 * 2.4, (total * 1.5) / LP); // spacing, widened if the pool runs short
+      let j = 0;
+      const put = (x: number, y: number, h: number, a: number, sz: number) => {
+        if (j >= LP) return; const k = oLine + j++, o3 = k * 3, o4 = k * 4;
+        pos[o3] = x; pos[o3 + 1] = y; pos[o3 + 2] = 0; heatRGB(h, col, o4, 1); col[o4 + 3] = a; size[k] = sz;
+      };
+      for (const g of segs) {
+        const len = g.x1 - g.x0, n = Math.max(2, Math.floor(len / core));
+        for (let k = 0; k < n; k++) {
+          const x = g.x0 + ((k + 0.5) / n) * len, tw = 0.78 + 0.22 * Math.sin(tm * 2.6 + x * 900);
+          put(x, g.y + (k % 2 ? 0.35 : -0.35) * px1, 0.66 + 0.05 * Math.sin(x * 700), 1.05 * tw * g.a, 4);
+          if (k % 2 === 0) put(x, g.y + Math.sin(x * 2300 + tm * 0.8) * px1 * 5, 0.62, 0.13 * g.a, 6.5);
+        }
+        for (let k = 0; k < 3; k++) put(g.x1 - px1 * k * 2.4, g.y, 0.55, 0.9 * g.a * (1 - k * 0.25), 5.5); // a brighter head
+      }
+      for (; j < LP; j++) { const k = oLine + j; col[k * 4 + 3] = 0; }
+    }
 
     function draw() {
       if (!gl || !prog || !lprog) return;
@@ -643,6 +672,8 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
     addEventListener('resize', () => { layout(); readScroll(); });
     document.addEventListener('visibilitychange', () => { if (!document.hidden && !reduce && !raf) raf = requestAnimationFrame(frame); });
     reduceMq.addEventListener('change', () => { reduce = reduceMq.matches; readScroll(); });
+    let hoverRaf = 0;
+    addEventListener('pointerover', () => { if (reduce && !hoverRaf) hoverRaf = requestAnimationFrame(() => { hoverRaf = 0; drawStill(); }); }, { passive: true });
     readScroll();
   }
 </script>
