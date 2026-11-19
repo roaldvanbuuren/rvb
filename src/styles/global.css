@@ -1,4 +1,6 @@
-/* Fonts, self-hosted (SIL OFL): Instrument Serif (headlines, quotes), IBM Plex Mono (dates, eyebrows, numbers), Inter (body) */
+/* Fonts, self-hosted (SIL OFL): Instrument Serif (headlines, quotes), Jost (nav only), IBM Plex Mono (dates, eyebrows, numbers), Inter (body) */
+@font-face{font-family:"Jost";font-style:normal;font-weight:300;font-display:swap;src:url(/fonts/jost-latin-300-normal.woff2) format("woff2")}
+@font-face{font-family:"Jost";font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/jost-latin-400-normal.woff2) format("woff2")}
 @font-face{font-family:"Instrument Serif";font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/instrument-serif-latin-400-normal.woff2) format("woff2")}
 @font-face{font-family:"Instrument Serif";font-style:italic;font-weight:400;font-display:swap;src:url(/fonts/instrument-serif-latin-400-italic.woff2) format("woff2")}
 @font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/ibm-plex-mono-latin-400-normal.woff2) format("woff2")}
@@ -13,7 +15,7 @@
   --bone:#FBF3E4;--warm:#EFE3CF;--body:#C9BBA3;--dim:#9A8E7B;
   --hair:rgba(239,227,207,.12);
   --disp:"Instrument Serif",Georgia,"Times New Roman",serif;
-  --caps:var(--mono);
+  --caps:"Jost",system-ui,sans-serif;
   --serif:"Instrument Serif",Georgia,"Times New Roman",serif;
   --text:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
@@ -44,7 +46,7 @@ img,svg{display:block;max-width:100%}
 
 /* buttons: accent (from the ELO nav CTA) and outlined (ELO ghost) */
 .ctas{display:flex;flex-wrap:wrap;gap:10px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:14px;min-height:44px;padding:4px 4px 4px 20px;border-radius:var(--radius-soft);background:linear-gradient(135deg,#F6C873 0%,#E8A33D 48%,#C4622D 100%);color:#140D06;
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:14px;min-height:44px;padding:4px 4px 4px 20px;border-radius:var(--radius-soft);background:radial-gradient(120% 220% at 8% 0%,#F8B84A 0%,rgba(248,184,74,0) 62%),linear-gradient(115deg,#F2A23A 0%,#E4772B 52%,#C23A20 100%);color:#1A0804;
   font:600 15px/1 var(--text);letter-spacing:.01em;text-decoration:none;transition:filter .2s,box-shadow .2s}
 .btn:hover{filter:brightness(1.1) saturate(1.05);box-shadow:0 8px 28px -10px rgba(232,163,61,.6)}
 .btn .blk{width:36px;height:36px;border-radius:4px;background:#141414;display:flex;align-items:center;justify-content:center;color:var(--warm)}
@@ -59,12 +61,12 @@ img,svg{display:block;max-width:100%}
 .enav{position:fixed;top:0;left:0;right:0;z-index:100}
 .enav-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;height:48px;padding:0 32px;background:rgba(13,10,8,.78);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .enav a{text-decoration:none}
-.enav-logo{font:500 13px/1 var(--mono);letter-spacing:.16em;color:var(--bone);display:inline-flex;align-items:center;gap:12px}
+.enav-logo{font:400 13px/1 var(--caps);letter-spacing:.34em;color:var(--bone);display:inline-flex;align-items:center;gap:12px}
 .rvb-mark{height:23px;width:auto;flex:none;color:var(--bone)}
 .enav-right{display:flex;align-items:center;gap:28px}
-.enav-link{font:400 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#fff;transition:color .15s}
+.enav-link{font:300 12px/1 var(--caps);letter-spacing:.3em;text-transform:uppercase;color:#fff;transition:color .15s}
 .enav-link:hover,.enav-link[aria-current="page"]{color:var(--accent-hover)}
-@media (max-width:560px){.enav-bar{padding:0 16px}.enav-logo{font-size:11px;letter-spacing:.12em}.enav-right{gap:20px}}
+@media (max-width:560px){.enav-bar{padding:0 16px}.enav-logo{font-size:11px;letter-spacing:.26em}.enav-right{gap:20px}}
 
 /* hero: X banner fading into the canvas */
 .hero{--hh:max(clamp(460px,52vw,800px),76svh);position:relative;isolation:isolate;overflow:hidden}
@@ -249,7 +251,7 @@ img.binary-live{display:none !important}
 }
 
 /* statement band: electric blue with film grain (from data.elocollective.com, grain kept still) */
-.band{position:relative;overflow:hidden;isolation:isolate;padding:clamp(100px,12vw,170px) 24px;background:radial-gradient(70% 95% at 88% 0%,rgba(246,200,115,.7),rgba(246,200,115,0) 62%),linear-gradient(160deg,#C4622D 0%,#9A4220 52%,#6E2C12 100%);text-align:center}
+.band{position:relative;overflow:hidden;isolation:isolate;padding:clamp(100px,12vw,170px) 24px;background:radial-gradient(55% 75% at 20% 14%,#F5A93E 0%,rgba(245,169,62,0) 72%),radial-gradient(65% 85% at 82% 88%,#B52A1B 0%,rgba(181,42,27,0) 74%),radial-gradient(45% 65% at 100% 6%,#4A0C08 0%,rgba(74,12,8,0) 72%),radial-gradient(45% 60% at 0% 100%,#3A0A06 0%,rgba(58,10,6,0) 72%),#CC5A22;text-align:center}
 .band-grain{position:absolute;inset:0;width:100%;height:100%;z-index:0;mix-blend-mode:soft-light;opacity:.6;pointer-events:none}
 .band-in{position:relative;z-index:1;margin:0 auto;max-width:1080px}
 .band-q{margin:0}
