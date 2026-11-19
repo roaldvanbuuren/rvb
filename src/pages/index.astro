@@ -162,3 +162,22 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
     </div>
   </section>
 </Base>
+
+<script>
+  // Hover a stop on the road and the horizon lights up from the left edge to that stop.
+  const road = document.querySelector<HTMLElement>('.road');
+  if (road) {
+    const items = Array.from(road.children) as HTMLElement[];
+    items.forEach((li) => {
+      li.addEventListener('pointerenter', () => {
+        road.style.setProperty('--lit', li.offsetLeft + 'px');
+        road.classList.add('lit-on');
+        items.forEach((o) => o.classList.toggle('is-lit', o === li));
+      });
+    });
+    road.addEventListener('pointerleave', () => {
+      road.classList.remove('lit-on');
+      items.forEach((o) => o.classList.remove('is-lit'));
+    });
+  }
+</script>

@@ -720,3 +720,20 @@ html:has(#top.hero) .world{scroll-snap-align:start}
   .orb-sun{--s:clamp(340px,46vw,640px)}
   .world .scene-line{font-size:clamp(34px,5vw,74px)}
 }
+
+/* hover a stop: the horizon lights up from the left edge to it, the stop's node and name catch fire, the rest recede */
+.world .road li{transition:opacity .7s ease}
+.world .road li::before{transition:height .7s var(--line-ease,ease),background .7s ease}
+.world .road li::after{transition:transform .7s ease,box-shadow .7s ease,background .7s ease}
+.world .r-name{transition:color .7s ease}
+@media (min-width:701px){
+  .world .road::before{content:"";position:absolute;z-index:4;top:-2px;left:calc(50% - 50vw);height:2px;width:calc(50vw - 50% + var(--lit,0px));
+    background:linear-gradient(90deg,transparent 0,#FFE0A0 70%,#FFF0CF 100%);box-shadow:0 0 18px 4px rgba(var(--accent-rgb),.8),0 0 60px 10px rgba(var(--accent-rgb),.35);
+    opacity:0;transition:width 1s cubic-bezier(.22,1,.36,1),opacity .6s ease;pointer-events:none}
+  .world .road.lit-on::before{opacity:1}
+  .world .road.lit-on li:not(.is-lit){opacity:.42}
+  .world .road li.is-lit::before{height:68px;background:linear-gradient(180deg,#FFE0A0,rgba(var(--accent-rgb),0))}
+  .world .road li.is-lit::after{transform:scale(1.9);background:#FFE9B8;box-shadow:0 0 22px 7px rgba(var(--accent-rgb),.9)}
+  .world .road li.is-lit .r-name{color:var(--accent-hover)}
+}
+@media (hover:none){.world .road.lit-on li:not(.is-lit){opacity:1}}
