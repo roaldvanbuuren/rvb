@@ -7,7 +7,7 @@ interface Props { id: string; title: string; summary?: string }
 const { id, title, summary = '' } = Astro.props;
 
 const W = 480, H = 320;
-const BONE = '#E8E8DB', ACC = '#6B7BFF', AMB = '#C8842A';
+const BONE = '#EFE3CF', ACC = '#E8A33D', AMB = '#C4622D';
 
 function hash(s: string) { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
 function rng(seed: number) {
@@ -142,7 +142,7 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" pre
 <radialGradient id="${uid}a" cx="${f(glowA.x)}" cy="${f(glowA.y)}" r="${f(between(190, 260))}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${glowA.c}" stop-opacity=".30"/><stop offset="1" stop-color="${glowA.c}" stop-opacity="0"/></radialGradient>
 <radialGradient id="${uid}b" cx="${f(glowB.x)}" cy="${f(glowB.y)}" r="${f(between(150, 220))}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${glowB.c}" stop-opacity=".16"/><stop offset="1" stop-color="${glowB.c}" stop-opacity="0"/></radialGradient>
 </defs>
-<rect width="${W}" height="${H}" fill="#121211"/>
+<rect width="${W}" height="${H}" fill="#120E0B"/>
 <rect width="${W}" height="${H}" fill="url(#${uid}a)"/>
 <rect width="${W}" height="${H}" fill="url(#${uid}b)"/>
 ${art}
