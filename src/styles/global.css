@@ -514,7 +514,7 @@ html[data-theme="light"] .foot nav a:hover{color:#000}
 .slit:hover i,.slit:focus-visible i{width:180px}
 .hero .slits{margin-top:14px}
 .hero-in .rvb-mark{height:34px}
-.hero .sub{font-family:var(--mono);font-size:12.5px;letter-spacing:.1em;line-height:1.8;color:#F0E2CB}
+.hero .sub{font-family:var(--mono);font-size:13px;letter-spacing:.1em;line-height:1.8;color:#F0E2CB}
 .f-eyebrow{margin:0 0 56px;font:400 12px/1 var(--mono);letter-spacing:.28em;text-transform:uppercase;color:var(--accent)}
 .f-mono{margin:44px 0 0;font:400 12px/1.6 var(--mono);letter-spacing:.24em;text-transform:uppercase;color:var(--dim)}
 .f-mono a{text-decoration:none}
