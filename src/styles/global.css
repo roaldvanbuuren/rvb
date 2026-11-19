@@ -670,3 +670,38 @@ html.js .world .horizon.rv{transform:scaleX(.06);transform-origin:left center;op
 html.js .world .horizon.rv.in{transform:none}
 @media (prefers-reduced-motion:reduce){html.js .world .horizon.rv{transform:none}}
 .wcard{position:relative}
+
+/* ---- Home: every section is a full screen, and the page snaps from one to the next ---- */
+html:has(#top.hero){scroll-snap-type:y mandatory}
+html:has(#top.hero) .hero,html:has(#top.hero) .film,html:has(#top.hero) .scene,html:has(#top.hero) .band,html:has(#top.hero) .close,html:has(#top.hero) .world-sky,html:has(#top.hero) .world-ground{scroll-snap-align:start;scroll-snap-stop:always}
+html:has(#top.hero) footer{scroll-snap-align:end}
+#top.hero{min-height:100svh;display:flex}
+#top.hero .hero-in{width:100%}
+.film,.scene,.close,.world-ground{min-height:100svh;display:flex;flex-direction:column;justify-content:center}
+.film .wrap,.scene .wrap,.close .wrap,.world-ground .wrap{width:100%;margin-left:auto;margin-right:auto}
+.film,.close{padding-top:clamp(90px,10vw,140px);padding-bottom:clamp(60px,8vw,110px)}
+.band{min-height:100svh;display:flex;align-items:center;justify-content:center}
+.world-sky{min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end}
+.world-sky .wrap{margin-top:auto}
+.world-ground .horizon{position:absolute;left:0;right:0;top:0}
+.world-ground .wrap{padding-top:clamp(60px,8vw,120px)}
+.world .f-more{padding-bottom:0}
+@media (prefers-reduced-motion:reduce){html:has(#top.hero){scroll-snap-type:none}}
+/* desktop: dispatches and the work each fit one screen */
+@media (min-width:901px) and (min-height:760px){
+  .film .f-eyebrow{margin-bottom:34px}
+  .credit{padding:20px 0}
+  .c-title{font-size:clamp(34px,4.2vw,60px)}
+  .film{padding-top:clamp(72px,7vw,96px);padding-bottom:clamp(40px,5vw,70px)}
+  .f-more{margin-top:34px}
+  .prod{padding:18px 0}
+  .p-name{font-size:clamp(34px,4.2vw,58px)}
+  .f-lede{margin:-12px 0 30px}
+  .f-mono-block{margin-top:28px}
+}
+@media (min-width:701px){
+  .world-sky{padding-top:clamp(88px,8vw,110px)}
+  .road-eyebrow{margin-top:clamp(120px,13vw,190px)}
+  .orb-sun{--s:clamp(320px,38vw,540px)}
+  .world .scene-line{font-size:clamp(34px,4.6vw,68px)}
+}
