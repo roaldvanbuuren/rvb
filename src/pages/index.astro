@@ -45,7 +45,7 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
       <div class="t-pin">
         <div class="t-hero-in wrap">
           <h1 class="h1 t-h1">Roald van Buuren</h1>
-          <p class="t-belief">I believe the way people play shows us who they really are, and where society is heading next.</p>
+          <p class="t-belief">I believe the way people play, and the communities they build around it, show us who they really are and where society is heading next.</p>
           <p class="t-lede">So I'm building ways to see it: records of how people behave under pressure, turned into simulations of what happens next.</p>
           <a class="t-cue" href="#signal"><span>Scroll</span><i></i></a>
         </div>
@@ -63,12 +63,23 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
       </div>
     </section>
 
-    <section class="t-step" data-act="2" aria-labelledby="h-scale">
+    <section class="t-step" data-act="2" aria-labelledby="h-gather">
       <div class="t-pin">
         <div class="t-card rv">
-          <p class="t-eye">02 · What I noticed next</p>
-          <h2 class="t-h2" id="h-scale">It happens everywhere people play, billions of times a day.</h2>
-          <p>Fifteen years in this industry showed me that every match, every server and every Discord is a small society, with its own rules, factions, economies and crises. Almost all of it is logged, and very little of it is studied.</p>
+          <p class="t-eye">02 · Where people gather</p>
+          <h2 class="t-h2" id="h-gather">Around every game, people build a community.</h2>
+          <p>That is where they show the most. Discord servers, guilds, clans and fan groups have leaders and lurkers, in-jokes and feuds. When a patch lands, a scandal breaks or a final is lost, they react the way towns react to news, and you can watch it spread from one server to the next.</p>
+          <p>I believe these communities are the closest thing we have to a living, observable model of society. They are also where most of my work is now: at ELO we build Lumen, which reads Discord communities and shows the people running them what to fix and why.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="t-step" data-act="3" aria-labelledby="h-scale">
+      <div class="t-pin">
+        <div class="t-card rv">
+          <p class="t-eye">03 · What I noticed next</p>
+          <h2 class="t-h2" id="h-scale">Now count all of it: billions of people, every day.</h2>
+          <p>Fifteen years in this industry showed me how much of this is recorded: every match, every message, every trade and every argument. Almost all of it is logged, and very little of it is studied.</p>
           <figure class="t-quote">
             <blockquote><p>{bandQuote}</p></blockquote>
             <figcaption><a href={postUrl(bandPost)}>From my journal</a></figcaption>
@@ -77,20 +88,20 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
       </div>
     </section>
 
-    <section class="t-step" data-act="3" aria-labelledby="h-record">
+    <section class="t-step" data-act="4" aria-labelledby="h-record">
       <div class="t-pin">
         <div class="t-card rv">
-          <p class="t-eye">03 · Why it matters</p>
+          <p class="t-eye">04 · Why it matters</p>
           <h2 class="t-h2" id="h-record">Every decision, kept with its context.</h2>
           <p>The score, the clock, the money, the people watching and the people relying on you. I believe that once you capture all of that next to what someone actually did, pressure stops being a feeling. It becomes something you can measure, person by person.</p>
         </div>
       </div>
     </section>
 
-    <section class="t-step" data-act="4" aria-labelledby="h-swarm">
+    <section class="t-step" data-act="5" aria-labelledby="h-swarm">
       <div class="t-pin">
         <div class="t-card rv">
-          <p class="t-eye">04 · What I believe</p>
+          <p class="t-eye">05 · What I believe</p>
           <h2 class="t-h2" id="h-swarm">Agents built from what people actually did.</h2>
           <p>I think every agent in a simulation should carry a response to pressure that was measured from real people: how it moves, who it follows, when it holds and when it breaks. Put thousands of them together and you get a population that behaves like the people it came from.</p>
           <p class="t-try"><span class="t-try-fine">Move through them. You are the pressure.</span><span class="t-try-touch">Touch them. You are the pressure.</span></p>
@@ -98,10 +109,10 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
       </div>
     </section>
 
-    <section class="t-step" data-act="5" aria-labelledby="h-forward">
+    <section class="t-step" data-act="6" aria-labelledby="h-forward">
       <div class="t-pin">
         <div class="t-card rv">
-          <p class="t-eye">05 · Where this goes</p>
+          <p class="t-eye">06 · Where this goes</p>
           <h2 class="t-h2" id="h-forward">Then run it forward, thousands of times.</h2>
           <p>Change the conditions, raise the pressure, and watch where a population fractures, where it holds and where it runs. Run it often enough and the futures start to agree with each other.</p>
           <p>I believe this is how we will learn to predict what societies do next: markets, elections, and the way people respond to the next crisis. It's what I'm working towards.</p>
@@ -109,7 +120,7 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
       </div>
     </section>
 
-    <section class="t-step t-end" data-act="6" aria-labelledby="h-end">
+    <section class="t-step t-end" data-act="7" aria-labelledby="h-end">
       <div class="t-pin">
         <div class="t-end-in wrap rv">
           <h2 class="t-h2 t-end-h" id="h-end">Games are a lens on human behaviour. I'm building the tools to look through it.</h2>
@@ -123,7 +134,7 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
   </div>
 
   {latest.length > 0 && (
-    <section class="film grained t-after" id="writing">
+    <section class="film grained t-after" id="writing" data-act="8">
       <div class="glows" aria-hidden="true"><div class="glow glow-d" aria-hidden="true"></div><div class="glow glow-d2" aria-hidden="true"></div></div>
       <div class="wrap rv">
         <p class="f-eyebrow">Dispatches</p>
@@ -143,7 +154,7 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
     </section>
   )}
 
-  <section class="world grained t-after" id="about" aria-label="About">
+  <section class="world grained t-after" id="about" aria-label="About" data-act="9">
       <div class="glows" aria-hidden="true"><div class="glow glow-s" aria-hidden="true"></div></div>
     <div class="world-stage">
     <div class="world-sky">
@@ -174,7 +185,7 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
     </div>
   </section>
 
-  <section class="film grained t-after" id="now">
+  <section class="film grained t-after" id="now" data-act="10">
       <div class="glows" aria-hidden="true"><div class="glow glow-w" aria-hidden="true"></div><div class="glow glow-w2" aria-hidden="true"></div></div>
     <div class="wrap rv">
       <p class="f-eyebrow">The work</p>
@@ -192,7 +203,7 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
     </div>
   </section>
 
-  <section class="close grained t-after" id="contact">
+  <section class="close grained t-after" id="contact" data-act="11">
     <div class="glow glow-c" aria-hidden="true"></div>
     <div class="wrap rv">
       <h2 class="h1">Send word.</h2>
@@ -251,8 +262,8 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
   .t-end .slit{align-items:center}
 
   /* the rest of the page slides over the swarm */
+  /* the rest of the page sits on the swarm too: no solid grounds, no second grain (the swarm's layer carries it) */
   .t-after{position:relative;z-index:2}
-  .thesis + .t-after{background:linear-gradient(180deg,rgba(14,14,14,0) 0,var(--ink) 12svh)}
 
   @media (max-width:700px){
     .t-step{height:160svh}
@@ -281,6 +292,9 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
   html:has(.thesis) .foot small{color:#B1B1A8}
   html:has(.thesis) body > footer::after{opacity:.28}
   html:has(.thesis) body{background:#0B0B0B}
+  html:has(.thesis) .t-after.film.grained,html:has(.thesis) .world,html:has(.thesis) .world-ground{background:transparent}
+  html:has(.thesis) .t-after.grained::after,html:has(.thesis) .world-ground::after{display:none}
+  html:has(.thesis) .close.grained{background:linear-gradient(180deg,rgba(14,14,14,0) 0%,rgba(35,35,34,.35) 45%,#3B3A36 100%)}
 </style>
 
 <script>
