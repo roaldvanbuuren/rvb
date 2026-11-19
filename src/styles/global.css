@@ -46,13 +46,13 @@ img,svg{display:block;max-width:100%}
 
 /* buttons: accent (from the ELO nav CTA) and outlined (ELO ghost) */
 .ctas{display:flex;flex-wrap:wrap;gap:10px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:14px;min-height:44px;padding:4px 4px 4px 20px;border-radius:var(--radius-soft);background:var(--accent);color:#140D06;
-  font:400 12px/1 var(--caps);letter-spacing:.3em;text-transform:uppercase;text-decoration:none;transition:background .2s}
-.btn:hover{background:var(--accent-hover)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:14px;min-height:44px;padding:4px 4px 4px 20px;border-radius:var(--radius-soft);background:linear-gradient(135deg,#F6C873 0%,#E8A33D 48%,#C4622D 100%);color:#140D06;
+  font:600 15px/1 var(--text);letter-spacing:.01em;text-decoration:none;transition:filter .2s,box-shadow .2s}
+.btn:hover{filter:brightness(1.1) saturate(1.05);box-shadow:0 8px 28px -10px rgba(232,163,61,.6)}
 .btn .blk{width:36px;height:36px;border-radius:4px;background:#141414;display:flex;align-items:center;justify-content:center;color:var(--warm)}
 .btn .blk svg{width:9px;height:12px}
 .btn-ghost{display:inline-flex;align-items:center;min-height:44px;padding:0 20px;border-radius:var(--radius-soft);background:rgba(13,10,8,.7);border:1px solid rgba(239,227,207,.3);color:var(--warm);
-  font:300 12px/1 var(--caps);letter-spacing:.3em;text-transform:uppercase;text-decoration:none;transition:border-color .2s}
+  font:500 15px/1 var(--text);letter-spacing:.01em;text-decoration:none;transition:border-color .2s}
 .btn-ghost:hover{border-color:rgba(239,227,207,.3)}
 .more{display:inline-block;font:400 12px/1 var(--caps);letter-spacing:.3em;text-transform:uppercase;color:var(--warm);text-decoration:none;border-bottom:1px solid rgba(239,227,207,.3);padding-bottom:4px;transition:color .15s,border-color .15s}
 .more:hover{color:#fff;border-color:#fff}
@@ -251,7 +251,7 @@ img.binary-live{display:none !important}
 }
 
 /* statement band: electric blue with film grain (from data.elocollective.com, grain kept still) */
-.band{position:relative;overflow:hidden;isolation:isolate;padding:clamp(100px,12vw,170px) 24px;background:#B4531F;text-align:center}
+.band{position:relative;overflow:hidden;isolation:isolate;padding:clamp(100px,12vw,170px) 24px;background:radial-gradient(70% 95% at 88% 0%,rgba(246,200,115,.7),rgba(246,200,115,0) 62%),linear-gradient(160deg,#C4622D 0%,#9A4220 52%,#6E2C12 100%);text-align:center}
 .band-grain{position:absolute;inset:0;width:100%;height:100%;z-index:0;mix-blend-mode:soft-light;opacity:.6;pointer-events:none}
 .band-in{position:relative;z-index:1;margin:0 auto;max-width:1080px}
 .band-q{margin:0}
