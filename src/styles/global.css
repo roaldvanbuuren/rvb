@@ -774,40 +774,42 @@ html:has(#top.hero) body > footer::after{opacity:.28}
 .hero-img{filter:none;-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 52%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 52%,transparent 100%)}
 .glows{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;-webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 26%,#000 74%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0%,#000 26%,#000 74%,transparent 100%)}
 
-/* pinned scroll scene: the sun turns, the road rises (desktop, motion allowed; JS sets --p 0..1) */
-@media (min-width:900px) and (min-height:640px) and (prefers-reduced-motion:no-preference){
-  html.pin .world{--p:0;--rise:clamp(0,calc(var(--p) / .34),1);--clear:clamp(0,calc((var(--p) - .16) / .2),1);height:calc(100svh + 360vh);min-height:0}
-  html.pin .world-stage{position:sticky;top:0;height:100svh;overflow:hidden}
-  html.pin .world-sky{position:absolute;inset:0;padding:0;z-index:1}
-  html.pin .world-sky .wrap{position:absolute;left:50%;top:clamp(84px,11svh,130px);transform:translate(-50%,calc(var(--clear) * -34px));margin:0;opacity:calc(1 - var(--clear));width:100%;pointer-events:none}
-  html.pin .world .scene-line{font-size:min(4.2vw,6.6svh)}
-  html.pin .world .f-mono{margin-top:calc(2.6svh)}
-  html.pin .world-ground{position:absolute;left:0;right:0;bottom:0;height:50svh;display:flex;flex-direction:column;z-index:2}
-  html.pin .world-ground .wrap{padding-top:0}
-  html.pin .road-eyebrow{margin:clamp(20px,3.6svh,40px) 0 clamp(14px,2.4svh,26px);opacity:calc((var(--p) - .3) / .08)}
-  html.pin .world .horizon.rv{transform:scaleX(clamp(.06,calc(.06 + var(--p) * 1.6),1));transition:none}
-  html.pin .world .horizon::before{opacity:calc(.35 + var(--p) * .65)}
-  html.pin .world .road{--k0:.36}
-  html.pin .world .road li{--k:clamp(0,calc((var(--p) - .36 - var(--i) * .1) / .1),1);opacity:var(--k);transform:translateY(calc((1 - var(--k)) * 42px));padding-top:clamp(34px,5svh,54px)}
-  html.pin .world .road li::before{height:clamp(24px,4svh,40px);transform-origin:top;transform:scaleY(var(--k))}
-  html.pin .world .road li::after{transform:scale(var(--k))}
-  html.pin .world .road.lit-on li:not(.is-lit){opacity:calc(var(--k) * .42)}
-  html.pin .world .r-name{font-size:clamp(28px,3.1vw,42px)}
-  html.pin .world .r-text{font-size:14px;line-height:1.5}
-  html.pin .world .f-more{margin-top:clamp(14px,2.4svh,28px);opacity:clamp(0,calc((var(--p) - .86) / .1),1)}
-  /* the sun: rises behind the horizon, then keeps turning */
-  html.pin .orb-sun{animation:none;--s:clamp(340px,min(46vw,78svh),680px);left:50%;bottom:calc(50svh - var(--s) * .5);z-index:1;
-    translate:0 calc((1 - var(--rise)) * var(--s) * .44 - var(--p) * 10px);
-    background:radial-gradient(circle at 76% 82%,rgba(4,3,3,.92) 0%,rgba(4,3,3,.6) 32%,transparent 70%),radial-gradient(circle at calc(31% + var(--p) * 22%) 27%,#FCE3AE 0%,#F2B452 12%,#DF9232 28%,#B2501B 52%,#521F0E 76%,#120A07 100%)}
-  html.pin .orb-sun::after{background-image:var(--noise),radial-gradient(ellipse 34% 14% at 30% 38%,rgba(255,236,180,.55),transparent 70%),radial-gradient(ellipse 26% 10% at 72% 64%,rgba(70,22,8,.6),transparent 70%),radial-gradient(ellipse 20% 8% at 55% 20%,rgba(255,214,140,.4),transparent 70%);
-    background-size:170px,60% 100%,60% 100%,60% 100%;background-repeat:repeat,repeat-x,repeat-x,repeat-x;background-position:0 0,calc(var(--p) * -150%) 0,calc(var(--p) * -230%) 0,calc(var(--p) * -310%) 0;opacity:.8}
-  html.pin .orb-sun::before{opacity:calc(.5 + var(--rise) * .5)}
-  html.pin .world .glows{position:absolute}
-}
+/* pinned scroll scene: the sun stays put and turns; history comes up one stop at a time (desktop; JS sets --p 0..1) */
 @media (min-width:900px) and (min-height:640px) and (prefers-reduced-motion:no-preference){
   html.pin .world.grained{overflow:visible}
   html.pin .world.grained::after{display:none}
+  html.pin .world{--p:0;--sun:clamp(340px,46vw,640px);--clear:clamp(0,calc((var(--p) - .05) / .09),1);height:calc(100svh + 380vh);min-height:0}
+  html.pin .world-stage{position:sticky;top:0;height:100svh;overflow:hidden}
+  html.pin .world-sky{position:absolute;inset:0;padding:0;z-index:1}
+  html.pin .world-sky .wrap{position:absolute;left:50%;top:clamp(84px,11svh,130px);transform:translate(-50%,calc(var(--clear) * -30px));margin:0;width:100%;opacity:calc(1 - var(--clear));pointer-events:none}
+  html.pin .world .scene-line{font-size:min(4.6vw,7svh)}
+  html.pin .world .f-mono{margin-top:2.6svh}
+  html.pin .orb-sun{animation:none;--s:var(--sun);left:50%;margin-left:calc(var(--s) * -.5);bottom:calc(var(--s) * -.5);translate:none;z-index:1;
+    background:radial-gradient(circle at 76% 82%,rgba(4,3,3,.92) 0%,rgba(4,3,3,.6) 32%,transparent 70%),radial-gradient(circle at calc(31% + var(--p) * 30%) 27%,#FCE3AE 0%,#F2B452 12%,#DF9232 28%,#B2501B 52%,#521F0E 76%,#120A07 100%)}
+  html.pin .orb-sun::after{background-image:var(--noise),radial-gradient(ellipse 34% 14% at 30% 38%,rgba(255,236,180,.55),transparent 70%),radial-gradient(ellipse 26% 10% at 72% 64%,rgba(70,22,8,.6),transparent 70%),radial-gradient(ellipse 20% 8% at 55% 20%,rgba(255,214,140,.4),transparent 70%);
+    background-size:170px,60% 100%,60% 100%,60% 100%;background-repeat:repeat,repeat-x,repeat-x,repeat-x;background-position:0 0,calc(var(--p) * -420%) 0,calc(var(--p) * -640%) 0,calc(var(--p) * -880%) 0;opacity:.8}
+  /* history layer */
+  html.pin .world-ground{position:absolute;inset:0;z-index:2;background:none;display:block;pointer-events:none}
+  html.pin .world-ground::before,html.pin .world-ground::after,html.pin .world .horizon{display:none}
+  html.pin .world-ground .wrap{position:absolute;inset:0;max-width:none;padding:0}
+  html.pin .road{position:absolute;inset:0;margin:0;display:block}
+  html.pin .road::before{display:none}
+  html.pin .world .road li{--u:calc((var(--p) - .12) / .17 - var(--i));--in:clamp(0,calc(var(--u) / .3),1);--out:clamp(0,calc((1 - var(--u)) / .25),1);
+    position:absolute;bottom:clamp(90px,16svh,170px);width:min(300px,calc(50vw - var(--sun) * .5 - 110px));padding:0;gap:12px;
+    opacity:min(var(--in),var(--out));transform:translateY(calc((1 - var(--in)) * 40px - (1 - var(--out)) * 26px))}
+  html.pin .world .road li:last-child{--out:1}
+  html.pin .world .road li:nth-child(odd){right:calc(50% + var(--sun) * .5 + 48px);text-align:right;align-items:flex-end}
+  html.pin .world .road li:nth-child(even){left:calc(50% + var(--sun) * .5 + 48px)}
+  html.pin .world .road li::before,html.pin .world .road li::after{display:none}
+  html.pin .world .r-name{font-size:clamp(34px,3.6vw,52px)}
+  html.pin .world .r-text{font-size:15px;line-height:1.55}
+  html.pin .road-eyebrow{position:absolute;left:max(28px,calc(50% - 550px));bottom:calc(6svh + 22px);margin:0;opacity:clamp(0,calc((var(--p) - .1) / .05),1)}
+  html.pin .road-dots{display:flex}
+  html.pin .world .f-more{position:absolute;right:max(28px,calc(50% - 550px));bottom:6svh;margin:0;pointer-events:auto;opacity:clamp(0,calc((var(--p) - .9) / .06),1)}
 }
+.road-dots{display:none;position:absolute;left:max(28px,calc(50% - 550px));bottom:6svh;gap:14px;z-index:3;pointer-events:none}
+.road-dots i{--on:clamp(0,calc((var(--p) - .1 - var(--i) * .17) / .03),1);width:7px;height:7px;border-radius:50%;background:var(--accent);opacity:calc(.22 + var(--on) * .78);box-shadow:0 0 calc(var(--on) * 14px) calc(var(--on) * 2px) rgba(var(--accent-rgb),.7)}
 @media (min-width:900px) and (min-height:640px) and (prefers-reduced-motion:no-preference){
-  html.pin .road-eyebrow{margin-top:clamp(34px,6svh,60px)}
+  html.pin .world .road li,html.pin .world .r-name{transition:none}
+  html.pin .world .f-more{flex-direction:column;align-items:flex-end;gap:14px;z-index:4}
 }
