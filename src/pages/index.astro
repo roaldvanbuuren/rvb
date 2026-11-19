@@ -6,6 +6,7 @@ import { getPosts, links, postUrl, formatDate, isoDate } from '../lib/posts';
 
 const all = await getPosts();
 const latest = all.slice(0, 5);
+const [lead, ...rest] = latest;
 
 // Pull quotes: each must be a verbatim line from its article. The build fails if one drifts.
 function pull(slug: string, quote: string) {
@@ -61,22 +62,27 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
   </section>
 
   {latest.length > 0 && (
-    <section class="film grained" id="writing">
-    <div class="glow glow-d" aria-hidden="true"></div><div class="glow glow-d2" aria-hidden="true"></div>
+    <section class="film disp grained" id="writing">
+      <div class="glow glow-d" aria-hidden="true"></div><div class="glow glow-d2" aria-hidden="true"></div>
       <div class="wrap rv">
         <p class="f-eyebrow">Dispatches</p>
-        <div class="credits">
-          {latest.map((p) => (
-            <a class="credit" href={postUrl(p)}>
-              <span class="c-top">
+        <a class="lead-card" href={postUrl(lead)}>
+          {lead.data.cover && <img class="lc-img" src={lead.data.cover} alt="" width="1200" height="900" loading="lazy" decoding="async" />}
+          <span class="lc-meta">
+            <time datetime={isoDate(lead.data.date)}>{formatDate(lead.data.date)}</time>
+            <span class="lc-title">{lead.data.title}</span>
+          </span>
+        </a>
+        <ul class="disp-list">
+          {rest.map((p) => (
+            <li>
+              <a href={postUrl(p)}>
                 <time datetime={isoDate(p.data.date)}>{formatDate(p.data.date)}</time>
-                <span class="c-title">{p.data.title}</span>
-              </span>
-              <span class="c-sum">{p.data.summary}</span>
-              {p.data.cover && <img class="c-plate" src={p.data.cover} alt="" width="260" height="150" loading="lazy" decoding="async" />}
-            </a>
+                <span class="dl-title">{p.data.title}</span>
+              </a>
+            </li>
           ))}
-        </div>
+        </ul>
         <p class="f-more"><a class="slit" href="/writing">See all writing<i></i></a></p>
       </div>
     </section>
@@ -138,7 +144,15 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
         ))}
       </div>
       <p class="f-mono-block"><b>ELO works with</b><br />{worksWith.join(', ')}, and many more</p>
-      <p class="f-mono-block"><b>Beyond the work</b><br />{beyond.join(' · ')}<br />Currently (re-)playing: Assassin's Creed Odyssey.</p>
+    </div>
+  </section>
+
+  <section class="scene scene-beyond grained" aria-label="Beyond the work">
+    <div class="glow glow-w2" aria-hidden="true"></div>
+    <div class="wrap rv">
+      <p class="f-eyebrow">Beyond the work</p>
+      <p class="beyond-line">{beyond.join(' · ')}</p>
+      <p class="f-mono">Currently (re-)playing: Assassin's Creed Odyssey.</p>
     </div>
   </section>
 
