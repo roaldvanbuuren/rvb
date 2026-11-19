@@ -80,20 +80,21 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
 
   <section class="world grained" id="about" aria-label="About">
       <div class="glows" aria-hidden="true"><div class="glow glow-s" aria-hidden="true"></div></div>
+    <div class="world-stage">
     <div class="world-sky">
       <div class="orb orb-sun" aria-hidden="true"></div>
       <div class="wrap rv">
         <p class="scene-line">Fifteen years inside the games industry, watching millions of people organise themselves. Now I study what that reveals about where AI, technology and society are heading.</p>
-        <p class="f-mono">Dutch. Based in Turin.</p>
-        <p class="f-eyebrow road-eyebrow" id="road">The road so far</p>
+        <p class="f-mono">Amsterdam &gt; London &gt; Torino</p>
       </div>
     </div>
     <div class="world-ground">
       <div class="horizon rv" aria-hidden="true"></div>
       <div class="wrap rv">
+        <p class="f-eyebrow road-eyebrow" id="road">The road so far</p>
         <ol class="road">
-          {road.map((s) => (
-            <li>
+          {road.map((s, i) => (
+            <li style={`--i:${i}`}>
               <span class="r-date">{s.date}</span>
               <span class={`r-name${s.lit ? ' lit' : ''}`}>{s.name}</span>
               <span class="r-text">{s.text}</span>
@@ -102,6 +103,7 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
         </ol>
         <p class="f-more"><a class="slit" href="/work">Work, in more detail<i></i></a> <a class="slit" href="/press">Press, talks and podcasts<i></i></a></p>
       </div>
+    </div>
     </div>
   </section>
 
@@ -176,5 +178,27 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
       road.classList.remove('lit-on');
       items.forEach((o) => o.classList.remove('is-lit'));
     });
+  }
+
+  const world = document.querySelector<HTMLElement>('.world');
+  if (world) {
+    const mq = matchMedia('(min-width: 900px) and (min-height: 640px) and (prefers-reduced-motion: no-preference)');
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const r = world.getBoundingClientRect();
+      const span = r.height - innerHeight;
+      const p = span > 0 ? Math.min(1, Math.max(0, -r.top / span)) : 0;
+      world.style.setProperty('--p', p.toFixed(4));
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    const apply = () => {
+      document.documentElement.classList.toggle('pin', mq.matches);
+      if (mq.matches) { update(); } else { world.style.removeProperty('--p'); }
+    };
+    addEventListener('scroll', onScroll, { passive: true });
+    addEventListener('resize', onScroll);
+    mq.addEventListener('change', apply);
+    apply();
   }
 </script>

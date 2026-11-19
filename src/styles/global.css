@@ -773,3 +773,41 @@ html:has(#top.hero) body > footer::after{opacity:.28}
 .hero-art::before,.hero .grain{display:none}
 .hero-img{filter:none;-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 52%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 52%,transparent 100%)}
 .glows{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;-webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 26%,#000 74%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0%,#000 26%,#000 74%,transparent 100%)}
+
+/* pinned scroll scene: the sun turns, the road rises (desktop, motion allowed; JS sets --p 0..1) */
+@media (min-width:900px) and (min-height:640px) and (prefers-reduced-motion:no-preference){
+  html.pin .world{--p:0;--rise:clamp(0,calc(var(--p) / .34),1);--clear:clamp(0,calc((var(--p) - .16) / .2),1);height:calc(100svh + 360vh);min-height:0}
+  html.pin .world-stage{position:sticky;top:0;height:100svh;overflow:hidden}
+  html.pin .world-sky{position:absolute;inset:0;padding:0;z-index:1}
+  html.pin .world-sky .wrap{position:absolute;left:50%;top:clamp(84px,11svh,130px);transform:translate(-50%,calc(var(--clear) * -34px));margin:0;opacity:calc(1 - var(--clear));width:100%;pointer-events:none}
+  html.pin .world .scene-line{font-size:min(4.2vw,6.6svh)}
+  html.pin .world .f-mono{margin-top:calc(2.6svh)}
+  html.pin .world-ground{position:absolute;left:0;right:0;bottom:0;height:50svh;display:flex;flex-direction:column;z-index:2}
+  html.pin .world-ground .wrap{padding-top:0}
+  html.pin .road-eyebrow{margin:clamp(20px,3.6svh,40px) 0 clamp(14px,2.4svh,26px);opacity:calc((var(--p) - .3) / .08)}
+  html.pin .world .horizon.rv{transform:scaleX(clamp(.06,calc(.06 + var(--p) * 1.6),1));transition:none}
+  html.pin .world .horizon::before{opacity:calc(.35 + var(--p) * .65)}
+  html.pin .world .road{--k0:.36}
+  html.pin .world .road li{--k:clamp(0,calc((var(--p) - .36 - var(--i) * .1) / .1),1);opacity:var(--k);transform:translateY(calc((1 - var(--k)) * 42px));padding-top:clamp(34px,5svh,54px)}
+  html.pin .world .road li::before{height:clamp(24px,4svh,40px);transform-origin:top;transform:scaleY(var(--k))}
+  html.pin .world .road li::after{transform:scale(var(--k))}
+  html.pin .world .road.lit-on li:not(.is-lit){opacity:calc(var(--k) * .42)}
+  html.pin .world .r-name{font-size:clamp(28px,3.1vw,42px)}
+  html.pin .world .r-text{font-size:14px;line-height:1.5}
+  html.pin .world .f-more{margin-top:clamp(14px,2.4svh,28px);opacity:clamp(0,calc((var(--p) - .86) / .1),1)}
+  /* the sun: rises behind the horizon, then keeps turning */
+  html.pin .orb-sun{animation:none;--s:clamp(340px,min(46vw,78svh),680px);left:50%;bottom:calc(50svh - var(--s) * .5);z-index:1;
+    translate:0 calc((1 - var(--rise)) * var(--s) * .44 - var(--p) * 10px);
+    background:radial-gradient(circle at 76% 82%,rgba(4,3,3,.92) 0%,rgba(4,3,3,.6) 32%,transparent 70%),radial-gradient(circle at calc(31% + var(--p) * 22%) 27%,#FCE3AE 0%,#F2B452 12%,#DF9232 28%,#B2501B 52%,#521F0E 76%,#120A07 100%)}
+  html.pin .orb-sun::after{background-image:var(--noise),radial-gradient(ellipse 34% 14% at 30% 38%,rgba(255,236,180,.55),transparent 70%),radial-gradient(ellipse 26% 10% at 72% 64%,rgba(70,22,8,.6),transparent 70%),radial-gradient(ellipse 20% 8% at 55% 20%,rgba(255,214,140,.4),transparent 70%);
+    background-size:170px,60% 100%,60% 100%,60% 100%;background-repeat:repeat,repeat-x,repeat-x,repeat-x;background-position:0 0,calc(var(--p) * -150%) 0,calc(var(--p) * -230%) 0,calc(var(--p) * -310%) 0;opacity:.8}
+  html.pin .orb-sun::before{opacity:calc(.5 + var(--rise) * .5)}
+  html.pin .world .glows{position:absolute}
+}
+@media (min-width:900px) and (min-height:640px) and (prefers-reduced-motion:no-preference){
+  html.pin .world.grained{overflow:visible}
+  html.pin .world.grained::after{display:none}
+}
+@media (min-width:900px) and (min-height:640px) and (prefers-reduced-motion:no-preference){
+  html.pin .road-eyebrow{margin-top:clamp(34px,6svh,60px)}
+}
