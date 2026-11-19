@@ -21,10 +21,10 @@ const quietPost = pull(quietSlug, quietQuote);
 
 // Stops on the horizon line. Copy is from the About timeline; nothing added.
 const road = [
-  { date: '2008 to 2011', name: 'Fnatic', text: 'Joined as an editor and worked my way up.' },
-  { date: '2012 to 2022', name: 'FACEIT', text: "One of FACEIT's first hires, there from its first year through to its acquisition." },
-  { date: '2024 to now', name: 'ELO', text: 'We saw a common thread in all success in gaming: community.', lit: true },
-  { date: 'March 2026', name: 'Lumen', text: 'ELO launches Lumen with design partners, pivoting from an agency to a tech and AI-native business.' },
+  { date: '2008 to 2011', name: 'Fnatic', place: 'London', text: 'Joined as an editor and worked my way up.' },
+  { date: '2012 to 2022', name: 'FACEIT', place: 'Milano | London', text: "One of FACEIT's first hires, there from its first year through to its acquisition." },
+  { date: '2024 to now', name: 'ELO', place: 'London', text: 'We saw a common thread in all success in gaming: community.', lit: true },
+  { date: 'March 2026', name: 'Lumen', place: 'London', text: 'ELO launches Lumen with design partners, pivoting from an agency to a tech and AI-native business.' },
   { date: 'July 2026', name: 'Turin', text: 'Moved to Turin.' },
 ];
 
@@ -97,6 +97,7 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
             <li style={`--i:${i}`}>
               <span class="r-date">{s.date}</span>
               <span class={`r-name${s.lit ? ' lit' : ''}`}>{s.name}</span>
+              {s.place && <span class="r-place">{s.place}</span>}
               <span class="r-text">{s.text}</span>
             </li>
           ))}
