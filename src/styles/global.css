@@ -636,3 +636,18 @@ html[data-theme="light"] .foot nav a:hover{color:#000}
 .close::before{z-index:2}
 .world-ground::after{content:"";position:absolute;inset:0;pointer-events:none;background-image:var(--noise);background-size:200px;opacity:.16;filter:grayscale(1);mix-blend-mode:screen}
 .world-ground .wrap{position:relative;z-index:1}
+
+/* soft glows: the old page's light, edgeless amber and bone washes over grain, drifting slower than the text */
+.glow{--s:640px;--g:232,163,61;--a:.26;--dy:60px;position:absolute;z-index:0;width:var(--s);height:var(--s);border-radius:50%;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(var(--g),var(--a)) 0%,rgba(var(--g),calc(var(--a) * .4)) 45%,transparent 100%)}
+@supports (animation-timeline:view()){.glow{animation:orb-drift linear both;animation-timeline:view();animation-range:cover 0% cover 100%}}
+@media (prefers-reduced-motion:reduce){.glow{animation:none}}
+.glow-d{--s:clamp(420px,55vw,820px);right:-14%;top:-18%}
+.glow-d2{--s:clamp(300px,38vw,560px);--g:239,227,207;--a:.07;left:-12%;top:38%;--dy:-50px}
+.glow-s{--s:clamp(360px,48vw,720px);--g:239,227,207;--a:.08;left:-14%;top:-6%}
+.glow-w{--s:clamp(420px,56vw,820px);--g:196,98,45;--a:.22;left:-16%;bottom:-14%;--dy:-70px}
+.glow-w2{--s:clamp(320px,44vw,640px);right:-12%;top:8%;--a:.14}
+.glow-a{--s:clamp(520px,72vw,1100px);right:-18%;top:50%;margin-top:calc(var(--s) * -.5);--a:.30}
+.glow-c{--s:clamp(640px,96vw,1500px);--a:.36;left:50%;margin-left:calc(var(--s) * -.5);bottom:calc(var(--s) * -.5);--dy:30px}
+.close.grained{padding-bottom:clamp(100px,12vw,170px)}
+.scene-quiet .scene-quote{max-width:none}
