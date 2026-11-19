@@ -61,7 +61,8 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
   </section>
 
   {latest.length > 0 && (
-    <section class="film" id="writing">
+    <section class="film grained" id="writing">
+    <div class="orb orb-ember orb-d orb-far" aria-hidden="true"></div>
       <div class="wrap rv">
         <p class="f-eyebrow">Dispatches</p>
         <div class="credits">
@@ -81,27 +82,30 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
     </section>
   )}
 
-  <section class="scene" id="about" aria-label="About">
-    <div class="wrap rv">
-      <p class="scene-line">Fifteen years inside the games industry, watching millions of people organise themselves. Now I study what that reveals about where AI, technology and society are heading.</p>
-      <p class="f-mono">Dutch. Based in Turin.</p>
+  <section class="world grained" id="about" aria-label="About">
+    <div class="orb orb-moon orb-sun-moon orb-far" aria-hidden="true"></div>
+    <div class="world-sky">
+      <div class="orb orb-sun" aria-hidden="true"></div>
+      <div class="wrap rv">
+        <p class="scene-line">Fifteen years inside the games industry, watching millions of people organise themselves. Now I study what that reveals about where AI, technology and society are heading.</p>
+        <p class="f-mono">Dutch. Based in Turin.</p>
+        <p class="f-eyebrow road-eyebrow" id="road">The road so far</p>
+      </div>
     </div>
-  </section>
-
-  <section class="film film-road" id="road">
-    <div class="wrap rv">
-      <p class="f-eyebrow">The road so far</p>
+    <div class="world-ground">
       <div class="horizon" aria-hidden="true"></div>
-      <ol class="road">
-        {road.map((s) => (
-          <li>
-            <span class="r-date">{s.date}</span>
-            <span class={`r-name${s.lit ? ' lit' : ''}`}>{s.name}</span>
-            <span class="r-text">{s.text}</span>
-          </li>
-        ))}
-      </ol>
-      <p class="f-more"><a class="slit" href="/work">Work, in more detail<i></i></a> <a class="slit" href="/press">Press, talks and podcasts<i></i></a></p>
+      <div class="wrap rv">
+        <ol class="road">
+          {road.map((s) => (
+            <li>
+              <span class="r-date">{s.date}</span>
+              <span class={`r-name${s.lit ? ' lit' : ''}`}>{s.name}</span>
+              <span class="r-text">{s.text}</span>
+            </li>
+          ))}
+        </ol>
+        <p class="f-more"><a class="slit" href="/work">Work, in more detail<i></i></a> <a class="slit" href="/press">Press, talks and podcasts<i></i></a></p>
+      </div>
     </div>
   </section>
 
@@ -120,7 +124,8 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
     </figure>
   </section>
 
-  <section class="film" id="now">
+  <section class="film grained" id="now">
+    <div class="orb orb-moon orb-w orb-far" aria-hidden="true"></div>
     <div class="wrap rv">
       <p class="f-eyebrow">The work</p>
       <p class="f-lede">ELO turns how people behave in games and online communities into lessons for the real world.</p>
@@ -137,14 +142,17 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
     </div>
   </section>
 
-  <section class="scene scene-quiet" aria-label="From the writing">
+  <section class="scene scene-quiet grained vig" aria-label="From the writing">
+    <div class="orb orb-a" aria-hidden="true"></div>
+    <div class="orb orb-e" aria-hidden="true"></div>
     <figure class="wrap rv">
       <blockquote class="scene-line scene-quote">Most people don't realize the world runs on one thing: <em>alignment.</em></blockquote>
       <figcaption class="f-mono"><a href={postUrl(quietPost)}>From: {quietPost.data.title}</a></figcaption>
     </figure>
   </section>
 
-  <section class="close" id="contact">
+  <section class="close grained" id="contact">
+    <div class="orb orb-c" aria-hidden="true"></div>
     <div class="wrap rv">
       <h2 class="h1">Send word.</h2>
       <p class="sub">Messages reach me on X, LinkedIn or email.</p>
