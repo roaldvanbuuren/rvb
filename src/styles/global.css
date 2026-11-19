@@ -46,13 +46,13 @@ img,svg{display:block;max-width:100%}
 
 /* buttons: accent (from the ELO nav CTA) and outlined (ELO ghost) */
 .ctas{display:flex;flex-wrap:wrap;gap:10px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:14px;min-height:44px;padding:4px 4px 4px 20px;border-radius:var(--radius-soft);background:radial-gradient(120% 220% at 8% 0%,#F8B84A 0%,rgba(248,184,74,0) 62%),linear-gradient(115deg,#F2A23A 0%,#E4772B 52%,#C23A20 100%);color:#1A0804;
-  font:600 15px/1 var(--text);letter-spacing:.01em;text-decoration:none;transition:filter .2s,box-shadow .2s}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:14px;min-height:44px;padding:4px 4px 4px 20px;border-radius:var(--radius-soft);background:linear-gradient(115deg,#F3A63E 0%,#E8822E 50%,#D4561B 100%);color:#1A0804;
+  font:400 23px/1 var(--disp);letter-spacing:0;text-decoration:none;transition:filter .2s,box-shadow .2s}
 .btn:hover{filter:brightness(1.1) saturate(1.05);box-shadow:0 8px 28px -10px rgba(232,163,61,.6)}
 .btn .blk{width:36px;height:36px;border-radius:4px;background:#141414;display:flex;align-items:center;justify-content:center;color:var(--warm)}
 .btn .blk svg{width:9px;height:12px}
 .btn-ghost{display:inline-flex;align-items:center;min-height:44px;padding:0 20px;border-radius:var(--radius-soft);background:rgba(13,10,8,.7);border:1px solid rgba(239,227,207,.3);color:var(--warm);
-  font:500 15px/1 var(--text);letter-spacing:.01em;text-decoration:none;transition:border-color .2s}
+  font:400 23px/1 var(--disp);letter-spacing:0;text-decoration:none;transition:border-color .2s}
 .btn-ghost:hover{border-color:rgba(239,227,207,.3)}
 .more{display:inline-block;font:500 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--warm);text-decoration:none;border-bottom:1px solid rgba(239,227,207,.3);padding-bottom:4px;transition:color .15s,border-color .15s}
 .more:hover{color:#fff;border-color:#fff}
