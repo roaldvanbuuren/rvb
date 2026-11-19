@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import Logo from '../components/Logo.astro';
+import Swarm from '../components/Swarm.astro';
 import { getPosts, links, postUrl, formatDate, isoDate } from '../lib/posts';
 
 const all = await getPosts();
@@ -15,9 +15,6 @@ function pull(slug: string, quote: string) {
 const bandSlug = 'gaming-is-a-lens-for-human-behaviour-and-we-re-barely-scratching-the-surface';
 const bandQuote = 'We have built, almost by accident, the most heavily instrumented environment for studying human behaviour that has ever existed, and we mostly use it to sell battle passes.';
 const bandPost = pull(bandSlug, bandQuote);
-const quietSlug = 'the-world-runs-on-alignment';
-const quietQuote = "Most people don't realize the world runs on one thing: alignment.";
-const quietPost = pull(quietSlug, quietQuote);
 
 // Stops on the horizon line. Copy is from the About timeline; nothing added.
 const road = [
@@ -38,27 +35,95 @@ const worksWith = ['McLaren', 'Torpor Games', 'NASCAR', 'Team Liquid', 'NSE', 'B
 const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and power', 'Science fiction', 'Big-idea non-fiction', 'AI that makes us more human', 'Europe', 'English legend and folklore', 'PC games', 'Rain, with a good coat'];
 ---
 <Base
-  title="Roald van Buuren · Co-founder of ELO Collective"
-  description="Co-founder of ELO Collective. On AI, technology, Europe, and what games reveal about people. Based in Turin."
+  title="Roald van Buuren · Predicting society from the way people play"
+  description="Games and online communities are a lens on human behaviour. Roald van Buuren, co-founder of ELO Collective, on using what they record to predict where societies are heading."
 >
-  <section class="hero" id="top">
-    <div class="hero-art" aria-hidden="true">
-      <div class="hero-img" aria-hidden="true"></div>
-    </div>
-    <div class="wrap hero-in">
-      <Logo />
-      <h1 class="h1">Roald van Buuren</h1>
-      <p class="sub">Co-founder of ELO Collective. On AI, technology, Europe, and what games reveal about people.</p>
-      <div class="slits">
-        <a class="slit" href={links.x} target="_blank" rel="noopener">Follow on X<i></i></a>
-        <a class="slit" href={links.linkedin} target="_blank" rel="noopener">LinkedIn<i></i></a>
-        <a class="slit" href={links.email}>Email<i></i></a>
+  <Swarm />
+
+  <div class="thesis">
+    <section class="t-step t-hero" data-act="0" aria-label="Introduction">
+      <div class="t-pin">
+        <div class="t-hero-in wrap">
+          <p class="t-kicker">Roald van Buuren · Turin</p>
+          <h1 class="h1 t-h1">Predicting society from the way people play.</h1>
+          <p class="t-lede">Games and online communities record more human behaviour, in more detail, than anything we have built before. I study what people do in them under pressure, and turn it into simulations that show where societies are heading.</p>
+          <a class="t-cue" href="#signal"><span>Scroll</span><i></i></a>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+
+    <section class="t-step" data-act="1" id="signal" aria-labelledby="h-signal">
+      <div class="t-pin">
+        <div class="t-card rv">
+          <p class="t-eye">01 · Behaviour under pressure</p>
+          <h2 class="t-h2" id="h-signal">Same player. Same map. Same round. The only variable is pressure.</h2>
+          <p>Up 12–3 with full money, he holds the angle and lets the enemy come to him. Down 11–12 with nothing in the bank, the same player in the same spot peeks early and alone.</p>
+          <p>Nothing about the game changed between those two rounds except the weight on his shoulders, and that weight is the thing worth measuring.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="t-step" data-act="2" aria-labelledby="h-scale">
+      <div class="t-pin">
+        <div class="t-card rv">
+          <p class="t-eye">02 · Scale</p>
+          <h2 class="t-h2" id="h-scale">Now do that for billions of players, every day.</h2>
+          <p>Every match, every server and every Discord is a small society, with its own rules, factions, economies and crises. Almost all of it is logged.</p>
+          <figure class="t-quote">
+            <blockquote><p>{bandQuote}</p></blockquote>
+            <figcaption><a href={postUrl(bandPost)}>From the journal</a></figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="t-step" data-act="3" aria-labelledby="h-record">
+      <div class="t-pin">
+        <div class="t-card rv">
+          <p class="t-eye">03 · The record</p>
+          <h2 class="t-h2" id="h-record">Every decision, kept with its context.</h2>
+          <p>The score, the clock, the money, the people watching and the people relying on you. Capture all of that next to what someone actually did, and pressure stops being a feeling. It becomes a variable you can measure, person by person.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="t-step" data-act="4" aria-labelledby="h-swarm">
+      <div class="t-pin">
+        <div class="t-card rv">
+          <p class="t-eye">04 · The swarm</p>
+          <h2 class="t-h2" id="h-swarm">Agents built from what people actually did.</h2>
+          <p>Each agent carries a measured response to pressure: how it moves, who it follows, when it holds and when it breaks. Put thousands of them together and you get a population that behaves like the people it came from.</p>
+          <p class="t-try"><span class="t-try-fine">Move through them. You are the pressure.</span><span class="t-try-touch">Touch them. You are the pressure.</span></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="t-step" data-act="5" aria-labelledby="h-forward">
+      <div class="t-pin">
+        <div class="t-card rv">
+          <p class="t-eye">05 · Forward</p>
+          <h2 class="t-h2" id="h-forward">Then run it forward, thousands of times.</h2>
+          <p>Change the conditions, raise the pressure, and watch where a population fractures, where it holds and where it runs. Run it often enough and the futures start to agree with each other.</p>
+          <p>That is how I think we will predict what societies do next: markets, elections, and the way people respond to the next crisis.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="t-step t-end" data-act="6" aria-labelledby="h-end">
+      <div class="t-pin">
+        <div class="t-end-in wrap rv">
+          <h2 class="t-h2 t-end-h" id="h-end">Games are a lens on human behaviour. I'm building the tools to look through it.</h2>
+          <div class="slits">
+            <a class="slit" href="/writing">Read the journal<i></i></a>
+            <a class="slit" href="/work">The work<i></i></a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
 
   {latest.length > 0 && (
-    <section class="film grained" id="writing">
+    <section class="film grained t-after" id="writing">
       <div class="glows" aria-hidden="true"><div class="glow glow-d" aria-hidden="true"></div><div class="glow glow-d2" aria-hidden="true"></div></div>
       <div class="wrap rv">
         <p class="f-eyebrow">Dispatches</p>
@@ -78,7 +143,7 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
     </section>
   )}
 
-  <section class="world grained" id="about" aria-label="About">
+  <section class="world grained t-after" id="about" aria-label="About">
       <div class="glows" aria-hidden="true"><div class="glow glow-s" aria-hidden="true"></div></div>
     <div class="world-stage">
     <div class="world-sky">
@@ -109,22 +174,7 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
     </div>
   </section>
 
-  <section class="band" aria-label="From the writing">
-    <svg class="band-grain" aria-hidden="true">
-      <filter id="band-grain">
-        <feTurbulence type="fractalNoise" baseFrequency="0.68" numOctaves="2" stitchTiles="stitch" />
-        <feColorMatrix type="saturate" values="0" />
-        <feComponentTransfer><feFuncA type="linear" slope="0.85" /></feComponentTransfer>
-      </filter>
-      <rect width="100%" height="100%" filter="url(#band-grain)" />
-    </svg>
-    <figure class="band-in rv">
-      <blockquote class="band-q"><p>{bandQuote}</p></blockquote>
-      <figcaption><a href={postUrl(bandPost)}>From: {bandPost.data.title}<svg viewBox="0 0 12 16" aria-hidden="true"><path d="M2 2L10 8L2 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" /></svg></a></figcaption>
-    </figure>
-  </section>
-
-  <section class="film grained" id="now">
+  <section class="film grained t-after" id="now">
       <div class="glows" aria-hidden="true"><div class="glow glow-w" aria-hidden="true"></div><div class="glow glow-w2" aria-hidden="true"></div></div>
     <div class="wrap rv">
       <p class="f-eyebrow">The work</p>
@@ -142,15 +192,7 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
     </div>
   </section>
 
-  <section class="scene scene-quiet grained vig" aria-label="From the writing">
-      <div class="glows" aria-hidden="true"><div class="glow glow-a" aria-hidden="true"></div></div>
-    <figure class="wrap rv">
-      <blockquote class="scene-line scene-quote">Most people don't realize the world runs on one thing: <em>alignment.</em></blockquote>
-      <figcaption class="f-mono"><a href={postUrl(quietPost)}>From: {quietPost.data.title}</a></figcaption>
-    </figure>
-  </section>
-
-  <section class="close grained" id="contact">
+  <section class="close grained t-after" id="contact">
     <div class="glow glow-c" aria-hidden="true"></div>
     <div class="wrap rv">
       <h2 class="h1">Send word.</h2>
@@ -163,6 +205,81 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
     </div>
   </section>
 </Base>
+
+<style>
+  /* ---- the thesis: a tall scroll; each step pins its text for a while; the swarm (Swarm.astro) plays behind ---- */
+  .thesis{position:relative;z-index:1}
+  .t-step{position:relative;height:150svh}
+  .t-hero{height:120svh}
+  .t-end{height:130svh}
+  .t-pin{position:sticky;top:0;height:100svh;display:flex;align-items:center}
+  .t-card{width:min(520px,calc(100% - 48px));margin-left:max(24px,calc(50% - 576px))}
+  .t-card p{margin:0 0 16px;font-size:17px;line-height:1.65;color:#C9C9BE}
+  .t-eye{margin:0 0 26px !important;font:500 12px/1 var(--mono) !important;letter-spacing:.28em;text-transform:uppercase;color:var(--accent) !important}
+  .t-h2{margin:0 0 26px;font:400 clamp(40px,4.3vw,66px)/1.02 var(--disp);color:var(--bone);text-wrap:balance}
+
+  /* hero */
+  .t-hero .t-pin{align-items:center;justify-content:center}
+  .t-hero-in{display:flex;flex-direction:column;align-items:center;text-align:center;gap:26px;max-width:1000px}
+  .t-kicker{margin:0;font:500 12px/1 var(--mono);letter-spacing:.32em;text-transform:uppercase;color:var(--accent)}
+  .t-h1{font-size:clamp(54px,8.2vw,124px);line-height:.94;text-wrap:balance;text-shadow:0 0 60px rgba(11,11,11,.9)}
+  .t-lede{margin:0;max-width:620px;font-size:clamp(17px,1.4vw,19px);line-height:1.65;color:#D5D5C8;text-shadow:0 0 24px rgba(11,11,11,.95)}
+  .t-cue{margin-top:28px;display:inline-flex;flex-direction:column;align-items:center;gap:14px;text-decoration:none;color:var(--warm);font:500 11px/1 var(--mono);letter-spacing:.32em;text-transform:uppercase}
+  .t-cue i{display:block;width:1px;height:56px;background:linear-gradient(180deg,var(--accent),rgba(var(--accent-rgb),0));animation:t-cue 2.4s cubic-bezier(.22,1,.36,1) infinite;transform-origin:top}
+  @keyframes t-cue{0%{transform:scaleY(0);opacity:1}60%{transform:scaleY(1);opacity:1}100%{transform:scaleY(1);opacity:0}}
+  html.js .t-hero-in > *{opacity:0;transform:translateY(16px);animation:t-in 1.2s cubic-bezier(.22,1,.36,1) forwards}
+  html.js .t-hero-in > :nth-child(2){animation-delay:.15s}
+  html.js .t-hero-in > :nth-child(3){animation-delay:.35s}
+  html.js .t-hero-in > :nth-child(4){animation-delay:.8s}
+  @keyframes t-in{to{opacity:1;transform:none}}
+
+  /* the quote in act 2 */
+  .t-quote{margin:30px 0 0;padding:0 0 0 22px;border-left:2px solid var(--accent);box-shadow:-10px 0 18px -14px rgba(var(--accent-rgb),.8)}
+  .t-quote blockquote{margin:0}
+  .t-quote blockquote p{margin:0 0 12px;font:italic 400 clamp(22px,1.9vw,27px)/1.25 var(--serif);color:var(--warm)}
+  .t-quote figcaption a{font:500 11px/1 var(--mono);letter-spacing:.24em;text-transform:uppercase;color:var(--dim);text-decoration:none}
+  .t-quote figcaption a:hover{color:var(--accent-hover)}
+
+  .t-try{margin-top:26px !important;font:500 12px/1.6 var(--mono) !important;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-hover) !important}
+  .t-try-touch{display:none}
+  @media (hover:none){.t-try-fine{display:none}.t-try-touch{display:inline}}
+
+  /* the close of the story: the swarm becomes the horizon beneath it */
+  .t-end .t-pin{justify-content:center;align-items:flex-start;padding-top:28svh}
+  .t-end-in{display:flex;flex-direction:column;align-items:center;text-align:center;gap:40px;max-width:1000px}
+  .t-end-h{font-size:clamp(40px,5.2vw,80px);margin:0;max-width:15em}
+  .t-end .slit{align-items:center}
+
+  /* the rest of the page slides over the swarm */
+  .t-after{position:relative;z-index:2}
+  .thesis + .t-after{background:linear-gradient(180deg,rgba(14,14,14,0) 0,var(--ink) 40svh)}
+
+  @media (max-width:700px){
+    .t-step{height:160svh}
+    .t-pin{align-items:flex-end;padding-bottom:max(48px,7svh)}
+    .t-card{margin:0 auto;width:calc(100% - 40px)}
+    .t-card p{font-size:16px}
+    .t-h2{font-size:clamp(34px,9vw,44px);margin-bottom:18px}
+    .t-eye{margin-bottom:18px !important}
+    .t-quote blockquote p{font-size:20px}
+    .t-hero .t-pin,.t-end .t-pin{align-items:center;padding-bottom:0}
+    .t-end .t-pin{padding-top:0;align-items:center}
+    .t-end-in{margin-top:-12svh}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html.js .t-hero-in > *{opacity:1;transform:none;animation:none}
+    .t-cue i{animation:none}
+  }
+</style>
+
+<style is:global>
+  /* home footer: the grey closing fade carries on into the footer and settles into the charcoal */
+  html:has(.thesis) body > footer{position:relative;z-index:2;border-top:0;background:linear-gradient(180deg,#3B3A36 0%,#2A2A28 38%,var(--ink) 100%)}
+  html:has(.thesis) .foot{padding-top:clamp(56px,6vw,84px)}
+  html:has(.thesis) .foot small{color:#B1B1A8}
+  html:has(.thesis) body > footer::after{opacity:.28}
+  html:has(.thesis) body{background:#0B0B0B}
+</style>
 
 <script>
   // Hover a stop on the road and the horizon lights up from the left edge to that stop.

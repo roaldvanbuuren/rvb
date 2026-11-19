@@ -1,0 +1,444 @@
+---
+// The thesis swarm: one WebGL2 canvas fixed behind the home page's opening story.
+//
+// Every dot is an agent with a measured "pressure response" (s, 0 calm to 1 volatile).
+// Colour is heat: blue when calm, through bone and amber, to red under pressure.
+// The page's .t-step blocks (data-act 0..6) drive what the swarm does:
+//   0 field     a calm drifting population (hero)
+//   1 signal    one player; scroll raises the pressure and his movement changes
+//   2 scale     the one becomes thousands, gathered into communities
+//   3 record    the swarm becomes a dataset; a scan line records it row by row
+//   4 swarm     free agents; scroll raises pressure on everyone, the cursor is local pressure
+//   5 forward   the population runs forward along branching futures
+//   6 horizon   the agents settle into the site's horizon line
+// No dependencies: raw WebGL2, a few typed arrays, one draw call per frame.
+// Reduced motion: no loop; the swarm is drawn once, settled, whenever the act changes.
+---
+<div class="t-bg" aria-hidden="true">
+  <canvas id="swarm"></canvas>
+  <div class="t-shade"></div>
+  <div class="t-grain"></div>
+</div>
+<div class="t-hud" aria-hidden="true"><span class="t-hud-a"></span><span class="t-hud-b"></span></div>
+<ol class="t-rail" aria-hidden="true">
+  <li data-a="1"><b>01</b>Signal</li>
+  <li data-a="2"><b>02</b>Scale</li>
+  <li data-a="3"><b>03</b>Record</li>
+  <li data-a="4"><b>04</b>Swarm</li>
+  <li data-a="5"><b>05</b>Forward</li>
+</ol>
+
+<style>
+  .t-bg{position:fixed;inset:0;z-index:-1;pointer-events:none;background:#0B0B0B}
+  #swarm{position:absolute;left:0;top:0;width:100%;height:100lvh;display:block}
+  .t-shade{position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;
+    background:linear-gradient(90deg,rgba(11,11,11,.92) 0%,rgba(11,11,11,.74) 28%,rgba(11,11,11,.18) 50%,rgba(11,11,11,0) 62%)}
+  :global(html[data-act="1"]) .t-shade,:global(html[data-act="2"]) .t-shade,:global(html[data-act="3"]) .t-shade,
+  :global(html[data-act="4"]) .t-shade,:global(html[data-act="5"]) .t-shade{opacity:1}
+  .t-grain{position:absolute;inset:0;background-image:var(--noise);background-size:180px;opacity:.11;filter:grayscale(1);mix-blend-mode:screen;
+    box-shadow:inset 0 0 220px 60px rgba(0,0,0,.55)}
+  @media (max-width:700px){
+    .t-shade{background:linear-gradient(0deg,rgba(11,11,11,.96) 0%,rgba(11,11,11,.82) 34%,rgba(11,11,11,.2) 56%,rgba(11,11,11,0) 66%)}
+  }
+  /* no WebGL: the old page's light, still */
+  :global(html.no-gl) .t-bg{background:radial-gradient(50% 60% at 70% 45%,rgba(232,163,61,.14),transparent 70%),radial-gradient(40% 50% at 20% 70%,rgba(128,168,214,.08),transparent 70%),#0B0B0B}
+
+  .t-hud{position:fixed;left:max(24px,calc(50% - 576px));bottom:26px;z-index:5;display:flex;flex-direction:column;gap:8px;pointer-events:none;
+    font:500 11px/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--dim);opacity:0;transition:opacity .6s ease}
+  .t-hud-b{color:var(--accent)}
+  .t-hud span:empty{display:none}
+  :global(html.t-live) .t-hud{opacity:1}
+  .t-rail{position:fixed;right:max(24px,calc(50% - 576px));top:50%;z-index:5;transform:translateY(-50%);list-style:none;margin:0;padding:0;
+    display:flex;flex-direction:column;gap:18px;pointer-events:none;opacity:0;transition:opacity .6s ease}
+  .t-rail li{display:flex;align-items:center;justify-content:flex-end;gap:12px;font:500 11px/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:rgba(232,232,219,.28);transition:color .5s ease}
+  .t-rail b{font-weight:500;color:inherit}
+  .t-rail li::after{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;transition:background .5s,box-shadow .5s}
+  .t-rail li.on{color:var(--accent)}
+  .t-rail li.on::after{box-shadow:0 0 14px 2px rgba(var(--accent-rgb),.7)}
+  .t-rail li.past{color:rgba(232,232,219,.5)}
+  :global(html[data-act="1"]) .t-rail,:global(html[data-act="2"]) .t-rail,:global(html[data-act="3"]) .t-rail,
+  :global(html[data-act="4"]) .t-rail,:global(html[data-act="5"]) .t-rail{opacity:1}
+  @media (max-width:900px){.t-rail{display:none}}
+  @media (max-width:700px){.t-hud{top:66px;bottom:auto;left:16px;font-size:10px}}
+</style>
+
+<script>
+  const root = document.documentElement;
+  const bg = document.querySelector<HTMLElement>('.t-bg');
+  const canvas = document.querySelector<HTMLCanvasElement>('#swarm');
+  const thesis = document.querySelector<HTMLElement>('.thesis');
+  const hudA = document.querySelector<HTMLElement>('.t-hud-a');
+  const hudB = document.querySelector<HTMLElement>('.t-hud-b');
+  const railItems = Array.from(document.querySelectorAll<HTMLElement>('.t-rail li'));
+
+  if (bg && canvas && thesis) {
+    const steps = Array.from(thesis.querySelectorAll<HTMLElement>('.t-step'));
+    const reduceMq = matchMedia('(prefers-reduced-motion: reduce)');
+    let reduce = reduceMq.matches;
+    const small = matchMedia('(max-width: 700px)').matches || (navigator.hardwareConcurrency || 8) <= 4;
+
+    // ---------- scroll: which act, and how far through it ----------
+    let act = 0, t = 0, fade = 1, lastAct = -1;
+    const clamp = (x: number, a = 0, b = 1) => (x < a ? a : x > b ? b : x);
+    const sstep = (a: number, b: number, x: number) => { const u = clamp((x - a) / (b - a)); return u * u * (3 - 2 * u); };
+    function readScroll() {
+      const c = innerHeight * 0.5;
+      let found = false;
+      for (const el of steps) {
+        const r = el.getBoundingClientRect();
+        if (r.top <= c && r.bottom > c) { act = Number(el.dataset.act) || 0; t = (c - r.top) / r.height; found = true; break; }
+      }
+      if (!found) {
+        const first = steps[0]?.getBoundingClientRect();
+        if (first && first.top > c) { act = 0; t = 0; } else { act = 6; t = 1; }
+      }
+      const tb = thesis!.getBoundingClientRect().bottom;
+      fade = clamp(tb / innerHeight);
+      bg!.style.opacity = fade.toFixed(3);
+      if (act !== lastAct) {
+        root.dataset.act = String(act);
+        railItems.forEach((li) => { const a = Number(li.dataset.a); li.classList.toggle('on', a === act); li.classList.toggle('past', a < act); });
+        if (act === 5) runStart = time;
+        lastAct = act;
+      }
+      root.classList.toggle('t-live', fade > 0.5 && act >= 1 && act <= 5);
+      if (reduce) drawStill();
+      else if (!raf && fade > 0) raf = requestAnimationFrame(frame);
+    }
+
+    // ---------- GL ----------
+    const gl = canvas.getContext('webgl2', { antialias: false, alpha: false, depth: false, stencil: false, powerPreference: 'high-performance' }) as WebGL2RenderingContext | null;
+    if (!gl) root.classList.add('no-gl');
+
+    const VS = `#version 300 es
+layout(location=0) in vec3 aPos;
+layout(location=1) in vec4 aCol;
+layout(location=2) in float aSize;
+uniform vec2 uScale;
+uniform float uDpr;
+out vec4 vCol;
+void main(){
+  float d = 1.0 / (1.0 + aPos.z * 0.12);
+  gl_Position = vec4(aPos.xy * d * uScale, 0.0, 1.0);
+  gl_PointSize = aSize * uDpr * d;
+  vCol = aCol;
+}`;
+    const FS = `#version 300 es
+precision mediump float;
+in vec4 vCol;
+out vec4 o;
+void main(){
+  vec2 q = gl_PointCoord * 2.0 - 1.0;
+  float r = dot(q, q);
+  if (r > 1.0) discard;
+  float a = (exp(-r * 7.0) + exp(-r * 2.2) * 0.22) * vCol.a;
+  o = vec4(vCol.rgb * a, 1.0);
+}`;
+
+    // ---------- the population ----------
+    const N = small ? 4200 : 9000, TRAIL = 160, RING = 72, C = 7, M = N + TRAIL;
+    let seed = 20261119;
+    const rnd = () => { seed = (seed + 0x6d2b79f5) | 0; let q = Math.imul(seed ^ (seed >>> 15), 1 | seed); q = (q + Math.imul(q ^ (q >>> 7), 61 | q)) ^ q; return ((q ^ (q >>> 14)) >>> 0) / 4294967296; };
+    const gauss = () => { const u = Math.max(1e-6, rnd()), v = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+
+    const sx = new Float32Array(N), sy = new Float32Array(N), gx = new Float32Array(N), gy = new Float32Array(N);
+    const sens = new Float32Array(N), stiff = new Float32Array(N), ph = new Float32Array(N), br = new Float32Array(N), z0 = new Float32Array(N);
+    const cl = new Uint8Array(N), leaf = new Uint8Array(N), rankL = new Uint32Array(N), rankH = new Float32Array(N);
+    const px = new Float32Array(N), py = new Float32Array(N), pz = new Float32Array(N), vx = new Float32Array(N), vy = new Float32Array(N);
+    const ca = new Float32Array(N), ch = new Float32Array(N), cs = new Float32Array(N), hT = new Float32Array(N), lastU = new Float32Array(N);
+
+    const cw = [0.22, 0.18, 0.16, 0.14, 0.12, 0.1, 0.08];
+    const cTheta = cw.map((_, j) => (j / C) * Math.PI * 2 + rnd() * 0.5);
+    const cRad = cw.map((w) => 0.07 + w * 0.42);
+    const leafP = [0.3, 0.04, 0.17, 0.03, 0.22, 0.05, 0.13, 0.06];
+    const pick = (ws: number[]) => { let r = rnd(), k = 0; for (; k < ws.length - 1; k++) { r -= ws[k]; if (r < 0) break; } return k; };
+
+    for (let i = 0; i < N; i++) {
+      sx[i] = rnd() * 2 - 1; sy[i] = rnd() * 2 - 1;
+      gx[i] = gauss(); gy[i] = gauss();
+      sens[i] = Math.pow(rnd(), 1.7);
+      stiff[i] = 1.6 + rnd() * 3.4;
+      ph[i] = rnd() * Math.PI * 2;
+      br[i] = 0.55 + rnd() * 0.45;
+      z0[i] = rnd() * 2 - 1;
+      cl[i] = pick(cw);
+      leaf[i] = pick(leafP);
+    }
+    {
+      const order = Array.from({ length: N }, (_, i) => i).sort((a, b) => cl[a] - cl[b] || sens[a] - sens[b]);
+      order.forEach((i, r) => { rankL[i] = r; });
+      const h = Array.from({ length: N }, (_, i) => i).sort((a, b) => sx[a] - sx[b]);
+      h.forEach((i, r) => { rankH[i] = r / (N - 1); });
+    }
+
+    // heat: blue (calm) > bone > amber > red (pressure)
+    const HS = [[0, 0.5, 0.66, 0.86], [0.4, 0.86, 0.87, 0.82], [0.72, 0.96, 0.66, 0.25], [1, 0.88, 0.32, 0.15]];
+    const heatRGB = (h: number, out: Float32Array, o: number, m: number) => {
+      h = clamp(h);
+      let k = 0; while (k < HS.length - 2 && h > HS[k + 1][0]) k++;
+      const a = HS[k], b = HS[k + 1], u = (h - a[0]) / (b[0] - a[0]);
+      out[o] = (a[1] + (b[1] - a[1]) * u) * m; out[o + 1] = (a[2] + (b[2] - a[2]) * u) * m; out[o + 2] = (a[3] + (b[3] - a[3]) * u) * m;
+    };
+
+    const pos = new Float32Array(M * 3), col = new Float32Array(M * 4), size = new Float32Array(M);
+    const trX = new Float32Array(TRAIL), trY = new Float32Array(TRAIL), trH = new Float32Array(TRAIL);
+    let trHead = 0, trailA = 0;
+
+    // ---------- viewport and stage ----------
+    let W = 1, H = 1, A = 1, dpr = 1, wide = true;
+    let scx = 0, scy = 0, sR = 0.8;
+    const stage = (a: number): [number, number, number] => {
+      if (a === 0 || a === 6) return [0, 0, Math.min(1, A * 0.9)];
+      if (wide) return [A * 0.34, 0.02, Math.min(0.8, A * 0.48)];
+      return [0, 0.36, Math.min(0.9 * A, 0.5)];
+    };
+
+    let prog: WebGLProgram | null = null, uScale: WebGLUniformLocation | null = null, uDpr: WebGLUniformLocation | null = null;
+    let bPos: WebGLBuffer | null = null, bCol: WebGLBuffer | null = null, bSize: WebGLBuffer | null = null;
+    if (gl) {
+      const sh = (type: number, src: string) => { const s = gl.createShader(type)!; gl.shaderSource(s, src); gl.compileShader(s); return s; };
+      prog = gl.createProgram()!;
+      gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS));
+      gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS));
+      gl.linkProgram(prog);
+      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { root.classList.add('no-gl'); prog = null; }
+      else {
+        gl.useProgram(prog);
+        uScale = gl.getUniformLocation(prog, 'uScale');
+        uDpr = gl.getUniformLocation(prog, 'uDpr');
+        const vao = gl.createVertexArray(); gl.bindVertexArray(vao);
+        const mk = (data: Float32Array, loc: number, n: number) => { const b = gl.createBuffer()!; gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, data, gl.DYNAMIC_DRAW); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, n, gl.FLOAT, false, 0, 0); return b; };
+        bPos = mk(pos, 0, 3); bCol = mk(col, 1, 4); bSize = mk(size, 2, 1);
+        gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE);
+        gl.clearColor(0.043, 0.043, 0.043, 1);
+      }
+    }
+
+    function layout() {
+      W = canvas!.clientWidth || innerWidth; H = canvas!.clientHeight || innerHeight;
+      A = W / H; wide = A > 1.15;
+      dpr = Math.min(devicePixelRatio || 1, small ? 1.5 : 1.75);
+      canvas!.width = Math.round(W * dpr); canvas!.height = Math.round(H * dpr);
+      if (gl && prog) { gl.viewport(0, 0, canvas!.width, canvas!.height); gl.uniform2f(uScale, 1 / A, 1); gl.uniform1f(uDpr, dpr); }
+      const s = stage(act); scx = s[0]; scy = s[1]; sR = s[2];
+    }
+
+    // ---------- pointer: local pressure ----------
+    let mx = 99, my = 99, mOn = 0;
+    addEventListener('pointermove', (e) => { mx = (e.clientX / W * 2 - 1) * A; my = -(e.clientY / H * 2 - 1); mOn = 1; }, { passive: true });
+    addEventListener('pointerdown', (e) => { mx = (e.clientX / W * 2 - 1) * A; my = -(e.clientY / H * 2 - 1); mOn = 1; }, { passive: true });
+    document.addEventListener('pointerleave', () => { mOn = 0; });
+    addEventListener('pointerup', (e) => { if (e.pointerType !== 'mouse') mOn = 0; }, { passive: true });
+
+    // ---------- simulation ----------
+    let time = 0, last = 0, raf = 0, runStart = 0, hudT = 0, fractured = 0;
+    let prX = 0, prY = 0; // the player in act 1
+
+    function playerTarget(P: number, tm: number) {
+      const pan = Math.pow(P, 1.3);
+      const calmX = 0.018 * Math.sin(tm * 0.8), calmY = 0.012 * Math.sin(tm * 1.1 + 1);
+      const ax = 0.2 * Math.sin(tm * 2.1) + 0.1 * Math.sin(tm * 4.7 + 1.3) + 0.05 * Math.sin(tm * 9.3 + 0.4);
+      const ay = 0.15 * Math.sin(tm * 1.6 + 0.5) + 0.09 * Math.sin(tm * 5.3 + 2.1) + 0.04 * Math.sin(tm * 11.7 + 1);
+      return [scx + (calmX * (1 - pan) + ax * pan) * sR * 1.7, scy + (calmY * (1 - pan) + ay * pan) * sR * 1.7];
+    }
+
+    // fills tx..th for agent i; returns stiffness multiplier
+    let tx = 0, ty = 0, tz = 0, ta = 0, ts = 0, th = 0;
+    const lt = () => clamp((t - 0.3) / 0.4); // progress while the act's text is pinned
+    function target(i: number, a: number, tm: number, P: number, G: number) {
+      const s = sens[i];
+      tz = z0[i] * 0.6;
+      switch (a) {
+        case 0: {
+          tx = sx[i] * A * 1.06 + 0.08 * Math.sin(tm * 0.07 + sy[i] * 2.3 + ph[i]);
+          ty = sy[i] * 1.06 + 0.08 * Math.cos(tm * 0.06 + sx[i] * 2.1 + ph[i] * 0.7);
+          ta = 0.3 * br[i]; ts = 2.2 + (z0[i] + 1) * 0.8; th = 0.04 + 0.28 * s; return 1;
+        }
+        case 1: {
+          if (i === 0) { tx = prX; ty = prY; tz = 0; ta = 1; ts = 22 + 12 * P; th = 0.08 + 0.92 * P; return 0; }
+          if (i <= RING) {
+            const ang = ((i - 1) / RING) * Math.PI * 2 + tm * 0.12, rad = sR * 0.38 * (1 - 0.42 * P);
+            tx = scx + Math.cos(ang) * rad; ty = scy + Math.sin(ang) * rad; tz = 0; ta = 0.34; ts = 2.6; th = 0.1 + 0.6 * P; return 1.4;
+          }
+          tx = prX; ty = prY; ta = 0; ts = 1; th = 0.1; return 1;
+        }
+        case 2: {
+          const j = cl[i], ang = cTheta[j] + tm * 0.025;
+          const cx = scx + Math.cos(ang) * sR * 0.62, cy = scy + Math.sin(ang) * sR * 0.54;
+          const r = cRad[j] * sR, rot = tm * 0.12 * (0.5 + s) * (j % 2 ? 1 : -1), c = Math.cos(rot), sn = Math.sin(rot);
+          const ox = gx[i] * r, oy = gy[i] * r;
+          tx = cx + ox * c - oy * sn; ty = cy + ox * sn + oy * c;
+          ta = (0.26 + 0.22 * br[i]); ts = 2.4 + (z0[i] + 1) * 0.7; th = 0.05 + s * 0.5; return 1;
+        }
+        case 3: {
+          const wd = sR * (wide ? 1.85 : 1.8), hd = sR * (wide ? 1.3 : 1.5);
+          const cols = Math.round(Math.sqrt((N * wd) / hd)), rows = Math.ceil(N / cols);
+          const r = rankL[i], cI = r % cols, rI = Math.floor(r / cols);
+          tx = scx - wd / 2 + ((cI + 0.5) * wd) / cols; ty = scy + hd / 2 - ((rI + 0.5) * hd) / rows; tz = 0;
+          const scan = scy + hd / 2 - lt() * hd * 1.02;
+          const d = (ty - scan) / 0.018, boost = Math.exp(-d * d);
+          const rec = ty > scan ? 1 : 0;
+          ta = rec ? 0.42 + 0.5 * boost : 0.12 + 0.5 * boost; ts = 2.2 + 2 * boost;
+          th = rec ? 0.04 + s * 0.96 : 0.38; return 1.3;
+        }
+        case 4: {
+          const j = cl[i];
+          const cx = scx + sR * 0.55 * Math.sin(tm * 0.11 * (1 + j * 0.13) + cTheta[j]);
+          const cy = scy + sR * 0.42 * Math.sin(tm * 0.09 * (1 + j * 0.07) + cTheta[j] * 1.7);
+          const spread = 1 + G * s * 2.8;
+          const r = cRad[j] * sR * spread, rot = tm * (0.25 + 0.4 * s) * (j % 2 ? 1 : -1), c = Math.cos(rot), sn = Math.sin(rot);
+          const ox = gx[i] * r, oy = gy[i] * r, jit = G * s * 0.045;
+          tx = cx + ox * c - oy * sn + jit * Math.sin(tm * 7 + ph[i]); ty = cy + ox * sn + oy * c + jit * Math.cos(tm * 6.3 + ph[i]);
+          ta = 0.28 + 0.22 * br[i] + 0.2 * G * s; ts = 2.4 + (z0[i] + 1) * 0.7 + G * s * 1.2; th = 0.05 + G * s * 1.0; return 1;
+        }
+        case 5: {
+          const x0 = wide ? scx - sR * 1.0 : -A * 0.94, x1 = wide ? A * 0.97 : A * 0.94;
+          let u = (ph[i] / (Math.PI * 2) + tm * 0.045 * (0.7 + 0.6 * br[i])) % 1;
+          const L = leaf[i], b0 = L & 4 ? 1 : -1, b1 = L & 2 ? 1 : -1, b2 = L & 1 ? 1 : -1;
+          const amp = sR * (wide ? 1.25 : 1.1);
+          let y = scy + b0 * amp * 0.36 * sstep(0.2, 0.4, u) + b1 * amp * 0.17 * sstep(0.44, 0.6, u) + b2 * amp * 0.085 * sstep(0.64, 0.78, u);
+          y += gy[i] * (0.006 + 0.018 * u) * amp + 0.004 * Math.sin(tm * 3 + ph[i]);
+          tx = x0 + u * (x1 - x0); ty = y; tz = 0;
+          if (u < lastU[i]) { px[i] = tx; py[i] = ty; vx[i] = 0; vy[i] = 0; ca[i] = 0; }
+          lastU[i] = u;
+          const p = leafP[L], split = sstep(0.2, 0.5, u), edge = sstep(0, 0.05, u) * (1 - sstep(0.93, 1, u));
+          ta = (0.22 + split * 1.5 * p) * br[i] * edge + 0.05 * edge; ts = 2.2 + split * p * 5;
+          th = 0.38 * (1 - split) + split * (0.22 + p * 2.3); return 2.2;
+        }
+        default: {
+          tx = (rankH[i] * 2 - 1) * A * 1.08;
+          ty = (wide ? -0.4 : -0.3) + 0.012 * Math.sin(tx * 5 + tm * 0.6) + gy[i] * 0.005;
+          tz = 0; const fall = 1 - Math.abs(tx) / (A * 1.08);
+          ta = (0.12 + 0.4 * fall * fall) * br[i]; ts = 2.2 + fall; th = 0.62 + 0.12 * s; return 1;
+        }
+      }
+    }
+
+    function step(dt: number) {
+      time += dt;
+      const tm = time;
+      const sg = stage(act), sk = Math.min(1, dt * 2.2);
+      scx += (sg[0] - scx) * sk; scy += (sg[1] - scy) * sk; sR += (sg[2] - sR) * sk;
+      const P = act === 1 ? sstep(0.34, 0.64, t) : 0;
+      const G = act === 4 ? 0.05 + 0.95 * sstep(0.32, 0.66, t) : 0;
+      if (act === 1) { const p = playerTarget(P, tm); prX = p[0]; prY = p[1]; }
+      const cursor = mOn ? (act === 4 ? 1 : 0.45) : 0, rad = act === 4 ? 0.32 : 0.22, r2 = rad * rad;
+      const flowAmt = act === 4 ? 0.55 : act === 0 ? 0.35 : act === 2 ? 0.25 : 0.12;
+      const dec = Math.min(1, dt * 2.6);
+      let fr = 0;
+      for (let i = 0; i < N; i++) {
+        const km = target(i, act, tm, P, G);
+        if (km === 0) { // the player: tight follow
+          const f = Math.min(1, dt * 14); px[i] += (tx - px[i]) * f; py[i] += (ty - py[i]) * f; vx[i] = 0; vy[i] = 0;
+        } else {
+          const k = Math.min(8, stiff[i] * km), k2 = k * k, damp = 2 * k * 0.82;
+          let ax = (tx - px[i]) * k2 - vx[i] * damp, ay = (ty - py[i]) * k2 - vy[i] * damp;
+          const X = px[i], Y = py[i];
+          ax += (Math.sin(1.7 * Y + tm * 0.09 + ph[i] * 0.2) + 0.5 * Math.sin(3.1 * Y + 1.3 * X + tm * 0.07)) * flowAmt;
+          ay += (Math.cos(1.3 * X - tm * 0.11) + 0.5 * Math.cos(2.7 * X - 1.9 * Y + tm * 0.05)) * flowAmt;
+          if (cursor) {
+            const dx = X - mx, dy = Y - my, d2 = dx * dx + dy * dy;
+            if (d2 < r2) {
+              const d = Math.sqrt(d2) + 1e-4, f = 1 - d / rad, s = 0.3 + sens[i];
+              ax += (dx / d) * f * 9 * s * cursor; ay += (dy / d) * f * 9 * s * cursor;
+              hT[i] = Math.min(1, hT[i] + f * dt * 3.2 * s * cursor);
+            }
+          }
+          vx[i] += ax * dt; vy[i] += ay * dt;
+          px[i] += vx[i] * dt; py[i] += vy[i] * dt;
+        }
+        pz[i] += (tz - pz[i]) * dec;
+        hT[i] = Math.max(0, hT[i] - dt * 0.55);
+        ca[i] += (ta - ca[i]) * dec; ch[i] += (th - ch[i]) * dec; cs[i] += (ts - cs[i]) * dec;
+        const h = Math.min(1, ch[i] + hT[i]);
+        if (h > 0.62) fr++;
+        writeAgent(i, h);
+      }
+      fractured = fr;
+      // the player's trail
+      trailA += ((act === 1 ? 1 : 0) - trailA) * Math.min(1, dt * 3);
+      if (act === 1) { trX[trHead] = px[0]; trY[trHead] = py[0]; trH[trHead] = ch[0]; trHead = (trHead + 1) % TRAIL; }
+      writeTrail();
+    }
+
+    function writeAgent(i: number, h: number) {
+      const o3 = i * 3, o4 = i * 4;
+      pos[o3] = px[i]; pos[o3 + 1] = py[i]; pos[o3 + 2] = pz[i];
+      heatRGB(h, col, o4, 1);
+      col[o4 + 3] = ca[i] * (1 + hT[i] * 0.8);
+      size[i] = cs[i] * (1 + hT[i] * 0.5);
+    }
+    function writeTrail() {
+      for (let k = 0; k < TRAIL; k++) {
+        const idx = (trHead - 1 - k + TRAIL * 2) % TRAIL, j = N + k, o3 = j * 3, o4 = j * 4, age = k / TRAIL;
+        pos[o3] = trX[idx]; pos[o3 + 1] = trY[idx]; pos[o3 + 2] = 0;
+        heatRGB(trH[idx], col, o4, 1);
+        col[o4 + 3] = trailA * (1 - age) * (1 - age) * 0.55;
+        size[j] = 5 * (1 - age * 0.6);
+      }
+    }
+
+    function draw() {
+      if (!gl || !prog) return;
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.bindBuffer(gl.ARRAY_BUFFER, bPos); gl.bufferSubData(gl.ARRAY_BUFFER, 0, pos);
+      gl.bindBuffer(gl.ARRAY_BUFFER, bCol); gl.bufferSubData(gl.ARRAY_BUFFER, 0, col);
+      gl.bindBuffer(gl.ARRAY_BUFFER, bSize); gl.bufferSubData(gl.ARRAY_BUFFER, 0, size);
+      gl.drawArrays(gl.POINTS, 0, M);
+    }
+
+    const fmt = (n: number) => Math.round(n).toLocaleString('en-GB');
+    function hud() {
+      if (!hudA || !hudB) return;
+      let a = '', b = '';
+      if (act === 1) {
+        const P = sstep(0.34, 0.64, t);
+        a = P < 0.5 ? 'Score 12–3 · Economy full' : 'Score 11–12 · Economy broken';
+        b = 'Pressure ' + P.toFixed(2);
+      } else if (act === 2) { a = 'Communities ' + C; b = 'Agents ' + fmt(N); }
+      else if (act === 3) { a = 'Recording'; b = 'Rows ' + fmt(Math.min(1, lt() * 1.02) * N) + ' / ' + fmt(N); }
+      else if (act === 4) { const G = 0.05 + 0.95 * sstep(0.32, 0.66, t); a = 'Pressure ' + G.toFixed(2); b = 'Fractured ' + fmt(fractured); }
+      else if (act === 5) { a = 'Futures 8'; b = 'Run ' + fmt(Math.min(10000, 1 + (time - runStart) * 460)) + ' / 10,000'; }
+      if (hudA.textContent !== a) hudA.textContent = a;
+      if (hudB.textContent !== b) hudB.textContent = b;
+    }
+
+    function frame(now: number) {
+      raf = 0;
+      if (document.hidden || fade <= 0 || reduce) { last = 0; return; }
+      const dt = last ? Math.min(1 / 30, (now - last) / 1000) : 1 / 60;
+      last = now;
+      step(dt);
+      draw();
+      if (now - hudT > 100) { hud(); hudT = now; }
+      raf = requestAnimationFrame(frame);
+    }
+
+    // reduced motion: everything at rest at its target, drawn once
+    function drawStill() {
+      const sg = stage(act); scx = sg[0]; scy = sg[1]; sR = sg[2];
+      const tm = 14;
+      const P = act === 1 ? sstep(0.34, 0.64, t) : 0, G = act === 4 ? 0.05 + 0.95 * sstep(0.32, 0.66, t) : 0;
+      if (act === 1) { const p = playerTarget(P, tm); prX = p[0]; prY = p[1]; }
+      time = tm;
+      for (let i = 0; i < N; i++) {
+        target(i, act, tm, P, G);
+        if (act === 5) { ca[i] = ta; } // keep the edge fades
+        px[i] = tx; py[i] = ty; pz[i] = tz; ca[i] = ta; ch[i] = th; cs[i] = ts; hT[i] = 0;
+        writeAgent(i, th);
+      }
+      trailA = 0; writeTrail();
+      draw(); hud();
+    }
+
+    // start from the hero field
+    layout();
+    for (let i = 0; i < N; i++) { target(i, 0, 0, 0, 0); px[i] = tx; py[i] = ty; pz[i] = tz; ca[i] = 0; ch[i] = th; cs[i] = ts; }
+    let scrollRaf = 0;
+    addEventListener('scroll', () => { if (!scrollRaf) scrollRaf = requestAnimationFrame(() => { scrollRaf = 0; readScroll(); }); }, { passive: true });
+    addEventListener('resize', () => { layout(); readScroll(); });
+    document.addEventListener('visibilitychange', () => { if (!document.hidden && !reduce && !raf) raf = requestAnimationFrame(frame); });
+    reduceMq.addEventListener('change', () => { reduce = reduceMq.matches; readScroll(); });
+    readScroll();
+  }
+</script>
