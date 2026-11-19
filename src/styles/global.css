@@ -814,3 +814,6 @@ html:has(#top.hero) body > footer::after{opacity:.28}
   html.pin .world .f-more{flex-direction:column;align-items:flex-end;gap:14px;z-index:4}
 }
 .r-place{font:500 12px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-top:-4px}
+@media (min-width:900px) and (min-height:640px) and (prefers-reduced-motion:no-preference){
+  html.pin .world-sky .wrap{transform-origin:50% 0;transform:translate(-50%,calc(var(--clear) * -38px)) scale(calc(1 - var(--clear) * .14));opacity:calc(1 - var(--clear) * .68);filter:blur(calc(var(--clear) * 1.8px))}
+}
