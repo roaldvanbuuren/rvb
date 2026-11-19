@@ -99,7 +99,9 @@
     const wy = (cy: number) => -(cy / H * 2 - 1);
 
     // ---------- scroll: which act, how far through it, and where the page's own shapes are ----------
-    let act = 0, t = 0, lastAct = -1;
+    let act = 0, t = 0, lastAct = -1, hz = 0;
+    const heroStep = document.querySelector<HTMLElement>('.t-hero');
+    const sky = document.querySelector<HTMLElement>('.t-sky');
     let sunX = 0, sunY = -1, sunR = 0.5;                              // road
     let closeX = 0, closeY = 0;                                      // send word
     const sun = document.querySelector<HTMLElement>('.orb-sun');
@@ -125,6 +127,12 @@
       if (!found) {
         const first = steps[0].getBoundingClientRect();
         if (first.top > c) { act = 0; t = 0; } else { act = 11; t = 1; }
+      }
+      if (heroStep) { // how far into the opening scroll: 0 at the top, 1 once the look up is done
+        const r = heroStep.getBoundingClientRect();
+        hz = clamp(-r.top / (r.height * 0.55));
+        root.style.setProperty('--hz', hz.toFixed(3));
+        if (sky) sky.style.opacity = act === 0 ? String(1 - sstep(0, 0.7, hz)) : '0';
       }
       measure();
       if (act !== lastAct) {
@@ -367,21 +375,40 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
         case 0: {
           // the Alps at dusk: the image spans the width (wider than the screen on phones, centred on the peak) and
           // sits on the bottom edge. Four in ten agents draw the ridgeline, five fill the mountains, one is a star.
+          // Scrolling (hz, 0 to 1) is a look up and in: the ridge sinks away, every agent becomes a star, the stars rush
+          // outward past you, and one of them, the player, stays and brightens where the next act will need him.
           const imgW = Math.max(2 * A * 1.04, 2.1), imgH = imgW / 3, x0 = wide ? -imgW / 2 : -imgW * 0.6, top = -1.02 + imgH;
+          const z = hz, sink = z * 0.95, zs = sstep(0.12, 0.8, z);
           const q = i % 10;
+          let rx: number, ry2: number, ra: number, rs: number, rh: number;
           if (q < 4) {
             const u = rankH[i], ry = top - ridgeAt(u) * imgH;
-            tx = x0 + u * imgW; ty = ry - Math.abs(gy[i]) * 0.0035 + 0.0015 * Math.sin(tm * 1.2 + ph[i]); tz = 0;
-            ta = (0.42 + 0.2 * br[i]) * (0.85 + 0.15 * Math.sin(tm * 0.9 + ph[i])); ts = 2.4; th = 0.56 + 0.08 * s; return 1;
-          }
-          if (q < 9) {
+            rx = x0 + u * imgW; ry2 = ry - Math.abs(gy[i]) * 0.0035 + 0.0015 * Math.sin(tm * 1.2 + ph[i]);
+            ra = (0.42 + 0.2 * br[i]) * (0.85 + 0.15 * Math.sin(tm * 0.9 + ph[i])); rs = 2.4; rh = 0.56 + 0.08 * s;
+          } else if (q < 9) {
             const u = (sx[i] + 1) / 2, ry = top - ridgeAt(u) * imgH, d = Math.pow((sy[i] + 1) / 2, 1.7);
-            tx = x0 + u * imgW; ty = ry - 0.01 - d * (ry + 1.05); tz = 0;
-            ta = 0.2 * Math.pow(1 - d, 1.6) * br[i]; ts = 2.2; th = 0.8 + 0.08 * s; return 0.9;
+            rx = x0 + u * imgW; ry2 = ry - 0.01 - d * (ry + 1.05);
+            ra = 0.2 * Math.pow(1 - d, 1.6) * br[i]; rs = 2.2; rh = 0.8 + 0.08 * s;
+          } else {
+            const u = (sx[i] + 1) / 2, ry = top - ridgeAt(u) * imgH;
+            rx = sx[i] * A * 1.02 + 0.01 * Math.sin(tm * 0.05 + ph[i]); ry2 = ry + 0.06 + ((sy[i] + 1) / 2) * (1 - ry);
+            ra = 0.1 * br[i] * (0.6 + 0.4 * Math.sin(tm * 1.7 + ph[i] * 3)); rs = 2; rh = 0.3 + 0.1 * s;
           }
-          const u = (sx[i] + 1) / 2, ry = top - ridgeAt(u) * imgH;
-          tx = sx[i] * A * 1.02 + 0.01 * Math.sin(tm * 0.05 + ph[i]); ty = ry + 0.06 + ((sy[i] + 1) / 2) * (1 - ry); tz = 0;
-          ta = 0.1 * br[i] * (0.6 + 0.4 * Math.sin(tm * 1.7 + ph[i] * 3)); ts = 2; th = 0.3 + 0.1 * s; return 0.8;
+          ry2 -= sink;
+          tz = 0;
+          if (zs <= 0) { tx = rx; ty = ry2; ta = ra; ts = rs; th = rh; return q < 4 ? 1 : 0.9; }
+          if (i === 0) { // the player, waiting where act one starts
+            const g = stage(1), e = sstep(0.35, 1, z);
+            tx = rx + (g[0] - rx) * e; ty = ry2 + (g[1] - ry2) * e; ta = ra + (1 - ra) * e; ts = rs + 18 * e; th = rh + (0.1 - rh) * e; return 3;
+          }
+          // the star field, pushed out from a point above the peak as you rise into it
+          const vx0 = 0, vy0 = 0.3, near = (z0[i] + 1) / 2, f = 1 + z * (1.2 + 2.6 * near);
+          const sx2 = vx0 + (sx[i] * A * 1.06 - vx0) * f, sy2 = vy0 + (sy[i] * 1.06 - vy0) * f;
+          tx = rx + (sx2 - rx) * zs; ty = ry2 + (sy2 - ry2) * zs;
+          ta = ra * (1 - zs) + (0.16 + 0.6 * z * near) * br[i] * zs;
+          ts = rs * (1 - zs) + (2.2 + 4.5 * z * near) * zs;
+          th = rh * (1 - zs) + (0.32 + 0.12 * s) * zs;
+          return 3;
         }
         case 11: {
           // the clover: slow breath, a slow turn, each agent shimmering in place

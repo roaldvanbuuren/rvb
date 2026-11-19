@@ -221,7 +221,7 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
   /* ---- the thesis: a tall scroll; each step pins its text for a while; the swarm (Swarm.astro) plays behind ---- */
   .thesis{position:relative;z-index:1}
   .t-step{position:relative;height:150svh}
-  .t-hero{height:120svh}
+  .t-hero{height:170svh}
   .t-end{height:130svh}
   .t-pin{position:sticky;top:0;height:100svh;display:flex;align-items:center}
   .t-card{width:min(520px,calc(100% - 48px));margin-left:max(24px,calc(50% - 576px))}
@@ -231,6 +231,8 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
 
   /* hero */
   .t-hero .t-pin{align-items:center;justify-content:center}
+  /* the look up: the opening words lift and fade as the ridge sinks */
+  .t-hero-in{opacity:calc(1 - var(--hz,0) * 1.6);transform:translateY(calc(var(--hz,0) * -70px))}
   .t-hero-in{display:flex;flex-direction:column;align-items:center;text-align:center;gap:26px;max-width:1000px}
   .t-h1{font-size:clamp(60px,9.4vw,144px);line-height:.92;text-wrap:balance;text-shadow:0 0 60px rgba(11,11,11,.9)}
   .t-belief{margin:0;max-width:820px;font:italic 400 clamp(26px,2.9vw,42px)/1.18 var(--serif);color:var(--warm);text-wrap:balance;text-shadow:0 0 30px rgba(11,11,11,.95)}
@@ -267,7 +269,7 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
 
   @media (max-width:700px){
     .t-step{height:160svh}
-    .t-hero{height:120svh}
+    .t-hero{height:160svh}
     .t-end{height:130svh}
     .t-pin{align-items:flex-end;padding-bottom:max(48px,7svh)}
     .t-card{margin:0 auto;width:calc(100% - 40px)}
