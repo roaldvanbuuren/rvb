@@ -4,7 +4,7 @@
 // Every dot is an agent with a measured "pressure response" (s, 0 calm to 1 volatile).
 // Colour is heat: blue when calm, through bone and amber, to red under pressure.
 // Every block on the page with a data-act drives what the swarm does while it holds the middle of the screen:
-//   0 clover     the population holds the family mark, the four-leaf clover (hero)
+//   0 ridge      the population draws the Alps at dusk: a bright ridgeline, the dark mass under it, a few stars (hero)
 //   1 player     one player; scroll raises the pressure and his movement changes
 //   2 network    communities: hubs, members, links, messages; a crisis spreads from one server to the next
 //   3 scale      thousands of agents in many communities
@@ -23,6 +23,7 @@
 ---
 <div class="t-bg" aria-hidden="true">
   <canvas id="swarm"></canvas>
+  <div class="t-sky"></div>
   <div class="t-shade"></div>
   <div class="t-grain"></div>
 </div>
@@ -39,6 +40,10 @@
 <style>
   .t-bg{position:fixed;inset:0;z-index:-1;pointer-events:none;background:#0B0B0B}
   #swarm{position:absolute;left:0;top:0;width:100%;height:100lvh;display:block}
+  /* the dusk behind the ridge (hero only): grey high up, rose toward the mountains, screened onto the dark */
+  .t-sky{position:absolute;inset:0;opacity:0;mix-blend-mode:screen;transition:opacity 1.4s ease;
+    background:linear-gradient(180deg,rgb(40,40,42) 0%,rgb(50,48,49) 35%,rgb(78,58,54) 62%,rgb(96,62,52) 74%,rgb(30,22,20) 86%,rgb(0,0,0) 100%)}
+  :global(html[data-act="0"]) .t-sky,:global(html:not([data-act])) .t-sky{opacity:1}
   .t-shade{position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;
     background:linear-gradient(90deg,rgba(11,11,11,.92) 0%,rgba(11,11,11,.74) 28%,rgba(11,11,11,.18) 50%,rgba(11,11,11,0) 62%)}
   :global(html.t-story) .t-shade{opacity:1}
@@ -209,6 +214,9 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
     const cRad = cw.map((w) => 0.07 + w * 0.42);
     const leafP = [0.3, 0.04, 0.17, 0.03, 0.22, 0.05, 0.13, 0.06];
     const commW = [0.34, 0.26, 0.22, 0.18], hubW = [0.46, 0.18, 0.18, 0.18];
+    // the ridgeline, traced from the Alps photo (alps-x-brown.png): 241 heights, fraction of the image's height from its top
+    const RIDGE = [.772,.77,.77,.77,.772,.774,.774,.776,.776,.778,.778,.778,.78,.782,.782,.782,.782,.782,.784,.784,.786,.788,.788,.788,.788,.788,.79,.79,.792,.792,.792,.792,.79,.782,.78,.78,.784,.786,.786,.784,.778,.768,.76,.756,.756,.756,.748,.74,.74,.74,.736,.728,.72,.712,.712,.712,.71,.708,.702,.698,.692,.692,.698,.704,.708,.708,.71,.708,.708,.7,.7,.702,.704,.704,.69,.68,.674,.668,.662,.65,.638,.634,.63,.63,.632,.636,.646,.656,.66,.66,.672,.688,.7,.708,.71,.71,.71,.712,.712,.71,.704,.698,.698,.698,.706,.714,.72,.732,.742,.742,.742,.736,.73,.724,.718,.708,.704,.704,.704,.696,.688,.686,.682,.68,.68,.686,.686,.686,.68,.672,.668,.668,.664,.658,.658,.658,.66,.668,.668,.664,.658,.648,.632,.618,.614,.61,.598,.58,.57,.57,.58,.592,.602,.618,.63,.638,.642,.646,.648,.658,.672,.682,.692,.698,.698,.69,.684,.684,.686,.686,.676,.662,.652,.652,.656,.668,.676,.678,.678,.68,.682,.686,.688,.696,.708,.716,.716,.718,.728,.732,.734,.738,.738,.736,.728,.724,.724,.726,.726,.72,.714,.714,.714,.714,.714,.708,.706,.706,.714,.722,.728,.732,.736,.74,.746,.752,.752,.748,.742,.736,.73,.73,.728,.728,.728,.732,.736,.74,.744,.744,.744,.738,.738,.734,.734,.736,.736,.736,.73,.722,.722];
+    const ridgeAt = (u: number) => { const f = clamp(u) * (RIDGE.length - 1), k = Math.min(RIDGE.length - 2, Math.floor(f)), w = f - k; return RIDGE[k] * (1 - w) + RIDGE[k + 1] * w; };
     const pick = (ws: number[]) => { let r = rnd(), k = 0; for (; k < ws.length - 1; k++) { r -= ws[k]; if (r < 0) break; } return k; };
 
     for (let i = 0; i < N; i++) {
@@ -356,7 +364,26 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
       const s = sens[i];
       tz = z0[i] * 0.6; wrap = false;
       switch (a) {
-        case 0: case 11: {
+        case 0: {
+          // the Alps at dusk: the image spans the width (wider than the screen on phones, centred on the peak) and
+          // sits on the bottom edge. Four in ten agents draw the ridgeline, five fill the mountains, one is a star.
+          const imgW = Math.max(2 * A * 1.04, 2.1), imgH = imgW / 3, x0 = wide ? -imgW / 2 : -imgW * 0.6, top = -1.02 + imgH;
+          const q = i % 10;
+          if (q < 4) {
+            const u = rankH[i], ry = top - ridgeAt(u) * imgH;
+            tx = x0 + u * imgW; ty = ry - Math.abs(gy[i]) * 0.0035 + 0.0015 * Math.sin(tm * 1.2 + ph[i]); tz = 0;
+            ta = (0.42 + 0.2 * br[i]) * (0.85 + 0.15 * Math.sin(tm * 0.9 + ph[i])); ts = 2.4; th = 0.56 + 0.08 * s; return 1;
+          }
+          if (q < 9) {
+            const u = (sx[i] + 1) / 2, ry = top - ridgeAt(u) * imgH, d = Math.pow((sy[i] + 1) / 2, 1.7);
+            tx = x0 + u * imgW; ty = ry - 0.01 - d * (ry + 1.05); tz = 0;
+            ta = 0.2 * Math.pow(1 - d, 1.6) * br[i]; ts = 2.2; th = 0.8 + 0.08 * s; return 0.9;
+          }
+          const u = (sx[i] + 1) / 2, ry = top - ridgeAt(u) * imgH;
+          tx = sx[i] * A * 1.02 + 0.01 * Math.sin(tm * 0.05 + ph[i]); ty = ry + 0.06 + ((sy[i] + 1) / 2) * (1 - ry); tz = 0;
+          ta = 0.1 * br[i] * (0.6 + 0.4 * Math.sin(tm * 1.7 + ph[i] * 3)); ts = 2; th = 0.3 + 0.1 * s; return 0.8;
+        }
+        case 11: {
           // the clover: slow breath, a slow turn, each agent shimmering in place
           const ox = a === 11 ? closeX : 0, oy = a === 11 ? closeY : 0;
           const R = (a === 11 ? Math.min(0.62, A * 0.6) : Math.min(0.86, A * 0.82)) * (1 + 0.015 * Math.sin(tm * 0.6));
