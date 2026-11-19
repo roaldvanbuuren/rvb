@@ -21,11 +21,11 @@
 </div>
 <div class="t-hud" aria-hidden="true"><span class="t-hud-a"></span><span class="t-hud-b"></span></div>
 <ol class="t-rail" aria-hidden="true">
-  <li data-a="1"><span>Signal</span><b>01</b></li>
-  <li data-a="2"><span>Scale</span><b>02</b></li>
-  <li data-a="3"><span>Record</span><b>03</b></li>
-  <li data-a="4"><span>Swarm</span><b>04</b></li>
-  <li data-a="5"><span>Forward</span><b>05</b></li>
+  <li data-a="1"><span>What I saw</span><b>01</b></li>
+  <li data-a="2"><span>Noticed</span><b>02</b></li>
+  <li data-a="3"><span>Why it matters</span><b>03</b></li>
+  <li data-a="4"><span>What I believe</span><b>04</b></li>
+  <li data-a="5"><span>Where this goes</span><b>05</b></li>
 </ol>
 
 <style>
@@ -53,7 +53,7 @@
   .t-rail li{display:flex;align-items:center;justify-content:flex-end;gap:12px;font:500 11px/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:rgba(232,232,219,.28);transition:color .5s ease}
   .t-rail b{font-weight:500;color:inherit}
   .t-rail li span{max-width:0;overflow:hidden;opacity:0;transition:max-width .6s ease,opacity .6s ease;white-space:nowrap}
-  .t-rail li.on span{max-width:120px;opacity:1}
+  .t-rail li.on span{max-width:220px;opacity:1}
   .t-rail li::after{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;transition:background .5s,box-shadow .5s}
   .t-rail li.on{color:var(--accent)}
   .t-rail li.on::after{box-shadow:0 0 14px 2px rgba(var(--accent-rgb),.7)}
