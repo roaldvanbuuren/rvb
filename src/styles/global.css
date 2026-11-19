@@ -651,3 +651,8 @@ html[data-theme="light"] .foot nav a:hover{color:#000}
 .glow-c{--s:clamp(640px,96vw,1500px);--a:.36;left:50%;margin-left:calc(var(--s) * -.5);bottom:calc(var(--s) * -.5);--dy:30px}
 .close.grained{padding-bottom:clamp(100px,12vw,170px)}
 .scene-quiet .scene-quote{max-width:none}
+/* dispatch titles stay on one line and are cut off with an ellipsis */
+.c-top{flex-wrap:nowrap;align-items:baseline}
+.credit time{flex:none}
+.c-title{flex:1 1 0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-bottom:.08em}
+@media (max-width:700px){.c-top{flex-wrap:wrap}.credit time{width:100%}.c-title{flex-basis:100%}}
