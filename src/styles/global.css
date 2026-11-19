@@ -838,3 +838,12 @@ a.prow::after{content:"";position:absolute;left:12px;right:12px;bottom:-1px;heig
 a.prow:hover::after,a.prow:focus-visible::after{opacity:1;width:calc(100% - 24px)}
 .page-head .h1{text-shadow:0 0 80px rgba(var(--accent-rgb),.14)}
 @media (prefers-reduced-motion:reduce){.zone.z-a::before{animation:none}a.prow::after{transition:none}}
+.p-text{text-align:left}
+@media (max-width:900px){
+  .prod{flex-direction:column;align-items:flex-start;gap:12px}
+  .p-text{max-width:none;width:100%}
+}
+@media (min-width:901px){
+  .prod{align-items:center}
+  .p-text{flex:0 0 420px;width:420px}
+}
