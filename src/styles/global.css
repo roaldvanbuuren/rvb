@@ -705,3 +705,18 @@ html:has(#top.hero) footer{scroll-snap-align:end}
   .orb-sun{--s:clamp(320px,38vw,540px)}
   .world .scene-line{font-size:clamp(34px,4.6vw,68px)}
 }
+
+/* about + road: one continuous scene, no snapping inside it (the sun, the horizon and the road scroll together) */
+html:has(#top.hero) .world-sky,html:has(#top.hero) .world-ground{scroll-snap-align:none;scroll-snap-stop:normal}
+html:has(#top.hero) .world{scroll-snap-align:start}
+.world{min-height:100svh}
+.world-sky{min-height:0;display:flow-root;padding-top:clamp(110px,12vw,180px)}
+.world-ground{min-height:0;display:block}
+.world-ground .horizon{position:relative;left:auto;right:auto;top:auto}
+.world-ground .wrap{padding-top:0}
+.world .f-more{padding-bottom:clamp(90px,11vw,160px)}
+@media (min-width:701px){
+  .road-eyebrow{margin-top:clamp(170px,20vw,290px)}
+  .orb-sun{--s:clamp(340px,46vw,640px)}
+  .world .scene-line{font-size:clamp(34px,5vw,74px)}
+}
