@@ -1,6 +1,5 @@
 ---
 import Base from '../layouts/Base.astro';
-import Dusk from '../components/Dusk.astro';
 import Logo from '../components/Logo.astro';
 import { getPosts, links, postUrl, formatDate, isoDate } from '../lib/posts';
 
@@ -45,8 +44,6 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
   <section class="hero" id="top">
     <div class="hero-art" aria-hidden="true">
       <div class="hero-img" aria-hidden="true"></div>
-      <Dusk />
-      <div class="grain" aria-hidden="true"></div>
     </div>
     <div class="wrap hero-in">
       <Logo />
@@ -62,7 +59,7 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
 
   {latest.length > 0 && (
     <section class="film grained" id="writing">
-    <div class="glow glow-d" aria-hidden="true"></div><div class="glow glow-d2" aria-hidden="true"></div>
+      <div class="glows" aria-hidden="true"><div class="glow glow-d" aria-hidden="true"></div><div class="glow glow-d2" aria-hidden="true"></div></div>
       <div class="wrap rv">
         <p class="f-eyebrow">Dispatches</p>
         <div class="credits">
@@ -82,7 +79,7 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
   )}
 
   <section class="world grained" id="about" aria-label="About">
-    <div class="glow glow-s" aria-hidden="true"></div>
+      <div class="glows" aria-hidden="true"><div class="glow glow-s" aria-hidden="true"></div></div>
     <div class="world-sky">
       <div class="orb orb-sun" aria-hidden="true"></div>
       <div class="wrap rv">
@@ -124,7 +121,7 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
   </section>
 
   <section class="film grained" id="now">
-    <div class="glow glow-w" aria-hidden="true"></div><div class="glow glow-w2" aria-hidden="true"></div>
+      <div class="glows" aria-hidden="true"><div class="glow glow-w" aria-hidden="true"></div><div class="glow glow-w2" aria-hidden="true"></div></div>
     <div class="wrap rv">
       <p class="f-eyebrow">The work</p>
       <p class="f-lede">ELO turns how people behave in games and online communities into lessons for the real world.</p>
@@ -142,7 +139,7 @@ const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and powe
   </section>
 
   <section class="scene scene-quiet grained vig" aria-label="From the writing">
-    <div class="glow glow-a" aria-hidden="true"></div>
+      <div class="glows" aria-hidden="true"><div class="glow glow-a" aria-hidden="true"></div></div>
     <figure class="wrap rv">
       <blockquote class="scene-line scene-quote">Most people don't realize the world runs on one thing: <em>alignment.</em></blockquote>
       <figcaption class="f-mono"><a href={postUrl(quietPost)}>From: {quietPost.data.title}</a></figcaption>
