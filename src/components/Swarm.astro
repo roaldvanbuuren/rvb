@@ -176,7 +176,20 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
 
     // ---------- the population ----------
     const N = small ? 4200 : 9000, TRAIL = 160, RING = 72, C = 7, HUBS = 16, MSG = small ? 140 : 260;
-    const LP = small ? 1600 : 2600; // dots for the page's lines
+    // the page's amber lines: each gets a fixed block of dots, one per CSS pixel or so, so the line reads solid
+    const SP = small ? 1.1 : 1, HSP = 4; // px between dots, and between the soft glow dots under them
+    type Src = { el: HTMLElement; pseudo: boolean; cap: number; at: number; hcap: number; hat: number };
+    const lineSrc: Src[] = [];
+    {
+      let at = 0, hat = 0;
+      const add = (el: HTMLElement, pseudo: boolean, w: number) => {
+        const cap = Math.ceil(w / SP), hcap = Math.ceil(w / HSP);
+        lineSrc.push({ el, pseudo, cap, at, hcap, hat }); at += cap; hat += hcap;
+      };
+      document.querySelectorAll<HTMLElement>('main .credit, main .prod').forEach((el) => add(el, true, Math.max(el.getBoundingClientRect().width, 320) * 1.1));
+      document.querySelectorAll<HTMLElement>('main .slit i').forEach((el) => add(el, false, 200));
+    }
+    const LC = lineSrc.reduce((n, g) => n + g.cap, 0), LH = lineSrc.reduce((n, g) => n + g.hcap, 0), LP = LC + LH;
     const oTrail = N, oHub = N + TRAIL, oMsg = oHub + HUBS, oLine = oMsg + MSG, M = oLine + LP;
     let seed = 20261119;
     const rnd = () => { seed = (seed + 0x6d2b79f5) | 0; let q = Math.imul(seed ^ (seed >>> 15), 1 | seed); q = (q + Math.imul(q ^ (q >>> 7), 61 | q)) ^ q; return ((q ^ (q >>> 14)) >>> 0) / 4294967296; };
@@ -520,7 +533,7 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
       // the network: hubs, messages, links
       netA += ((act === 2 ? 1 : 0) - netA) * (snap ? 1 : Math.min(1, dt * 2));
       writeNetwork(tm);
-      measureLines(); writeLines(tm);
+      lines(dt, snap);
     }
 
     function writeAgent(i: number, h: number) {
@@ -573,45 +586,72 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
     }
     let lineCount = 0;
 
-    // ---------- the page's amber lines, in dots ----------
-    type Seg = { x0: number; x1: number; y: number; a: number };
-    const segs: Seg[] = [];
-    const lineSrc: { el: HTMLElement; pseudo: boolean; rv: HTMLElement | null }[] = [
-      ...Array.from(document.querySelectorAll<HTMLElement>('main .credit, main .prod')).map((el) => ({ el, pseudo: true, rv: el.closest<HTMLElement>('.rv') })),
-      ...Array.from(document.querySelectorAll<HTMLElement>('main .slit i')).map((el) => ({ el, pseudo: false, rv: el.closest<HTMLElement>('.rv') })),
-    ];
-    function measureLines() {
-      segs.length = 0;
-      for (const { el, pseudo, rv } of lineSrc) {
-        const r = el.getBoundingClientRect();
-        if (r.bottom < -40 || r.top > innerHeight + 40) continue;
-        let x0 = r.left, w = r.width, y = r.top + r.height / 2;
-        if (pseudo) { const cs = getComputedStyle(el, '::after'); w = parseFloat(cs.width) || 0; x0 = r.left + (parseFloat(cs.left) || 0); y = r.bottom - 1; }
-        if (w < 1) continue;
-        const a = rv ? Number(getComputedStyle(rv).opacity) : 1;
-        if (a <= 0.01) continue;
-        segs.push({ x0: wx(x0), x1: wx(x0 + w), y: wy(y), a });
-      }
+    // ---------- the page's amber lines, formed by dots from the swarm ----------
+    // CSS still sizes and times every line (hover stretches it); its paint is hidden. Each frame a line asks for one dot
+    // per pixel of its current length. A dot that is newly wanted leaves a swarm agent near it, flies in and locks on;
+    // a dot no longer wanted lets go and drifts back into the swarm. Off screen, nothing flies.
+    const lx = new Float32Array(LC), ly = new Float32Array(LC), lvx = new Float32Array(LC), lvy = new Float32Array(LC);
+    const la = new Float32Array(LC), lst = new Uint8Array(LC), lfrom = new Uint32Array(LC); // state: 0 idle, 1 coming, 2 locked, 3 leaving
+    const LINE_A = 0.42, LINE_H = 0.72;
+    // how visible an element really is: its own and every ancestor's opacity (reveals, the road's fade-ins)
+    function seen(el: HTMLElement) {
+      let o = 1, n: HTMLElement | null = el;
+      for (let d = 0; n && d < 8 && n.tagName !== 'MAIN'; d++, n = n.parentElement) { o *= Number(getComputedStyle(n).opacity); if (o < 0.01) return 0; }
+      return o;
     }
-    function writeLines(tm: number) {
-      const px1 = 2 / H; // one CSS pixel in world units
-      let total = 0; for (const g of segs) total += g.x1 - g.x0;
-      const core = Math.max(px1 * 2.4, (total * 1.5) / LP); // spacing, widened if the pool runs short
-      let j = 0;
-      const put = (x: number, y: number, h: number, a: number, sz: number) => {
-        if (j >= LP) return; const k = oLine + j++, o3 = k * 3, o4 = k * 4;
-        pos[o3] = x; pos[o3 + 1] = y; pos[o3 + 2] = 0; heatRGB(h, col, o4, 1); col[o4 + 3] = a; size[k] = sz;
-      };
-      for (const g of segs) {
-        const len = g.x1 - g.x0, n = Math.max(2, Math.floor(len / core));
-        for (let k = 0; k < n; k++) {
-          const x = g.x0 + ((k + 0.5) / n) * len, tw = 0.78 + 0.22 * Math.sin(tm * 2.6 + x * 900);
-          put(x, g.y + (k % 2 ? 0.35 : -0.35) * px1, 0.66 + 0.05 * Math.sin(x * 700), 1.05 * tw * g.a, 4);
-          if (k % 2 === 0) put(x, g.y + Math.sin(x * 2300 + tm * 0.8) * px1 * 5, 0.62, 0.13 * g.a, 6.5);
+    function lines(dt: number, snap: boolean) {
+      const px1 = 2 / H, sp = SP * px1, lock = 1.6 * px1;
+      const fdec = snap ? 1 : Math.min(1, dt * 7), k = 24, k2 = k * k, damp = 2 * k * 0.9;
+      for (const g of lineSrc) {
+        const r = g.el.getBoundingClientRect(), vis = r.bottom > -40 && r.top < innerHeight + 40;
+        let x0 = 0, len = 0, y = 0, op = 0;
+        if (vis) {
+          let lx0 = r.left, w = r.width, yy = r.top + r.height / 2;
+          if (g.pseudo) { const cs = getComputedStyle(g.el, '::after'); w = parseFloat(cs.width) || 0; lx0 = r.left + (parseFloat(cs.left) || 0); yy = r.bottom - 1; }
+          op = w > 0.5 ? seen(g.el) : 0;
+          x0 = wx(lx0); len = w; y = wy(yy);
         }
-        for (let k = 0; k < 3; k++) put(g.x1 - px1 * k * 2.4, g.y, 0.55, 0.9 * g.a * (1 - k * 0.25), 5.5); // a brighter head
+        for (let q = 0; q < g.cap; q++) {
+          const j = g.at + q, o = oLine + j, o3 = o * 3, o4 = o * 4;
+          const want = op > 0.02 && (q + 0.5) * SP <= len;
+          const sx0 = x0 + (q + 0.5) * sp, sy0 = y;
+          if (!vis) { lst[j] = 0; la[j] = 0; }
+          else if (want) {
+            if (snap) { lst[j] = 2; la[j] = op * LINE_A; }
+            if (lst[j] === 0 || lst[j] === 3) {
+              if (lst[j] === 0) { // leave from a swarm agent, the nearest of three picked at random
+                let best = 0, bd = 1e9;
+                for (let t2 = 0; t2 < 3; t2++) { const a = (Math.random() * N) | 0, d = (px[a] - sx0) ** 2 + (py[a] - sy0) ** 2; if (d < bd) { bd = d; best = a; } }
+                lfrom[j] = best; lx[j] = px[best]; ly[j] = py[best]; lvx[j] = 0; lvy[j] = 0;
+              }
+              lst[j] = 1;
+            }
+            if (lst[j] === 1) {
+              lvx[j] += ((sx0 - lx[j]) * k2 - lvx[j] * damp) * dt; lvy[j] += ((sy0 - ly[j]) * k2 - lvy[j] * damp) * dt;
+              lx[j] += lvx[j] * dt; ly[j] += lvy[j] * dt;
+              if (Math.abs(sx0 - lx[j]) < lock && Math.abs(sy0 - ly[j]) < lock) lst[j] = 2;
+            }
+            if (lst[j] === 2) { lx[j] = sx0; ly[j] = sy0; }
+            la[j] += (op * LINE_A - la[j]) * fdec;
+          } else if (lst[j] === 1 || lst[j] === 2 || lst[j] === 3) {
+            // let go: drift back toward the agent it came from, fading
+            const a = lfrom[j];
+            lst[j] = 3; lx[j] += (px[a] - lx[j]) * Math.min(1, dt * 2.5); ly[j] += (py[a] - ly[j]) * Math.min(1, dt * 2.5);
+            la[j] *= snap ? 0 : Math.max(0, 1 - dt * 4);
+            if (la[j] < 0.01) { lst[j] = 0; la[j] = 0; }
+          }
+          pos[o3] = lx[j]; pos[o3 + 1] = ly[j]; pos[o3 + 2] = 0;
+          heatRGB(lst[j] === 2 ? LINE_H : 0.6, col, o4, 1);
+          col[o4 + 3] = la[j] * (lst[j] === 2 ? 1 : 1.8); size[o] = lst[j] === 2 ? 5 : 4.5;
+        }
+        // the glow under the line, where it has formed
+        for (let h = 0; h < g.hcap; h++) {
+          const o = oLine + LC + g.hat + h, o3 = o * 3, o4 = o * 4, q = Math.min(g.cap - 1, Math.floor(((h + 0.5) * HSP) / SP));
+          const on = vis && lst[g.at + q] === 2 ? la[g.at + q] / LINE_A : 0;
+          pos[o3] = x0 + (h + 0.5) * HSP * px1; pos[o3 + 1] = y; pos[o3 + 2] = 0;
+          heatRGB(LINE_H, col, o4, 1); col[o4 + 3] = 0.035 * on; size[o] = 28;
+        }
       }
-      for (; j < LP; j++) { const k = oLine + j; col[k * 4 + 3] = 0; }
     }
 
     function draw() {
