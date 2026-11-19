@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import Swarm from '../components/Swarm.astro';
 
 interface Props {
   title: string;
@@ -15,6 +16,17 @@ interface Props {
 }
 
 const { title, description, image = '/images/og.jpg', type = 'website', publishedTime, themeable = false } = Astro.props;
+// The swarm behind every page but home (which places its own) and admin: one shape per page, picked by path.
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const swarm =
+  path === '/' || path.startsWith('/admin') ? null
+  : path === '/writing' ? 'journal'
+  : path.startsWith('/writing/') ? 'article'
+  : path === '/press' ? 'press'
+  : path === '/work' ? 'work'
+  : path.startsWith('/work/') ? 'story'
+  : path === '/projects' ? 'projects'
+  : 'lost';
 const site = Astro.site ?? new URL('http://localhost:4321');
 const canonical = new URL(Astro.url.pathname, site).href;
 const ogImage = new URL(image, site).href;
@@ -55,6 +67,7 @@ const ogImage = new URL(image, site).href;
   <a class="skip" href="#main">Skip to content</a>
   <Nav />
   <main id="main">
+    {swarm && <Swarm page={swarm} />}
     <slot />
   </main>
   <Footer />

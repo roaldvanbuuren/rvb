@@ -20,22 +20,42 @@
 // redrawn here in dots, at the width CSS is animating it to, so hover still stretches it.
 // No dependencies: raw WebGL2, a few typed arrays, two draw calls per frame.
 // Reduced motion: no loop; the swarm is drawn once, settled, whenever the act changes.
+//
+// Other pages (Base.astro picks the page by path) get one shape in their header, then a quiet field:
+//  20 journal    a pen of dots writing lines of text      21 article   the same, smaller; still below the title
+//  22 press      a broadcast pulsing out from one point   23 work      a setting sun on a horizon
+//  24 projects   one small community per project          25 lost      the dots drift and scatter (404)
+//  30 field      the quiet star field under every header  31 still     nothing moving (an article's body)
+// Article light mode switches the whole layer off.
+interface Props { page?: 'home' | 'journal' | 'article' | 'press' | 'work' | 'story' | 'projects' | 'lost' }
+const { page = 'home' } = Astro.props;
+const home = page === 'home';
 ---
-<div class="t-bg" aria-hidden="true">
+<div class="t-bg" aria-hidden="true" data-page={page}>
   <canvas id="swarm"></canvas>
-  <div class="t-sky"></div>
+  {home && <div class="t-sky"></div>}
   <div class="t-shade"></div>
   <div class="t-grain"></div>
 </div>
-<div class="t-hud" aria-hidden="true"><span class="t-hud-a"></span><span class="t-hud-b"></span></div>
-<ol class="t-rail" aria-hidden="true">
+<canvas class="t-top" aria-hidden="true"></canvas>
+{home && <div class="t-hud" aria-hidden="true"><span class="t-hud-a"></span><span class="t-hud-b"></span></div>}
+{home && <ol class="t-rail" aria-hidden="true">
   <li data-a="1"><span>What I saw</span></li>
   <li data-a="2"><span>Where people gather</span></li>
   <li data-a="3"><span>What I noticed next</span></li>
   <li data-a="4"><span>Why it matters</span></li>
   <li data-a="5"><span>What I believe</span></li>
   <li data-a="6"><span>Where this goes</span></li>
-</ol>
+</ol>}
+
+<style is:global>
+  /* the amber lines are drawn by the swarm in dots; CSS keeps their size and timing so hover still stretches them */
+  html:has(.t-bg):not([data-theme="light"]):not(.no-gl) :is(.credit,.prod,.card,.wcard,a.prow)::after,
+  html:has(.t-bg):not([data-theme="light"]):not(.no-gl) main .slit i{background:transparent !important;box-shadow:none !important}
+  html[data-theme="light"] .t-bg,html[data-theme="light"] .t-top{display:none}
+  /* the lines' own layer: above the page (cards, photos), under the nav */
+  .t-top{position:fixed;left:0;top:0;width:100%;height:100lvh;z-index:60;pointer-events:none}
+</style>
 
 <style>
   .t-bg{position:fixed;inset:0;z-index:-1;pointer-events:none;background:#0B0B0B}
@@ -83,7 +103,8 @@
   const railItems = Array.from(document.querySelectorAll<HTMLElement>('.t-rail li'));
   const steps = Array.from(document.querySelectorAll<HTMLElement>('main [data-act]'));
 
-  if (bg && canvas && steps.length) {
+  const PAGE = (bg?.dataset.page || 'home') as string, HOME = PAGE === 'home';
+  if (bg && canvas && (steps.length || !HOME)) {
     const reduceMq = matchMedia('(prefers-reduced-motion: reduce)');
     let reduce = reduceMq.matches;
     const small = matchMedia('(max-width: 700px)').matches || (navigator.hardwareConcurrency || 8) <= 4;
@@ -117,7 +138,35 @@
       }
     }
 
+    // other pages: the header (and where a shape can sit beside its words), then everything below it
+    const SHAPE: Record<string, number> = { journal: 20, article: 21, press: 22, work: 23, story: 30, projects: 24, lost: 25 };
+    const head = HOME ? null : document.querySelector<HTMLElement>('main .page-head, main .article-head, main .fx-hero');
+    let hx0 = -1, hx1 = 1, hy0 = -1, hy1 = 1, nProj = Math.max(1, document.querySelectorAll('main .wcard').length);
+    function measureHead() {
+      if (!head) return;
+      const r = head.getBoundingClientRect(), wrap = Math.min(r.width, 1200);
+      let left = wide ? r.left + wrap * 0.5 : r.left, right = wide ? r.left + wrap : r.right;
+      if (PAGE === 'article' && wide) {
+        // an article's title is a narrow centred column: write in the free margin to its right, if there is one
+        const t = head.querySelector('.h1')?.getBoundingClientRect() ?? r, room = innerWidth - 48 - (t.right + 40);
+        if (room > 180) { left = t.right + 40; right = innerWidth - 48; }
+      }
+      if (PAGE === 'press' && wide) { left = r.left + wrap * 0.62; right = r.left + wrap; }
+      if (!wide) { left = r.left + r.width * 0.52; right = r.right - 8; } // phones: the right side, clear of most titles
+      hx0 = wx(left); hx1 = wx(right); hy1 = wy(Math.max(r.top + (wide ? 70 : 60), 60)); hy0 = wy(r.bottom);
+    }
+    function readInner() {
+      let a = SHAPE[PAGE] ?? 30;
+      if (head) { const r = head.getBoundingClientRect(); if (r.bottom < r.height * 0.5) a = PAGE === 'article' ? 31 : 30; } // half the header scrolled away
+      act = a; t = 0.5;
+      measureHead();
+      if (act !== lastAct) { root.dataset.act = String(act); lastAct = act; }
+      if (reduce || off) drawStill();
+      else if (!raf) raf = requestAnimationFrame(frame);
+    }
+
     function readScroll() {
+      if (!HOME) return readInner();
       const c = innerHeight * 0.5;
       let found = false;
       for (const el of steps) {
@@ -146,6 +195,10 @@
       if (reduce) drawStill();
       else if (!raf) raf = requestAnimationFrame(frame);
     }
+
+    // article light mode: the layer is hidden, so stop drawing it
+    let off = root.dataset.theme === 'light';
+    new MutationObserver(() => { const o = root.dataset.theme === 'light'; if (o !== off) { off = o; if (!off) { last = 0; readScroll(); } } }).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
 
     // ---------- GL ----------
     const gl = canvas.getContext('webgl2', { antialias: false, alpha: false, depth: false, stencil: false, powerPreference: 'high-performance' }) as WebGL2RenderingContext | null;
@@ -189,21 +242,18 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
 
     // ---------- the population ----------
     const N = small ? 4200 : 9000, TRAIL = 160, RING = 72, C = 7, HUBS = 16, MSG = small ? 140 : 260;
-    // the page's amber lines: each gets a fixed block of dots, one per CSS pixel or so, so the line reads solid
+    // the page's amber lines: a line on screen borrows a block of dots, one per CSS pixel or so, so it reads solid;
+    // it hands the block back when it leaves the screen
     const SP = small ? 1.1 : 1, HSP = 4; // px between dots, and between the soft glow dots under them
-    type Src = { el: HTMLElement; pseudo: boolean; cap: number; at: number; hcap: number; hat: number };
-    const lineSrc: Src[] = [];
-    {
-      let at = 0, hat = 0;
-      const add = (el: HTMLElement, pseudo: boolean, w: number) => {
-        const cap = Math.ceil(w / SP), hcap = Math.ceil(w / HSP);
-        lineSrc.push({ el, pseudo, cap, at, hcap, hat }); at += cap; hat += hcap;
-      };
-      document.querySelectorAll<HTMLElement>('main .credit, main .prod').forEach((el) => add(el, true, Math.max(el.getBoundingClientRect().width, 320) * 1.1));
-      document.querySelectorAll<HTMLElement>('main .slit i').forEach((el) => add(el, false, 200));
-    }
-    const LC = lineSrc.reduce((n, g) => n + g.cap, 0), LH = lineSrc.reduce((n, g) => n + g.hcap, 0), LP = LC + LH;
-    const oTrail = N, oHub = N + TRAIL, oMsg = oHub + HUBS, oLine = oMsg + MSG, M = oLine + LP;
+    type Src = { el: HTMLElement; pseudo: boolean; blk: number };
+    const lineSrc: Src[] = [
+      ...Array.from(document.querySelectorAll<HTMLElement>('main :is(.credit,.prod,.card,.wcard,a.prow)')).map((el) => ({ el, pseudo: true, blk: -1 })),
+      ...Array.from(document.querySelectorAll<HTMLElement>('main .slit i')).map((el) => ({ el, pseudo: false, blk: -1 })),
+    ];
+    const KB = small ? 8 : 14, B = Math.ceil(Math.min(1400, Math.max(innerWidth, 360)) / SP), HB = Math.ceil((B * SP) / HSP);
+    const freeB: number[] = []; for (let k = KB - 1; k >= 0; k--) freeB.push(k);
+    const LC = KB * B;
+    const oTrail = N, oHub = N + TRAIL, oMsg = oHub + HUBS, M = oMsg + MSG;
     let seed = 20261119;
     const rnd = () => { seed = (seed + 0x6d2b79f5) | 0; let q = Math.imul(seed ^ (seed >>> 15), 1 | seed); q = (q + Math.imul(q ^ (q >>> 7), 61 | q)) ^ q; return ((q ^ (q >>> 14)) >>> 0) / 4294967296; };
     const gauss = () => { const u = Math.max(1e-6, rnd()), v = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
@@ -326,6 +376,7 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
         gl.useProgram(lprog); gl.uniform2f(luScale, 1 / A, 1);
       }
       const s = stage(act); scx = s[0]; scy = s[1]; sR = s[2];
+      topLayout();
     }
 
     // ---------- pointer: local pressure ----------
@@ -514,6 +565,78 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
           wrap = u < lastU[i]; lastU[i] = u;
           ta = 0.3 * br[i] * (1 - u) * sstep(0, 0.05, u); ts = 1.8 + 1.2 * (1 - u); th = 0.55 + 0.3 * s; return 1.6;
         }
+        case 20: case 21: {
+          // a pen of dots writing lines of text, line by line; the dots not yet written wait at the pen
+          const rows = a === 20 ? 7 : 5, w = hx1 - hx0, hh = hy1 - hy0, rowH = Math.min(0.085, (hh * 0.9) / rows);
+          const yTop = hy0 + hh * 0.5 + (rows - 1) * rowH * 0.5;
+          if (i % 10 < 7) {
+            const row = i % rows, u = rankH[i], len = row === rows - 1 ? 0.55 : 0.82 + 0.18 * fract(Math.sin(row * 12.9898) * 43758.5);
+            const word = u * 9 + row * 3.7, gap = fract(word) > 0.84 || u > len;
+            const P = fract(tm / (rows * 2.6 + 3)) * (rows + 1.2), done = row + u < P;
+            const pr = Math.min(rows - 1, Math.floor(P)), pu = fract(P);
+            const penX = hx0 + w * 0.08 + pu * w * 0.84, penY = yTop - pr * rowH;
+            const fin = sstep(rows + 0.6, rows + 1.2, P); // the page fades before it is written again
+            if (done && !gap) {
+              tx = hx0 + w * 0.08 + u * w * 0.84; ty = yTop - row * rowH + gy[i] * rowH * 0.09; tz = 0;
+              ta = (a === 20 ? 0.5 : 0.4) * br[i] * (1 - fin); ts = 2.4; th = 0.42 + 0.08 * s; return 1.6;
+            }
+            tx = penX + gx[i] * 0.012; ty = penY + gy[i] * 0.012; tz = 0;
+            ta = (gap ? 0.06 : 0.3) * br[i]; ts = 2.2; th = 0.72; return 2.2;
+          }
+          tx = sx[i] * A * 1.05 + 0.08 * Math.sin(tm * 0.08 + sy[i] * 2 + ph[i]); ty = sy[i] * 1.05 + 0.08 * Math.cos(tm * 0.07 + sx[i] * 2);
+          ta = 0.06 * br[i]; ts = 2; th = 0.3 + 0.2 * s; return 0.8;
+        }
+        case 22: {
+          // a broadcast: rings pulse out from one point, warm at the source and cooling as they travel
+          const w = hx1 - hx0, hh = hy1 - hy0, ox = wide ? hx0 + w * 0.55 : hx1 - w * 0.2, oy = wide ? hy0 + hh * 0.5 : hy1 - hh * 0.1, Rm = wide ? Math.max(w * 0.6, hh * 0.7) : w * 0.9;
+          const k = i % 7;
+          if (k === 0 && i % 21 === 0) { tx = ox + gx[i] * 0.01; ty = oy + gy[i] * 0.01; tz = 0; ta = 0.5 * br[i]; ts = 2.6; th = 0.72; return 2; }
+          const r = fract(tm * 0.11 + k / 7) * Rm, f = r / Rm, ang = ph[i] + Math.sin(tm * 0.3 + k) * 0.05;
+          tx = ox + Math.cos(ang) * r * (1 + gx[i] * 0.01); ty = oy + Math.sin(ang) * r * 0.9 * (1 + gy[i] * 0.01); tz = 0;
+          wrap = f < lastU[i]; lastU[i] = f;
+          ta = 0.36 * Math.pow(1 - f, 1.3) * sstep(0, 0.04, f) * br[i]; ts = 2.2 + (1 - f); th = 0.72 - 0.4 * f + 0.1 * s; return 2.6;
+        }
+        case 23: {
+          // the work: the sun from the road, small, setting on its horizon
+          const w = hx1 - hx0, hh = hy1 - hy0, cx = hx0 + w * 0.5, hz2 = hy0 + hh * 0.38, rs = Math.min(hh * 0.42, w * 0.22);
+          const q = i & 7;
+          if (q < 5) {
+            const ux = udx[i], uy = udy[i], r2 = ux * ux + uy * uy, nz = Math.sqrt(Math.max(0, 1 - r2));
+            const lam = Math.max(0, (-0.5 * ux + 0.55 * uy + 0.66 * nz) / 1.0);
+            tx = cx + ux * rs; ty = hz2 + uy * rs; tz = 0;
+            ta = uy < 0 ? 0 : (0.06 + 0.8 * Math.pow(lam, 1.2)) * (0.8 + 0.2 * br[i]); ts = 3 + 1.2 * lam; th = clamp(0.98 - 0.4 * lam); return 1.4;
+          }
+          if (q < 7) { // the horizon
+            const u = rankH[i], fall = 1 - Math.abs(u * 2 - 1);
+            tx = hx0 + u * w; ty = hz2 + gy[i] * 0.002 + 0.004 * Math.sin(u * 30 + tm); tz = 0;
+            ta = (0.1 + 0.5 * fall * fall) * br[i]; ts = 2.2 + fall; th = 0.62 + 0.1 * s; return 1;
+          }
+          tx = sx[i] * A * 1.05 + 0.06 * Math.sin(tm * 0.08 + ph[i]); ty = sy[i] * 1.05 + 0.06 * Math.cos(tm * 0.07 + sx[i] * 2);
+          ta = 0.06 * br[i]; ts = 2; th = 0.4; return 0.8;
+        }
+        case 24: {
+          // side projects: one small community per project, side by side
+          const w = hx1 - hx0, hh = hy1 - hy0, n = nProj, k = i % (n + 1);
+          if (k < n) {
+            const cx = hx0 + w * ((k + 0.5) / n), cy = hy0 + hh * 0.5, r = Math.min(hh * 0.28, (w / n) * 0.26);
+            const rot = tm * (0.12 + 0.2 * s) * (k % 2 ? 1 : -1), c = Math.cos(rot), sn = Math.sin(rot), ox = gx[i] * r * 0.5, oy = gy[i] * r * 0.5;
+            tx = cx + ox * c - oy * sn; ty = cy + ox * sn + oy * c; tz = 0;
+            ta = (0.24 + 0.18 * br[i]); ts = 2.3; th = 0.55 + 0.25 * s; return 1.2;
+          }
+          tx = sx[i] * A * 1.05 + 0.06 * Math.sin(tm * 0.08 + ph[i]); ty = sy[i] * 1.05 + 0.06 * Math.cos(tm * 0.07 + sx[i] * 2);
+          ta = 0.06 * br[i]; ts = 2; th = 0.4; return 0.8;
+        }
+        case 25: {
+          // lost: the dots drift without a shape, a few of them searching quickly
+          const fast = i % 23 === 0, sp2 = fast ? 0.6 : 0.12;
+          tx = sx[i] * A * 1.02 + 0.3 * Math.sin(tm * sp2 * br[i] + ph[i]); ty = sy[i] * 1.02 + 0.3 * Math.cos(tm * sp2 * 0.8 * br[i] + ph[i] * 1.3); tz = z0[i] * 0.6;
+          ta = (fast ? 0.55 : 0.24) * br[i] * (0.6 + 0.4 * Math.sin(tm * 0.7 + ph[i])); ts = fast ? 2.8 : 2.2; th = fast ? 0.5 : 0.12 + 0.2 * s; return fast ? 2 : 0.6;
+        }
+        case 30: case 31: {
+          // the quiet field under every header (an article's body: still and nearly gone)
+          tx = sx[i] * A * 1.05 + 0.08 * Math.sin(tm * 0.06 + sy[i] * 2 + ph[i]); ty = sy[i] * 1.05 + 0.08 * Math.cos(tm * 0.05 + sx[i] * 2);
+          tz = 0; ta = (a === 31 ? 0 : 0.07) * br[i]; ts = 2; th = 0.3 + 0.25 * s; return 0.8;
+        }
         default: {
           tx = (rankH[i] * 2 - 1) * A * 1.08;
           ty = (wide ? -0.4 : -0.3) + 0.012 * Math.sin(tx * 5 + tm * 0.6) + gy[i] * 0.0035;
@@ -537,7 +660,7 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
       const cursor = mOn && !snap ? (act === 5 ? 1 : act === 4 ? 0.15 : 0.45) : 0, rad = act === 5 ? 0.32 : 0.22, r2 = rad * rad;
       const flowAmt = act === 5 ? 0.55 : act === 0 || act === 11 ? 0.08 : act === 3 ? 0.25 : 0.12;
       const dec = snap ? 1 : Math.min(1, dt * 2.6);
-      gDim += ((DIM[act] ?? 1) - gDim) * dec;
+      gDim += ((DIM[act] ?? 1) * (!HOME && !wide && act < 30 ? 0.7 : 1) - gDim) * dec;
       let fr = 0;
       for (let i = 0; i < N; i++) {
         const km = target(i, act, tm, P, G);
@@ -653,25 +776,38 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
       for (let d = 0; n && d < 8 && n.tagName !== 'MAIN'; d++, n = n.parentElement) { o *= Number(getComputedStyle(n).opacity); if (o < 0.01) return 0; }
       return o;
     }
+    // the lines draw on their own 2D layer above the page, so a line on a card or a photo is never hidden behind it
+    const top = document.querySelector<HTMLCanvasElement>('.t-top'), tctx = top?.getContext('2d') ?? null;
+    let tdpr = 1;
+    function topLayout() { if (!top) return; tdpr = Math.min(devicePixelRatio || 1, 2); top.width = Math.round(W * tdpr); top.height = Math.round(H * tdpr); }
+    const sxp = (x: number) => (x / A + 1) * 0.5 * W, syp = (y: number) => (1 - y) * 0.5 * H;
+    function clearBlock(k: number) { for (let q = 0; q < B; q++) { const j = k * B + q; lst[j] = 0; la[j] = 0; } }
     function lines(dt: number, snap: boolean) {
+      if (!tctx || !top) return;
+      tctx.setTransform(tdpr, 0, 0, tdpr, 0, 0);
+      tctx.clearRect(0, 0, W, H);
+      tctx.globalCompositeOperation = 'lighter';
       const px1 = 2 / H, sp = SP * px1, lock = 1.6 * px1;
       const fdec = snap ? 1 : Math.min(1, dt * 7), k = 24, k2 = k * k, damp = 2 * k * 0.9;
       for (const g of lineSrc) {
-        const r = g.el.getBoundingClientRect(), vis = r.bottom > -40 && r.top < innerHeight + 40;
-        let x0 = 0, len = 0, y = 0, op = 0;
-        if (vis) {
-          let lx0 = r.left, w = r.width, yy = r.top + r.height / 2;
-          if (g.pseudo) { const cs = getComputedStyle(g.el, '::after'); w = parseFloat(cs.width) || 0; lx0 = r.left + (parseFloat(cs.left) || 0); yy = r.bottom - 1; }
-          op = w > 0.5 ? seen(g.el) : 0;
-          x0 = wx(lx0); len = w; y = wy(yy);
+        const r = g.el.getBoundingClientRect(), vis = r.bottom > -40 && r.top < innerHeight + 40 && r.width > 0;
+        if (!vis) { if (g.blk >= 0) { clearBlock(g.blk); freeB.push(g.blk); g.blk = -1; } continue; }
+        if (g.blk < 0) { if (!freeB.length) continue; g.blk = freeB.pop()!; clearBlock(g.blk); }
+        let lx0 = r.left, w = r.width, yy = r.top + r.height / 2, pop = 1;
+        if (g.pseudo) {
+          const cs = getComputedStyle(g.el, '::after');
+          w = parseFloat(cs.width) || 0; lx0 = r.left + (parseFloat(cs.left) || 0); yy = r.bottom - (parseFloat(cs.bottom) || 0) - 1; pop = Number(cs.opacity);
         }
-        for (let q = 0; q < g.cap; q++) {
-          const j = g.at + q, o = oLine + j, o3 = o * 3, o4 = o * 4;
+        const op = w > 0.5 && pop > 0.01 ? pop * seen(g.el) : 0;
+        const x0 = wx(lx0), len = Math.min(w, B * SP), y = wy(yy), at = g.blk * B;
+        let solid = 0, run = true, solA = 0;
+        for (let q = 0; q < B; q++) {
+          const j = at + q;
           const want = op > 0.02 && (q + 0.5) * SP <= len;
+          if (!want && lst[j] === 0) { if ((q + 0.5) * SP > len + 40) break; run = false; continue; }
           const sx0 = x0 + (q + 0.5) * sp, sy0 = y;
-          if (!vis) { lst[j] = 0; la[j] = 0; }
-          else if (want) {
-            if (snap) { lst[j] = 2; la[j] = op * LINE_A; }
+          if (want) {
+            if (snap) { lst[j] = 2; la[j] = op; }
             if (lst[j] === 0 || lst[j] === 3) {
               if (lst[j] === 0) { // leave from a swarm agent, the nearest of three picked at random
                 let best = 0, bd = 1e9;
@@ -686,7 +822,7 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
               if (Math.abs(sx0 - lx[j]) < lock && Math.abs(sy0 - ly[j]) < lock) lst[j] = 2;
             }
             if (lst[j] === 2) { lx[j] = sx0; ly[j] = sy0; }
-            la[j] += (op * LINE_A - la[j]) * fdec;
+            la[j] += (op - la[j]) * fdec;
           } else if (lst[j] === 1 || lst[j] === 2 || lst[j] === 3) {
             // let go: drift back toward the agent it came from, fading
             const a = lfrom[j];
@@ -694,16 +830,23 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
             la[j] *= snap ? 0 : Math.max(0, 1 - dt * 4);
             if (la[j] < 0.01) { lst[j] = 0; la[j] = 0; }
           }
-          pos[o3] = lx[j]; pos[o3 + 1] = ly[j]; pos[o3 + 2] = 0;
-          heatRGB(lst[j] === 2 ? LINE_H : 0.6, col, o4, 1);
-          col[o4 + 3] = la[j] * (lst[j] === 2 ? 1 : 1.8); size[o] = lst[j] === 2 ? 5 : 4.5;
+          if (lst[j] === 2 && run) { solid = q + 1; solA = la[j]; continue; } // part of the formed line: drawn whole below
+          run = false;
+          if (la[j] < 0.01) continue;
+          // a dot on its way in or out
+          const X = sxp(lx[j]), Y = syp(ly[j]);
+          tctx.fillStyle = `rgba(250,196,110,${Math.min(1, la[j] * 0.9).toFixed(3)})`;
+          tctx.fillRect(X - 0.9, Y - 0.9, 1.8, 1.8);
         }
-        // the glow under the line, where it has formed
-        for (let h = 0; h < g.hcap; h++) {
-          const o = oLine + LC + g.hat + h, o3 = o * 3, o4 = o * 4, q = Math.min(g.cap - 1, Math.floor(((h + 0.5) * HSP) / SP));
-          const on = vis && lst[g.at + q] === 2 ? la[g.at + q] / LINE_A : 0;
-          pos[o3] = x0 + (h + 0.5) * HSP * px1; pos[o3 + 1] = y; pos[o3 + 2] = 0;
-          heatRGB(LINE_H, col, o4, 1); col[o4 + 3] = 0.035 * on; size[o] = 28;
+        if (solid) {
+          // the formed part, dot by dot but packed into the original line: 2px, amber, with its glow
+          const X0 = sxp(x0), Y0 = syp(y), L = solid * SP;
+          tctx.shadowColor = `rgba(232,163,61,${(0.6 * solA).toFixed(3)})`; tctx.shadowBlur = 14;
+          tctx.fillStyle = `rgba(232,163,61,${solA.toFixed(3)})`;
+          tctx.fillRect(X0, Y0 - 1, L, 2);
+          tctx.shadowBlur = 0;
+          tctx.fillStyle = `rgba(255,214,150,${(0.22 * solA).toFixed(3)})`; // the dots it is made of, a shade lighter
+          for (let q = 0; q < solid; q += 3) tctx.fillRect(X0 + q * SP, Y0 - 1, 1, 2);
         }
       }
     }
@@ -745,10 +888,11 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
 
     function frame(now: number) {
       raf = 0;
-      if (document.hidden || reduce) { last = 0; return; }
+      if (document.hidden || reduce || off) { last = 0; return; }
       const dt = last ? Math.min(1 / 30, (now - last) / 1000) : 1 / 60;
       last = now;
-      if (act >= 8) measure(); // the lower sections move with the page
+      if (HOME && act >= 8) measure(); // the lower sections move with the page
+      if (!HOME) measureHead();
       step(dt);
       draw();
       if (now - hudT > 100) { hud(); hudT = now; }
@@ -758,13 +902,14 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
     // reduced motion: everything at rest at its target, drawn once
     function drawStill() { time = 14; step(0, true); draw(); hud(); }
 
-    // start from the clover
+    // start from this page's own shape (the ridge, on home)
     layout();
-    for (let i = 0; i < N; i++) { target(i, 0, 0, 0, 0); px[i] = tx; py[i] = ty; pz[i] = tz; ca[i] = 0; ch[i] = th; cs[i] = ts; }
+    if (!HOME) { act = SHAPE[PAGE] ?? 30; measureHead(); }
+    for (let i = 0; i < N; i++) { target(i, act, 0, 0, 0); px[i] = tx; py[i] = ty; pz[i] = tz; ca[i] = 0; ch[i] = th; cs[i] = ts; }
     let scrollRaf = 0;
     addEventListener('scroll', () => { if (!scrollRaf) scrollRaf = requestAnimationFrame(() => { scrollRaf = 0; readScroll(); }); }, { passive: true });
     addEventListener('resize', () => { layout(); readScroll(); });
-    document.addEventListener('visibilitychange', () => { if (!document.hidden && !reduce && !raf) raf = requestAnimationFrame(frame); });
+    document.addEventListener('visibilitychange', () => { if (!document.hidden && !reduce && !off && !raf) raf = requestAnimationFrame(frame); });
     reduceMq.addEventListener('change', () => { reduce = reduceMq.matches; readScroll(); });
     let hoverRaf = 0;
     addEventListener('pointerover', () => { if (reduce && !hoverRaf) hoverRaf = requestAnimationFrame(() => { hoverRaf = 0; drawStill(); }); }, { passive: true });
