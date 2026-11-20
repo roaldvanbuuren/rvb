@@ -27,11 +27,17 @@
 //  24 projects   one small community per project          25 lost      the dots drift and scatter (404)
 //  30 field      the quiet star field under every header  31 still     nothing moving (an article's body)
 // Article light mode switches the whole layer off.
-interface Props { page?: 'home' | 'journal' | 'article' | 'press' | 'work' | 'story' | 'projects' | 'lost' }
-const { page = 'home' } = Astro.props;
+//
+// Paint (the /starry home page): the same agents and acts, painted. Each agent is a brushstroke laid along its own motion
+// and a flow field, onto a canvas that keeps its paint and slowly dries back to night blue, so the picture is always
+// being repainted. Pressure is turbulence: calm lays long level strokes, pressure winds the field into Van Gogh's
+// eddies and turns the strokes from Prussian blue through lemon to chrome yellow. A few thousand free strokes paint
+// the sky between the agents. The canvas is lit as impasto when it is shown.
+interface Props { page?: 'home' | 'journal' | 'article' | 'press' | 'work' | 'story' | 'projects' | 'lost'; paint?: boolean }
+const { page = 'home', paint = false } = Astro.props;
 const home = page === 'home';
 ---
-<div class="t-bg" aria-hidden="true" data-page={page}>
+<div class="t-bg" aria-hidden="true" data-page={page} data-paint={paint ? '1' : undefined}>
   <canvas id="swarm"></canvas>
   {home && <div class="t-sky"></div>}
   <div class="t-shade"></div>
@@ -67,6 +73,12 @@ const home = page === 'home';
   .t-shade{position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;
     background:linear-gradient(90deg,rgba(11,11,11,.92) 0%,rgba(11,11,11,.74) 28%,rgba(11,11,11,.18) 50%,rgba(11,11,11,0) 62%)}
   :global(html.t-story) .t-shade{opacity:1}
+  /* paint: the canvas paints its own sky, on night blue */
+  .t-bg[data-paint]{background:#101830}
+  .t-bg[data-paint] .t-sky{display:none}
+  .t-bg[data-paint] .t-shade{background:linear-gradient(90deg,rgba(9,13,26,.9) 0%,rgba(9,13,26,.7) 28%,rgba(9,13,26,.16) 50%,rgba(9,13,26,0) 62%)}
+  .t-bg[data-paint] .t-grain{opacity:.07;box-shadow:inset 0 0 240px 70px rgba(4,6,14,.6)}
+  @media (max-width:700px){.t-bg[data-paint] .t-shade{background:linear-gradient(0deg,rgba(9,13,26,.94) 0%,rgba(9,13,26,.8) 34%,rgba(9,13,26,.18) 56%,rgba(9,13,26,0) 66%)}}
   .t-grain{position:absolute;inset:0;background-image:var(--noise);background-size:180px;opacity:.11;filter:grayscale(1);mix-blend-mode:screen;
     box-shadow:inset 0 0 220px 60px rgba(0,0,0,.55)}
   @media (max-width:700px){
@@ -103,7 +115,7 @@ const home = page === 'home';
   const railItems = Array.from(document.querySelectorAll<HTMLElement>('.t-rail li'));
   const steps = Array.from(document.querySelectorAll<HTMLElement>('main [data-act]'));
 
-  const PAGE = (bg?.dataset.page || 'home') as string, HOME = PAGE === 'home';
+  const PAGE = (bg?.dataset.page || 'home') as string, HOME = PAGE === 'home', PAINT = bg?.dataset.paint === '1';
   if (bg && canvas && (steps.length || !HOME)) {
     const reduceMq = matchMedia('(prefers-reduced-motion: reduce)');
     let reduce = reduceMq.matches;
@@ -238,7 +250,7 @@ void main(){ gl_Position = vec4(aPos * uScale, 0.0, 1.0); vCol = aCol; }`;
 precision mediump float;
 in vec4 vCol;
 out vec4 o;
-void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
+void main(){ o = vec4(vCol.rgb * vCol.a, vCol.a); }`;
 
     // ---------- the population ----------
     const N = small ? 4200 : 9000, TRAIL = 160, RING = 72, C = 7, HUBS = 16, MSG = small ? 140 : 260;
@@ -322,7 +334,10 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
     const lpos = new Float32Array(LINES * 4), lcol = new Float32Array(LINES * 8);
 
     // heat: blue (calm) > bone > amber > red (pressure)
-    const HS = [[0, 0.5, 0.66, 0.86], [0.4, 0.86, 0.87, 0.82], [0.72, 0.96, 0.66, 0.25], [1, 0.88, 0.32, 0.15]];
+    // paint: Prussian blue > ultramarine > cerulean > lemon white > chrome yellow > orange
+    const HS = PAINT
+      ? [[0, 0.07, 0.13, 0.36], [0.3, 0.17, 0.33, 0.7], [0.5, 0.42, 0.63, 0.82], [0.62, 0.9, 0.89, 0.7], [0.8, 0.97, 0.77, 0.2], [1, 0.9, 0.42, 0.12]]
+      : [[0, 0.5, 0.66, 0.86], [0.4, 0.86, 0.87, 0.82], [0.72, 0.96, 0.66, 0.25], [1, 0.88, 0.32, 0.15]];
     const heatRGB = (h: number, out: Float32Array, o: number, m: number) => {
       h = clamp(h);
       let k = 0; while (k < HS.length - 2 && h > HS[k + 1][0]) k++;
@@ -330,7 +345,9 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
       out[o] = (a[1] + (b[1] - a[1]) * u) * m; out[o + 1] = (a[2] + (b[2] - a[2]) * u) * m; out[o + 2] = (a[3] + (b[3] - a[3]) * u) * m;
     };
 
-    const pos = new Float32Array(M * 3), col = new Float32Array(M * 4), size = new Float32Array(M);
+    const SKY = PAINT ? (small ? 1400 : 3200) : 0, MM = M + SKY;
+    const pos = new Float32Array(MM * 3), col = new Float32Array(MM * 4), size = new Float32Array(MM);
+    const dir = new Float32Array(MM * 2); // paint: each stroke's heading (its length says how far it is drawn out)
     const trX = new Float32Array(TRAIL), trY = new Float32Array(TRAIL), trH = new Float32Array(TRAIL);
     let trHead = 0, trailA = 0, netA = 0, gDim = 1;
 
@@ -365,6 +382,255 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
       }
     }
 
+
+    // ---------- paint ----------
+    // The flow the strokes are laid along: level and slow when calm; under pressure, eddies wind it up.
+    let frameDt = 1 / 60, still = false, turb = 0.4, skyA = 1;
+    const VK = 7, vcx = new Float32Array(VK + 4), vcy = new Float32Array(VK + 4), vs = new Float32Array(VK + 4), vr = new Float32Array(VK + 4);
+    let nV = VK, cOn = 0, cX = 0, cY = 0, cR = 0.3; // an act's own centre: the sun's halo, the clover
+    let fx = 0, fy = 0;
+    function placeEddies(tm: number) {
+      for (let k = 0; k < VK; k++) {
+        vcx[k] = (fract(k * 0.618 + 0.13) * 2 - 1) * A * 0.92 + 0.09 * Math.sin(tm * 0.04 + k * 1.7);
+        vcy[k] = (fract(k * 0.382 + 0.31) * 2 - 1) * 0.82 + 0.07 * Math.cos(tm * 0.05 + k);
+        vs[k] = (k % 2 ? -1 : 1) * (0.8 + 0.5 * fract(k * 0.7));
+        vr[k] = (0.16 + 0.16 * fract(k * 0.53)) * Math.min(1.2, A * 0.8 + 0.3);
+      }
+      nV = VK;
+      if (act === 2) for (let k = 0; k < 4; k++) { // every server its own eddy, spinning up as the crisis reaches it
+        vcx[nV] = hubX[k * 4]; vcy[nV] = hubY[k * 4]; vs[nV] = (k % 2 ? -1 : 1) * (0.4 + 1.6 * crisis[k]); vr[nV] = sR * 0.2; nV++;
+      }
+      cOn = act === 9 ? 1 : act === 11 ? 0.6 : act === 0 ? 0 : 0;
+      if (act === 9) { cX = sunX; cY = sunY; cR = Math.max(0.08, sunR); }
+      else if (act === 11) { cX = closeX; cY = closeY; cR = 0.35; }
+    }
+    function flow(x: number, y: number, tm: number) {
+      const lx = 1, ly = 0.32 * Math.sin(x * 2.2 + tm * 0.12) + 0.18 * Math.sin(y * 3.1 - tm * 0.08);
+      let ox = 0, oy = 0;
+      for (let k = 0; k < nV; k++) {
+        const dx = x - vcx[k], dy = y - vcy[k], r2 = dx * dx + dy * dy, c2 = vr[k] * vr[k];
+        if (r2 > c2 * 16) continue;
+        const f = (vs[k] * vr[k] * 2 / (r2 + c2)) * Math.exp(-r2 / (c2 * 6));
+        ox -= dy * f; oy += dx * f;
+      }
+      fx = lx * (1 - turb) + ox * turb * 1.8; fy = ly * (1 - turb) + oy * turb * 1.8;
+      if (cOn) { // rings round the centre, like the halos round his suns and stars
+        const dx = x - cX, dy = y - cY, r = Math.sqrt(dx * dx + dy * dy) + 1e-4, w = cOn * Math.exp(-((r / (cR * 2.6)) ** 2)) * 3;
+        fx += (-dy / r) * w; fy += (dx / r) * w;
+      }
+      const m = Math.sqrt(fx * fx + fy * fy) + 1e-5; fx /= m; fy /= m;
+    }
+    const heroRidge = (x: number) => {
+      const imgW = Math.max(2 * A * 1.04, 2.1), imgH = imgW / 3, x0 = wide ? -imgW / 2 : -imgW * 0.6, top = -1.02 + imgH;
+      return top - ridgeAt((x - x0) / imgW) * imgH - hz * 0.95;
+    };
+
+    // the free strokes: the sky between the agents
+    const kx = new Float32Array(SKY), ky = new Float32Array(SKY), kage = new Float32Array(SKY), klife = new Float32Array(SKY), kh = new Float32Array(SKY), kb = new Float32Array(SKY), ka = new Float32Array(SKY);
+    const spawnSky = (k: number, any: boolean) => {
+      kx[k] = (Math.random() * 2 - 1) * A * 1.06; ky[k] = Math.random() * 2.1 - 1.05;
+      klife[k] = 3 + Math.random() * 7; kage[k] = any ? Math.random() * klife[k] : 0;
+      const r = Math.random(); kh[k] = r < 0.09 ? 0.6 + Math.random() * 0.25 : r < 0.2 ? 0.42 + Math.random() * 0.1 : Math.random() * 0.36;
+      kb[k] = 0.6 + Math.random() * 0.4;
+    };
+    for (let k = 0; k < SKY; k++) spawnSky(k, true);
+
+    function paintStep(dt: number, snap: boolean, tm: number, P: number, G: number) {
+      let tt: number;
+      if (act === 0) tt = 0.55 + 0.4 * hz;
+      else if (act === 1) tt = 0.08 + 0.85 * P;
+      else if (act === 2) tt = 0.25 + 0.15 * (crisis[0] + crisis[1] + crisis[2] + crisis[3]);
+      else if (act === 4) tt = 0.06;
+      else if (act === 5) tt = 0.08 + 0.92 * G;
+      else if (act === 7) tt = 0.08;
+      else if (act === 3 || act === 6) tt = 0.32;
+      else tt = 0.38;
+      const sa = act === 0 ? 1 : act >= STORY0 && act <= STORY1 ? 0.6 : 0.5;
+      const e = snap ? 1 : Math.min(1, dt * 1.5);
+      turb += (tt - turb) * e; skyA += (sa - skyA) * e;
+      placeEddies(tm);
+      // agents: the stroke follows the agent's own motion, laid into the flow
+      const de = snap ? 1 : Math.min(1, dt * 5);
+      for (let j = 0; j < M; j++) {
+        const o3 = j * 3, o2 = j * 2;
+        if (col[j * 4 + 3] < 0.004) continue;
+        flow(pos[o3], pos[o3 + 1], tm);
+        let ux = fx, uy = fy;
+        if (j < N) { ux += vx[j] * 1.6; uy += vy[j] * 1.6; }
+        dir[o2] += (ux - dir[o2]) * de; dir[o2 + 1] += (uy - dir[o2 + 1]) * de;
+      }
+      // the sky
+      const spd = 0.05 + 0.09 * turb;
+      for (let k = 0; k < SKY; k++) {
+        const j = M + k, o3 = j * 3, o4 = j * 4, o2 = j * 2;
+        if (!snap) { kage[k] += dt; if (kage[k] > klife[k]) spawnSky(k, false); }
+        flow(kx[k], ky[k], tm);
+        if (!snap) { kx[k] += fx * spd * dt; ky[k] += fy * spd * dt; }
+        if (Math.abs(kx[k]) > A * 1.1 || Math.abs(ky[k]) > 1.1) { spawnSky(k, false); }
+        let a = Math.sin(Math.PI * clamp(kage[k] / klife[k])) * skyA * 0.3 * kb[k], h = kh[k] + 0.2 * turb * (kh[k] > 0.4 ? 1 : 0.4);
+        if (act === 0) { // over the Alps only, warmer toward the ridge at dusk; as you look up it becomes all sky
+          const ry = heroRidge(kx[k]), lift = ky[k] - ry, up = sstep(0.12, 0.8, hz);
+          a *= up + (1 - up) * sstep(-0.01, 0.06, lift);
+          h += (1 - up) * 0.4 * Math.exp(-((lift / 0.22) ** 2)) * (kh[k] < 0.4 ? 1 : 0.3);
+        }
+        pos[o3] = kx[k]; pos[o3 + 1] = ky[k]; pos[o3 + 2] = 0;
+        heatRGB(h, col, o4, 0.7 + 0.45 * kb[k]);
+        ka[k] += (a - ka[k]) * (snap ? 1 : Math.min(1, dt * 3));
+        col[o4 + 3] = ka[k];
+        size[j] = 5 + 6 * kb[k];
+        dir[o2] += (fx - dir[o2]) * de; dir[o2 + 1] += (fy - dir[o2 + 1]) * de;
+      }
+    }
+
+    // GL for paint: strokes into a canvas that keeps its paint, a pass that dries it back to night blue, and a pass that
+    // shows it lit as impasto
+    const SVS = `#version 300 es
+layout(location=0) in vec3 aPos;
+layout(location=1) in vec4 aCol;
+layout(location=2) in float aSize;
+layout(location=3) in vec2 aDir;
+uniform vec2 uScale;
+uniform vec2 uPx;
+out vec2 vUv;
+out vec4 vCol;
+out float vSeed;
+void main(){
+  vec2 cn = vec2(float(gl_VertexID & 1), float(gl_VertexID >> 1)) * 2.0 - 1.0;
+  float d = 1.0 / (1.0 + aPos.z * 0.12);
+  float m = length(aDir);
+  vec2 u = m > 1e-4 ? aDir / m : vec2(1.0, 0.0);
+  vec2 n = vec2(-u.y, u.x);
+  float L = max(aSize * 2.5, 8.0) * d * clamp(m, 0.8, 1.55);
+  float Wd = max(aSize * 0.85, 2.6) * d;
+  vec2 off = u * cn.x * L * 0.5 + n * cn.y * Wd * 0.5;
+  gl_Position = aCol.a < 0.003 ? vec4(2.0, 2.0, 2.0, 1.0) : vec4(aPos.xy * d * uScale + off * uPx, 0.0, 1.0);
+  vUv = cn; vCol = aCol;
+  vSeed = fract(sin(float(gl_InstanceID) * 12.9898) * 43758.5453);
+}`;
+    const SFS = `#version 300 es
+precision mediump float;
+in vec2 vUv;
+in vec4 vCol;
+in float vSeed;
+uniform float uGain;
+out vec4 o;
+float h1(float x){ return fract(sin(x) * 43758.5453); }
+void main(){
+  float u = vUv.x, v = vUv.y;
+  float taper = 1.0 - 0.45 * smoothstep(0.2, 1.0, u) - 0.25 * smoothstep(-0.4, -1.0, u);
+  float edge = 1.0 - smoothstep(taper * 0.62, taper, abs(v));
+  float head = 1.0 - smoothstep(0.82, 1.0, abs(u));
+  float lane = floor((v * 0.5 + 0.5) * 6.0);
+  float b = h1(lane * 7.13 + vSeed * 91.7);
+  float dry = smoothstep(-0.1, 1.0, u) * (1.0 - b) * 0.9;            // the brush running dry toward the end of the stroke
+  float a = edge * head * clamp(0.62 + 0.38 * b - dry, 0.0, 1.0) * vCol.a * uGain;
+  float shade = 0.8 + 0.32 * b + 0.12 * (1.0 - abs(v));               // bristle grooves and the ridge of paint
+  o = vec4(vCol.rgb * shade * a, min(a, 1.0));
+}`;
+    const QVS = `#version 300 es
+out vec2 vUv;
+void main(){ vec2 p = vec2(float((gl_VertexID << 1) & 2), float(gl_VertexID & 2)) * 2.0 - 1.0; vUv = p * 0.5 + 0.5; gl_Position = vec4(p, 0.0, 1.0); }`;
+    const DFS = `#version 300 es
+precision mediump float;
+in vec2 vUv;
+uniform float uK;
+out vec4 o;
+void main(){ vec3 c = mix(vec3(0.05, 0.075, 0.16), vec3(0.085, 0.11, 0.2), smoothstep(1.0, 0.15, vUv.y)); o = vec4(c * uK, uK); }`;
+    const CFS = `#version 300 es
+precision mediump float;
+in vec2 vUv;
+uniform sampler2D uTex;
+uniform vec2 uTexel;
+out vec4 o;
+float lum(vec2 p){ return dot(texture(uTex, p).rgb, vec3(0.3, 0.59, 0.11)); }
+void main(){
+  vec3 c = texture(uTex, vUv).rgb;
+  vec2 e = uTexel * 1.5;
+  float gx = lum(vUv + vec2(e.x, 0.0)) - lum(vUv - vec2(e.x, 0.0));
+  float gy = lum(vUv + vec2(0.0, e.y)) - lum(vUv - vec2(0.0, e.y));
+  vec3 n = normalize(vec3(-gx * 5.0, -gy * 5.0, 1.0));
+  float d = dot(n, normalize(vec3(-0.45, 0.55, 0.7)));
+  float l = dot(c, vec3(0.3, 0.59, 0.11));
+  vec3 col = c * (0.78 + 0.3 * d) + pow(max(d, 0.0), 30.0) * 0.18 * l;
+  float weave = sin(gl_FragCoord.x * 1.7) * sin(gl_FragCoord.y * 1.7) * 0.012;
+  o = vec4(col + weave, 1.0);
+}`;
+    let sprog: WebGLProgram | null = null, dprog: WebGLProgram | null = null, cprog: WebGLProgram | null = null;
+    let suScale: WebGLUniformLocation | null = null, suPx: WebGLUniformLocation | null = null, suGain: WebGLUniformLocation | null = null;
+    let duK: WebGLUniformLocation | null = null, cuTex: WebGLUniformLocation | null = null, cuTexel: WebGLUniformLocation | null = null;
+    let vaoA: WebGLVertexArrayObject | null = null, vaoS: WebGLVertexArrayObject | null = null, vaoQ: WebGLVertexArrayObject | null = null, bDir: WebGLBuffer | null = null;
+    let fbo: WebGLFramebuffer | null = null, ftex: WebGLTexture | null = null, half = false, fresh = true;
+    if (PAINT && gl && prog) {
+      const sh = (type: number, src: string) => { const q = gl.createShader(type)!; gl.shaderSource(q, src); gl.compileShader(q); return q; };
+      const link = (v: string, f: string) => { const p = gl.createProgram()!; gl.attachShader(p, sh(gl.VERTEX_SHADER, v)); gl.attachShader(p, sh(gl.FRAGMENT_SHADER, f)); gl.linkProgram(p); return gl.getProgramParameter(p, gl.LINK_STATUS) ? p : null; };
+      sprog = link(SVS, SFS); dprog = link(QVS, DFS); cprog = link(QVS, CFS);
+      if (!sprog || !dprog || !cprog) sprog = null;
+      else {
+        half = !!gl.getExtension('EXT_color_buffer_float');
+        bDir = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, bDir); gl.bufferData(gl.ARRAY_BUFFER, dir, gl.DYNAMIC_DRAW);
+        // the paint buffers hold agents then sky; two VAOs read the same buffers from either start, one instance per stroke
+        const big = (b: WebGLBuffer | null, data: Float32Array) => { gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, data, gl.DYNAMIC_DRAW); };
+        big(bPos, pos); big(bCol, col); big(bSize, size);
+        const vao = (first: number) => {
+          const v = gl.createVertexArray()!; gl.bindVertexArray(v);
+          const at = (b: WebGLBuffer | null, loc: number, n: number) => { gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, n, gl.FLOAT, false, 0, first * n * 4); gl.vertexAttribDivisor(loc, 1); };
+          at(bPos, 0, 3); at(bCol, 1, 4); at(bSize, 2, 1); at(bDir, 3, 2);
+          return v;
+        };
+        vaoA = vao(0); vaoS = vao(M); vaoQ = gl.createVertexArray();
+        gl.bindVertexArray(null);
+        suScale = gl.getUniformLocation(sprog, 'uScale'); suPx = gl.getUniformLocation(sprog, 'uPx'); suGain = gl.getUniformLocation(sprog, 'uGain');
+        duK = gl.getUniformLocation(dprog, 'uK'); cuTex = gl.getUniformLocation(cprog, 'uTex'); cuTexel = gl.getUniformLocation(cprog, 'uTexel');
+        fbo = gl.createFramebuffer();
+      }
+    }
+    function paintLayout() {
+      if (!gl || !sprog || !fbo) return;
+      const w = canvas!.width, h = canvas!.height;
+      if (ftex) gl.deleteTexture(ftex);
+      ftex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, ftex);
+      if (half) gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, w, h, 0, gl.RGBA, gl.HALF_FLOAT, null);
+      else gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fbo); gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, ftex, 0);
+      if (half && gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) { half = false; gl.bindFramebuffer(gl.FRAMEBUFFER, null); return paintLayout(); }
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.useProgram(sprog); gl.uniform2f(suScale, 1 / A, 1); gl.uniform2f(suPx, 2 / W, 2 / H);
+      gl.useProgram(cprog); gl.uniform2f(cuTexel, 1 / w, 1 / h);
+      fresh = true;
+    }
+    function drawPaint() {
+      if (!gl || !sprog || !dprog || !cprog || !fbo || !ftex) return;
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+      gl.viewport(0, 0, canvas!.width, canvas!.height);
+      gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+      // dry: the canvas slowly goes back to night blue, so the painting keeps being repainted
+      const k = still || fresh ? 1 : 1 - Math.exp(-frameDt * (half ? 0.55 : 2.5));
+      fresh = false;
+      gl.useProgram(dprog); gl.uniform1f(duK, k); gl.bindVertexArray(vaoQ); gl.drawArrays(gl.TRIANGLES, 0, 3);
+      if (netA > 0.01 && lineCount) {
+        gl.useProgram(lprog); gl.bindVertexArray(vaoL);
+        gl.bindBuffer(gl.ARRAY_BUFFER, bLPos); gl.bufferSubData(gl.ARRAY_BUFFER, 0, lpos);
+        gl.bindBuffer(gl.ARRAY_BUFFER, bLCol); gl.bufferSubData(gl.ARRAY_BUFFER, 0, lcol);
+        gl.drawArrays(gl.LINES, 0, lineCount * 2);
+      }
+      gl.bindBuffer(gl.ARRAY_BUFFER, bPos); gl.bufferSubData(gl.ARRAY_BUFFER, 0, pos);
+      gl.bindBuffer(gl.ARRAY_BUFFER, bCol); gl.bufferSubData(gl.ARRAY_BUFFER, 0, col);
+      gl.bindBuffer(gl.ARRAY_BUFFER, bSize); gl.bufferSubData(gl.ARRAY_BUFFER, 0, size);
+      gl.bindBuffer(gl.ARRAY_BUFFER, bDir); gl.bufferSubData(gl.ARRAY_BUFFER, 0, dir);
+      gl.useProgram(sprog); gl.uniform1f(suGain, still ? 2.4 : Math.min(1, frameDt * 36)); // paint laid per second, not per frame
+      if (SKY) { gl.bindVertexArray(vaoS); gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, SKY); }
+      gl.bindVertexArray(vaoA); gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, M);
+      // show it, lit as impasto
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.viewport(0, 0, canvas!.width, canvas!.height);
+      gl.disable(gl.BLEND);
+      gl.useProgram(cprog); gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, ftex); gl.uniform1i(cuTex, 0);
+      gl.bindVertexArray(vaoQ); gl.drawArrays(gl.TRIANGLES, 0, 3);
+      gl.bindVertexArray(null);
+    }
+
     function layout() {
       W = canvas!.clientWidth || innerWidth; H = canvas!.clientHeight || innerHeight;
       A = W / H; wide = A > 1.15;
@@ -377,6 +643,7 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
       }
       const s = stage(act); scx = s[0]; scy = s[1]; sR = s[2];
       topLayout();
+      if (PAINT) paintLayout();
     }
 
     // ---------- pointer: local pressure ----------
@@ -435,15 +702,15 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
           if (q < 4) {
             const u = rankH[i], ry = top - ridgeAt(u) * imgH;
             rx = x0 + u * imgW; ry2 = ry - Math.abs(gy[i]) * 0.0035 + 0.0015 * Math.sin(tm * 1.2 + ph[i]);
-            ra = (0.42 + 0.2 * br[i]) * (0.85 + 0.15 * Math.sin(tm * 0.9 + ph[i])); rs = 2.4; rh = 0.56 + 0.08 * s;
+            ra = (0.42 + 0.2 * br[i]) * (0.85 + 0.15 * Math.sin(tm * 0.9 + ph[i])); rs = 2.4; rh = PAINT ? 0.58 + 0.1 * s : 0.56 + 0.08 * s;
           } else if (q < 9) {
             const u = (sx[i] + 1) / 2, ry = top - ridgeAt(u) * imgH, d = Math.pow((sy[i] + 1) / 2, 1.7);
             rx = x0 + u * imgW; ry2 = ry - 0.01 - d * (ry + 1.05);
-            ra = 0.2 * Math.pow(1 - d, 1.6) * br[i]; rs = 2.2; rh = 0.8 + 0.08 * s;
+            ra = (PAINT ? 0.42 : 0.2) * Math.pow(1 - d, PAINT ? 0.9 : 1.6) * br[i]; rs = 2.2; rh = PAINT ? 0.04 + 0.2 * d * d + 0.08 * s : 0.8 + 0.08 * s;
           } else {
             const u = (sx[i] + 1) / 2, ry = top - ridgeAt(u) * imgH;
             rx = sx[i] * A * 1.02 + 0.01 * Math.sin(tm * 0.05 + ph[i]); ry2 = ry + 0.06 + ((sy[i] + 1) / 2) * (1 - ry);
-            ra = 0.1 * br[i] * (0.6 + 0.4 * Math.sin(tm * 1.7 + ph[i] * 3)); rs = 2; rh = 0.3 + 0.1 * s;
+            ra = (PAINT ? 0.3 : 0.1) * br[i] * (0.6 + 0.4 * Math.sin(tm * 1.7 + ph[i] * 3)); rs = PAINT ? 3.2 : 2; rh = PAINT ? 0.7 + 0.18 * s : 0.3 + 0.1 * s;
           }
           ry2 -= sink;
           tz = 0;
@@ -458,7 +725,7 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
           tx = rx + (sx2 - rx) * zs; ty = ry2 + (sy2 - ry2) * zs;
           ta = ra * (1 - zs) + (0.16 + 0.6 * z * near) * br[i] * zs;
           ts = rs * (1 - zs) + (2.2 + 4.5 * z * near) * zs;
-          th = rh * (1 - zs) + (0.32 + 0.12 * s) * zs;
+          th = rh * (1 - zs) + (PAINT ? 0.64 + 0.2 * s * near : 0.32 + 0.12 * s) * zs;
           return 3;
         }
         case 11: {
@@ -711,13 +978,19 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
       netA += ((act === 2 ? 1 : 0) - netA) * (snap ? 1 : Math.min(1, dt * 2));
       writeNetwork(tm);
       lines(dt, snap);
+      if (PAINT) paintStep(dt, snap, tm, P, G);
     }
 
     function writeAgent(i: number, h: number) {
       const o3 = i * 3, o4 = i * 4;
       pos[o3] = px[i]; pos[o3 + 1] = py[i]; pos[o3 + 2] = pz[i];
       heatRGB(h, col, o4, 1);
-      col[o4 + 3] = Math.min(1.6, ca[i] * 1.5 * gDim * (1 + hT[i] * 0.8));
+      if (PAINT) { // no two strokes the same mix: lighter or darker, and a few blues pulled toward viridian
+        const m = 0.78 + 0.4 * br[i] * (0.5 + 0.5 * Math.sin(ph[i] * 7));
+        col[o4] *= m; col[o4 + 1] *= m; col[o4 + 2] *= m;
+        if (i % 7 === 3 && h < 0.5) { col[o4] = col[o4] * 0.7 + 0.08; col[o4 + 1] = col[o4 + 1] * 0.7 + 0.2; col[o4 + 2] = col[o4 + 2] * 0.7 + 0.1; }
+      }
+      col[o4 + 3] = PAINT ? Math.min(0.92, ca[i] * (act >= 7 ? 0.62 : 1.25) * gDim * (1 + hT[i] * 0.8)) : Math.min(1.6, ca[i] * 1.5 * gDim * (1 + hT[i] * 0.8));
       size[i] = cs[i] * 1.45 * (1 + hT[i] * 0.5);
     }
     function writeTrail(snap: boolean) {
@@ -853,6 +1126,7 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
 
     function draw() {
       if (!gl || !prog || !lprog) return;
+      if (PAINT && sprog) return drawPaint();
       gl.clear(gl.COLOR_BUFFER_BIT);
       if (netA > 0.01 && lineCount) {
         gl.useProgram(lprog); gl.bindVertexArray(vaoL);
@@ -890,7 +1164,7 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
       raf = 0;
       if (document.hidden || reduce || off) { last = 0; return; }
       const dt = last ? Math.min(1 / 30, (now - last) / 1000) : 1 / 60;
-      last = now;
+      last = now; frameDt = dt; still = false;
       if (HOME && act >= 8) measure(); // the lower sections move with the page
       if (!HOME) measureHead();
       step(dt);
@@ -900,7 +1174,7 @@ void main(){ o = vec4(vCol.rgb * vCol.a, 1.0); }`;
     }
 
     // reduced motion: everything at rest at its target, drawn once
-    function drawStill() { time = 14; step(0, true); draw(); hud(); }
+    function drawStill() { time = 14; still = true; step(0, true); draw(); hud(); }
 
     // start from this page's own shape (the ridge, on home)
     layout();

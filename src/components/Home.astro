@@ -1,0 +1,351 @@
+---
+import Base from '../layouts/Base.astro';
+import Swarm from './Swarm.astro';
+import { getPosts, links, postUrl, formatDate, isoDate } from '../lib/posts';
+
+// The home page, shared by / (the swarm in dots) and /starry (the same swarm, painting).
+interface Props { paint?: boolean }
+const { paint = false } = Astro.props;
+
+const all = await getPosts();
+const latest = all.slice(0, 5);
+
+// Pull quotes: each must be a verbatim line from its article. The build fails if one drifts.
+function pull(slug: string, quote: string) {
+  const post = all.find((p) => p.id === slug);
+  if (!post || !post.body?.includes(quote)) throw new Error(`Pull quote is not a verbatim line of "${slug}"`);
+  return post;
+}
+const bandSlug = 'gaming-is-a-lens-for-human-behaviour-and-we-re-barely-scratching-the-surface';
+const bandQuote = 'We have built, almost by accident, the most heavily instrumented environment for studying human behaviour that has ever existed, and we mostly use it to sell battle passes.';
+const bandPost = pull(bandSlug, bandQuote);
+
+// Stops on the horizon line. Copy is from the About timeline; nothing added.
+const road = [
+  { date: '2008 to 2011', name: 'Fnatic', place: 'London', text: 'Joined as an editor and worked my way up.' },
+  { date: '2012 to 2022', name: 'FACEIT', place: 'Milano | London', text: "One of FACEIT's first hires, there from its first year through to its acquisition." },
+  { date: '2024 to now', name: 'ELO', place: 'London', text: 'We saw a common thread in all success in gaming: community.', lit: true },
+  { date: 'March 2026', name: 'Lumen', place: 'London', text: 'ELO launches Lumen with design partners, pivoting from an agency to a tech and AI-native business.' },
+  { date: 'July 2026', name: 'Turin', text: 'Moved to Turin.' },
+];
+
+const products = [
+  { name: 'Lumen', text: 'Community intelligence for Discord. Shows community teams what to fix and why.', href: links.lumen, lead: true },
+  { name: 'ELO Collective', text: 'Builds communities that grow themselves.', href: links.elo },
+  { name: 'ELO Labs', text: 'Finds out how people behave in them, together and under pressure.', href: links.labs },
+  { name: 'ELO Data', text: 'Turns what holds up into data for AI.', href: links.data },
+];
+const worksWith = ['McLaren', 'Torpor Games', 'NASCAR', 'Team Liquid', 'NSE', 'Burda Principal Investments', 'TUM Venture Labs', 'The Wolf'];
+const beyond = ['History, mostly Rome and Egypt', 'Statecraft, politics and power', 'Science fiction', 'Big-idea non-fiction', 'AI that makes us more human', 'Europe', 'English legend and folklore', 'PC games', 'Rain, with a good coat'];
+---
+<Base
+  title="Roald van Buuren"
+  description="Roald van Buuren believes the way people play shows us who they really are, and where society is heading next. Co-founder of ELO Collective."
+>
+  <Swarm paint={paint} />
+
+  <div class="thesis">
+    <section class="t-step t-hero" data-act="0" aria-label="Introduction">
+      <div class="t-pin">
+        <div class="t-hero-in wrap">
+          <h1 class="h1 t-h1">Roald van Buuren</h1>
+          <p class="t-belief">I believe the way people play, and the communities they build around it, show us who they really are and where society is heading next.</p>
+          <p class="t-lede">So I'm building ways to see it: records of how people behave under pressure, turned into simulations of what happens next.</p>
+          <a class="t-cue" href="#signal"><span>Scroll</span><i></i></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="t-step" data-act="1" id="signal" aria-labelledby="h-signal">
+      <div class="t-pin">
+        <div class="t-card rv">
+          <p class="t-eye">What I saw</p>
+          <h2 class="t-h2" id="h-signal">Same player. Same map. Same round. The only variable is pressure.</h2>
+          <p>I spent ten years at FACEIT, a platform built around competitive Counter-Strike, and one pattern kept coming back. Up 12–3 with full money, a player holds the angle and lets the enemy come to him. Down 11–12 with nothing in the bank, the same player in the same spot peeks early and alone.</p>
+          <p>Nothing about the game changed between those two rounds except the weight on his shoulders. I've come to believe that weight is one of the most important things we can measure about people.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="t-step" data-act="2" aria-labelledby="h-gather">
+      <div class="t-pin">
+        <div class="t-card rv">
+          <p class="t-eye">Where people gather</p>
+          <h2 class="t-h2" id="h-gather">Around every game, people build a community.</h2>
+          <p>That is where they show the most. Discord servers, guilds, clans and fan groups have leaders and lurkers, in-jokes and feuds. When a patch lands, a scandal breaks or a final is lost, they react the way towns react to news, and you can watch it spread from one server to the next.</p>
+          <p>I believe these communities are the closest thing we have to a living, observable model of society. They are also where most of my work is now: at ELO we build Lumen, which reads Discord communities and shows the people running them what to fix and why.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="t-step" data-act="3" aria-labelledby="h-scale">
+      <div class="t-pin">
+        <div class="t-card rv">
+          <p class="t-eye">What I noticed next</p>
+          <h2 class="t-h2" id="h-scale">Now count all of it: billions of people, every day.</h2>
+          <p>Fifteen years in this industry showed me how much of this is recorded: every match, every message, every trade and every argument. Almost all of it is logged, and very little of it is studied.</p>
+          <figure class="t-quote">
+            <blockquote><p>{bandQuote}</p></blockquote>
+            <figcaption><a href={postUrl(bandPost)}>From my journal</a></figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="t-step" data-act="4" aria-labelledby="h-record">
+      <div class="t-pin">
+        <div class="t-card rv">
+          <p class="t-eye">Why it matters</p>
+          <h2 class="t-h2" id="h-record">Every decision, kept with its context.</h2>
+          <p>The score, the clock, the money, the people watching and the people relying on you. I believe that once you capture all of that next to what someone actually did, pressure stops being a feeling. It becomes something you can measure, person by person.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="t-step" data-act="5" aria-labelledby="h-swarm">
+      <div class="t-pin">
+        <div class="t-card rv">
+          <p class="t-eye">What I believe</p>
+          <h2 class="t-h2" id="h-swarm">Agents built from what people actually did.</h2>
+          <p>I think every agent in a simulation should carry a response to pressure that was measured from real people: how it moves, who it follows, when it holds and when it breaks. Put thousands of them together and you get a population that behaves like the people it came from.</p>
+          <p class="t-try"><span class="t-try-fine">Move through them. You are the pressure.</span><span class="t-try-touch">Touch them. You are the pressure.</span></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="t-step" data-act="6" aria-labelledby="h-forward">
+      <div class="t-pin">
+        <div class="t-card rv">
+          <p class="t-eye">Where this goes</p>
+          <h2 class="t-h2" id="h-forward">Then run it forward, thousands of times.</h2>
+          <p>Change the conditions, raise the pressure, and watch where a population fractures, where it holds and where it runs. Run it often enough and the futures start to agree with each other.</p>
+          <p>I believe this is how we will learn to predict what societies do next: markets, elections, and the way people respond to the next crisis. It's what I'm working towards.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="t-step t-end" data-act="7" aria-labelledby="h-end">
+      <div class="t-pin">
+        <div class="t-end-in wrap rv">
+          <h2 class="t-h2 t-end-h" id="h-end">Games are a lens on human behaviour. I'm building the tools to look through it.</h2>
+          <div class="slits">
+            <a class="slit" href="/writing">Read the journal<i></i></a>
+            <a class="slit" href="/work">The work<i></i></a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  {latest.length > 0 && (
+    <section class="film grained t-after" id="writing" data-act="8">
+      <div class="glows" aria-hidden="true"><div class="glow glow-d" aria-hidden="true"></div><div class="glow glow-d2" aria-hidden="true"></div></div>
+      <div class="wrap rv">
+        <p class="f-eyebrow">Dispatches</p>
+        <div class="credits">
+          {latest.map((p) => (
+            <a class="credit" href={postUrl(p)}>
+              <span class="c-top">
+                <time datetime={isoDate(p.data.date)}>{formatDate(p.data.date)}</time>
+                <span class="c-title">{p.data.title}</span>
+              </span>
+              <span class="c-sum">{p.data.summary}</span>
+            </a>
+          ))}
+        </div>
+        <p class="f-more"><a class="slit" href="/writing">See all writing<i></i></a></p>
+      </div>
+    </section>
+  )}
+
+  <section class="world grained t-after" id="about" aria-label="About" data-act="9">
+      <div class="glows" aria-hidden="true"><div class="glow glow-s" aria-hidden="true"></div></div>
+    <div class="world-stage">
+    <div class="world-sky">
+      <div class="orb orb-sun" aria-hidden="true"></div>
+      <div class="wrap rv">
+        <p class="scene-line">Fifteen years inside the games industry, watching millions of people organise themselves. Now I study what that reveals about where AI, technology and society are heading.</p>
+        <p class="f-mono">Amsterdam &gt; London &gt; Torino</p>
+      </div>
+    </div>
+    <div class="world-ground">
+      <div class="horizon rv" aria-hidden="true"></div>
+      <div class="wrap rv">
+        <p class="f-eyebrow road-eyebrow" id="road">The road so far</p>
+        <ol class="road">
+          {road.map((s, i) => (
+            <li style={`--i:${i}`}>
+              <span class="r-date">{s.date}</span>
+              <span class={`r-name${s.lit ? ' lit' : ''}`}>{s.name}</span>
+              {s.place && <span class="r-place">{s.place}</span>}
+              <span class="r-text">{s.text}</span>
+            </li>
+          ))}
+        </ol>
+        <p class="f-more"><a class="slit" href="/work">Work, in more detail<i></i></a> <a class="slit" href="/press">Press, talks and podcasts<i></i></a></p>
+      </div>
+    </div>
+    <div class="road-dots" aria-hidden="true">{road.map((_, i) => <i style={`--i:${i}`}></i>)}</div>
+    </div>
+  </section>
+
+  <section class="film grained t-after" id="now" data-act="10">
+      <div class="glows" aria-hidden="true"><div class="glow glow-w" aria-hidden="true"></div><div class="glow glow-w2" aria-hidden="true"></div></div>
+    <div class="wrap rv">
+      <p class="f-eyebrow">The work</p>
+      <p class="f-lede">ELO turns how people behave in games and online communities into lessons for the real world.</p>
+      <div class="prods">
+        {products.map((p) => (
+          <a class={`prod${p.lead ? ' lead' : ''}`} href={p.href} target="_blank" rel="noopener">
+            <span class="p-name">{p.name}</span>
+            <span class="p-text">{p.text}</span>
+          </a>
+        ))}
+      </div>
+      <p class="f-mono-block"><b>ELO works with</b><br />{worksWith.join(', ')}, and many more</p>
+      <p class="f-mono-block"><b>Beyond the work</b><br />{beyond.join(' · ')}<br />Currently (re-)playing: Assassin's Creed Odyssey.</p>
+    </div>
+  </section>
+
+  <section class="close grained t-after" id="contact" data-act="11">
+    <div class="glow glow-c" aria-hidden="true"></div>
+    <div class="wrap rv">
+      <h2 class="h1">Send word.</h2>
+      <p class="sub">Messages reach me on X, LinkedIn or email.</p>
+      <div class="slits">
+        <a class="slit" href={links.x} target="_blank" rel="noopener">Follow on X<i></i></a>
+        <a class="slit" href={links.linkedin} target="_blank" rel="noopener">LinkedIn<i></i></a>
+        <a class="slit" href={links.email}>Email<i></i></a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---- the thesis: a tall scroll; each step pins its text for a while; the swarm (Swarm.astro) plays behind ---- */
+  .thesis{position:relative;z-index:1}
+  .t-step{position:relative;height:150svh}
+  .t-hero{height:170svh}
+  .t-end{height:130svh}
+  .t-pin{position:sticky;top:0;height:100svh;display:flex;align-items:center}
+  .t-card{width:min(520px,calc(100% - 48px));margin-left:max(24px,calc(50% - 576px))}
+  .t-card p{margin:0 0 16px;font-size:17px;line-height:1.65;color:#C9C9BE}
+  .t-eye{margin:0 0 26px !important;font:500 12px/1 var(--mono) !important;letter-spacing:.28em;text-transform:uppercase;color:var(--accent) !important}
+  .t-h2{margin:0 0 26px;font:400 clamp(40px,4.3vw,66px)/1.02 var(--disp);color:var(--bone);text-wrap:balance}
+
+  /* hero */
+  .t-hero .t-pin{align-items:center;justify-content:center}
+  /* the look up: the opening words lift and fade as the ridge sinks */
+  .t-hero-in{opacity:calc(1 - var(--hz,0) * 1.6);transform:translateY(calc(var(--hz,0) * -70px))}
+  .t-hero-in{display:flex;flex-direction:column;align-items:center;text-align:center;gap:26px;max-width:1000px}
+  .t-h1{font-size:clamp(60px,9.4vw,144px);line-height:.92;text-wrap:balance;text-shadow:0 0 60px rgba(11,11,11,.9)}
+  .t-belief{margin:0;max-width:820px;font:italic 400 clamp(26px,2.9vw,42px)/1.18 var(--serif);color:var(--warm);text-wrap:balance;text-shadow:0 0 30px rgba(11,11,11,.95)}
+  .t-lede{margin:0;max-width:560px;font-size:clamp(17px,1.4vw,19px);line-height:1.65;color:#D5D5C8;text-shadow:0 0 24px rgba(11,11,11,.95)}
+  .t-cue{margin-top:28px;display:inline-flex;flex-direction:column;align-items:center;gap:14px;text-decoration:none;color:var(--warm);font:500 11px/1 var(--mono);letter-spacing:.32em;text-transform:uppercase}
+  .t-cue i{display:block;width:1px;height:56px;background:linear-gradient(180deg,var(--accent),rgba(var(--accent-rgb),0));animation:t-cue 2.4s cubic-bezier(.22,1,.36,1) infinite;transform-origin:top}
+  @keyframes t-cue{0%{transform:scaleY(0);opacity:1}60%{transform:scaleY(1);opacity:1}100%{transform:scaleY(1);opacity:0}}
+  html.js .t-hero-in > *{opacity:0;transform:translateY(16px);animation:t-in 1.2s cubic-bezier(.22,1,.36,1) forwards}
+  html.js .t-hero-in > :nth-child(2){animation-delay:.15s}
+  html.js .t-hero-in > :nth-child(3){animation-delay:.35s}
+  html.js .t-hero-in > :nth-child(4){animation-delay:.9s}
+  @keyframes t-in{to{opacity:1;transform:none}}
+
+  /* the quote in act 2 */
+  .t-quote{margin:30px 0 0;padding:0 0 0 22px;border-left:2px solid var(--accent);box-shadow:-10px 0 18px -14px rgba(var(--accent-rgb),.8)}
+  .t-quote blockquote{margin:0}
+  .t-quote blockquote p{margin:0 0 12px;font:italic 400 clamp(22px,1.9vw,27px)/1.25 var(--serif);color:var(--warm)}
+  .t-quote figcaption a{font:500 11px/1 var(--mono);letter-spacing:.24em;text-transform:uppercase;color:var(--dim);text-decoration:none}
+  .t-quote figcaption a:hover{color:var(--accent-hover)}
+
+  .t-try{margin-top:26px !important;font:500 12px/1.6 var(--mono) !important;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-hover) !important}
+  .t-try-touch{display:none}
+  @media (hover:none){.t-try-fine{display:none}.t-try-touch{display:inline}}
+
+  /* the close of the story: the swarm becomes the horizon beneath it */
+  .t-end .t-pin{justify-content:center;align-items:flex-start;padding-top:28svh}
+  .t-end-in{display:flex;flex-direction:column;align-items:center;text-align:center;gap:40px;max-width:1000px}
+  .t-end-h{font-size:clamp(40px,5.2vw,80px);margin:0;max-width:15em}
+  .t-end .slit{align-items:center}
+
+  /* the rest of the page slides over the swarm */
+  /* the rest of the page sits on the swarm too: no solid grounds, no second grain (the swarm's layer carries it) */
+  .t-after{position:relative;z-index:2}
+
+  @media (max-width:700px){
+    .t-step{height:160svh}
+    .t-hero{height:160svh}
+    .t-end{height:130svh}
+    .t-pin{align-items:flex-end;padding-bottom:max(48px,7svh)}
+    .t-card{margin:0 auto;width:calc(100% - 40px)}
+    .t-card p{font-size:16px}
+    .t-h2{font-size:clamp(34px,9vw,44px);margin-bottom:18px}
+    .t-eye{margin-bottom:18px !important}
+    .t-quote blockquote p{font-size:20px}
+    .t-hero .t-pin,.t-end .t-pin{align-items:center;padding-bottom:0}
+    .t-end .t-pin{padding-top:0;align-items:center}
+    .t-end-in{margin-top:-12svh}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html.js .t-hero-in > *{opacity:1;transform:none;animation:none}
+    .t-cue i{animation:none}
+  }
+</style>
+
+<style is:global>
+  /* home footer: the grey closing fade carries on into the footer and settles into the charcoal */
+  html:has(.thesis) body > footer{position:relative;z-index:2;border-top:0;background:linear-gradient(180deg,#3B3A36 0%,#2A2A28 38%,var(--ink) 100%)}
+  html:has(.thesis) .foot{padding-top:clamp(56px,6vw,84px)}
+  html:has(.thesis) .foot small{color:#B1B1A8}
+  html:has(.thesis) body > footer::after{opacity:.28}
+  html:has(.thesis) body{background:#0B0B0B}
+  html:has(.thesis) .t-after.film.grained,html:has(.thesis) .world,html:has(.thesis) .world-ground{background:transparent}
+  html:has(.thesis) .t-after.grained::after,html:has(.thesis) .world-ground::after{display:none}
+  html:has(.thesis) .close.grained{background:linear-gradient(180deg,rgba(14,14,14,0) 0%,rgba(35,35,34,.35) 45%,#3B3A36 100%)}
+  /* the amber lines and the sun are drawn by the swarm (Swarm.astro). CSS keeps their size and timing, so hover still
+     stretches a line; only the paint goes. */
+  html:has(.thesis) .credit::after,html:has(.thesis) .prod::after,html:has(.thesis) .slit i{background:transparent !important;box-shadow:none !important}
+  html:has(.thesis) .orb-sun,html.pin:has(.thesis) .orb-sun{background:none !important;box-shadow:none !important}
+  html:has(.thesis) .orb-sun::before,html:has(.thesis) .orb-sun::after{display:none !important}
+  html:has(.thesis) .close::before{display:none}
+</style>
+
+<script>
+  // Hover a stop on the road and the horizon lights up from the left edge to that stop.
+  const road = document.querySelector<HTMLElement>('.road');
+  if (road) {
+    const items = Array.from(road.children) as HTMLElement[];
+    items.forEach((li) => {
+      li.addEventListener('pointerenter', () => {
+        road.style.setProperty('--lit', li.offsetLeft + 'px');
+        road.classList.add('lit-on');
+        items.forEach((o) => o.classList.toggle('is-lit', o === li));
+      });
+    });
+    road.addEventListener('pointerleave', () => {
+      road.classList.remove('lit-on');
+      items.forEach((o) => o.classList.remove('is-lit'));
+    });
+  }
+
+  const world = document.querySelector<HTMLElement>('.world');
+  if (world) {
+    const mq = matchMedia('(min-width: 900px) and (min-height: 640px) and (prefers-reduced-motion: no-preference)');
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const r = world.getBoundingClientRect();
+      const span = r.height - innerHeight;
+      const p = span > 0 ? Math.min(1, Math.max(0, -r.top / span)) : 0;
+      world.style.setProperty('--p', p.toFixed(4));
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    const apply = () => {
+      document.documentElement.classList.toggle('pin', mq.matches);
+      if (mq.matches) { update(); } else { world.style.removeProperty('--p'); }
+    };
+    addEventListener('scroll', onScroll, { passive: true });
+    addEventListener('resize', onScroll);
+    mq.addEventListener('change', apply);
+    apply();
+  }
+</script>
