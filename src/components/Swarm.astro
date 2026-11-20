@@ -141,9 +141,9 @@ const home = page === 'home';
   const steps = Array.from(document.querySelectorAll<HTMLElement>('main [data-act]'));
 
   const PAGE = (bg?.dataset.page || 'home') as string, HOME = PAGE === 'home', PAINT = bg?.dataset.paint === '1';
-    // the reading pages (the journal, every article and every work story) are for reading: their painting is laid down once and stays still;
+    // the reading pages (every article and every work story) are for reading: their painting is laid down once and stays still;
     // only the painted underlines still answer the pointer
-    const STATIC = PAINT && (PAGE === 'journal' || PAGE === 'article' || PAGE === 'story');
+    const STATIC = PAINT && (PAGE === 'article' || PAGE === 'story');
     let stillAct = -1;
   if (bg && canvas && (steps.length || !HOME)) {
     const reduceMq = matchMedia('(prefers-reduced-motion: reduce)');
