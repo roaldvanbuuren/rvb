@@ -62,16 +62,25 @@ const home = page === 'home';
   html[data-theme="light"] .t-bg,html[data-theme="light"] .t-top{display:none}
   /* the lines' own layer: above the page (cards, photos), under the nav */
   .t-top{position:fixed;left:0;top:0;width:100%;height:100lvh;z-index:60;pointer-events:none}
+  /* paint: the site's grounds are night blue, not charcoal (cards, panels and page sections take these tokens) */
+  html:not([data-theme="light"]):has(.t-bg[data-paint]){--ink:#101830;--ink-2:#152040;--ink-3:#1B284C;--hair:rgba(200,214,240,.12)}
+  /* paint: the old amber washes read as brown smudges on night blue; the paint carries the light instead */
+  html:not([data-theme="light"]):has(.t-bg[data-paint]) .glows{display:none}
+  /* paint: the nav's lines (above the paint layer, so drawn in CSS) are a short loaded dab, lemon on top, ochre, burnt orange below */
+  html:not([data-theme="light"]):has(.t-bg[data-paint]) .enav-link::after{height:3px;border-radius:2px 1px 1px 2px;box-shadow:0 0 10px rgba(232,163,61,.35);
+    background:linear-gradient(180deg,#F8DE96 0%,#EBB04A 45%,#C8702A 100%);
+    -webkit-mask-image:linear-gradient(90deg,#000 0%,#000 78%,rgba(0,0,0,.55) 90%,transparent 100%),repeating-linear-gradient(180deg,#000 0 1px,rgba(0,0,0,.7) 1px 2px);
+    -webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,#000 0%,#000 78%,rgba(0,0,0,.55) 90%,transparent 100%),repeating-linear-gradient(180deg,#000 0 1px,rgba(0,0,0,.7) 1px 2px);mask-composite:intersect}
   /* paint: the closing fade and the footer settle into night blue, not charcoal */
-  html:has(.t-bg[data-paint]) .close.grained{background:linear-gradient(180deg,rgba(16,24,48,0) 0%,rgba(14,21,42,.45) 45%,#0E1630 100%)}
-  html:has(.t-bg[data-paint]) .close.grained::after{opacity:.14}
-  html:has(.t-bg[data-paint]) body > footer{background:linear-gradient(180deg,#0E1630 0%,#0B1226 45%,#080D1C 100%);border-top:0}
-  html:has(.t-bg[data-paint]) body > footer::after{opacity:.14}
-  html:has(.t-bg[data-paint]) .foot small{color:rgba(196,206,230,.55)}
-  html:has(.t-bg[data-paint]) .foot nav a{color:#C9D2E6}
-  html:has(.t-bg[data-paint]) .enav-bar{background:rgba(10,15,32,.74)}
+  html:not([data-theme="light"]):has(.t-bg[data-paint]) .close.grained{background:linear-gradient(180deg,rgba(16,24,48,0) 0%,rgba(14,21,42,.45) 45%,#0E1630 100%)}
+  html:not([data-theme="light"]):has(.t-bg[data-paint]) .close.grained::after{opacity:.14}
+  html:not([data-theme="light"]):has(.t-bg[data-paint]) body > footer{background:linear-gradient(180deg,#0E1630 0%,#0B1226 45%,#080D1C 100%);border-top:0}
+  html:not([data-theme="light"]):has(.t-bg[data-paint]) body > footer::after{opacity:.14}
+  html:not([data-theme="light"]):has(.t-bg[data-paint]) .foot small{color:rgba(196,206,230,.55)}
+  html:not([data-theme="light"]):has(.t-bg[data-paint]) .foot nav a{color:#C9D2E6}
+  html:not([data-theme="light"]):has(.t-bg[data-paint]) .enav-bar{background:rgba(10,15,32,.74)}
   /* paint: the hero's words sit on a little shadow of their own, so the sky can stay wild around them */
-  html:has(.t-bg[data-paint]) :is(.t-h1,.t-belief,.t-lede,.t-cue){text-shadow:0 1px 2px rgba(6,10,24,.9),0 0 18px rgba(6,10,24,.85),0 0 42px rgba(6,10,24,.6)}
+  html:not([data-theme="light"]):has(.t-bg[data-paint]) :is(.t-h1,.t-belief,.t-lede,.t-cue){text-shadow:0 1px 2px rgba(6,10,24,.9),0 0 18px rgba(6,10,24,.85),0 0 42px rgba(6,10,24,.6)}
 </style>
 
 <style>
@@ -1087,8 +1096,66 @@ void main(){
     function topLayout() { if (!top) return; tdpr = Math.min(devicePixelRatio || 1, 2); top.width = Math.round(W * tdpr); top.height = Math.round(H * tdpr); }
     const sxp = (x: number) => (x / A + 1) * 0.5 * W, syp = (y: number) => (1 - y) * 0.5 * H;
     function clearBlock(k: number) { for (let q = 0; q < B; q++) { const j = k * B + q; lst[j] = 0; la[j] = 0; } }
+    // paint: every line is one loaded brushstroke instead, laid left to right at the width CSS is animating it to (hover still
+    // drags it further). Eleven bristles across about 7px: lemon on the top edge, ochre through the body, burnt orange
+    // underneath, as thick paint catches the light. The brush lands full and lets up as it travels: past a short dab the
+    // stroke thins, and its bristles break into dry streaks, more so toward the end. The breaks are fixed to the page, not
+    // the stroke's length, so extending it reveals new paint instead of stretching the old.
+    const BR = 11, brSeed = new Map<HTMLElement, number>();
+    const hash = (a: number, b: number) => { const x = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return x - Math.floor(x); };
+    const BRC = [[250, 228, 150], [248, 214, 120], [244, 196, 88], [240, 184, 74], [234, 168, 62], [232, 160, 56], [228, 150, 52], [222, 138, 46], [214, 124, 42], [200, 108, 38], [184, 92, 34]];
+    function paintLines() {
+      tctx!.setTransform(tdpr, 0, 0, tdpr, 0, 0);
+      tctx!.clearRect(0, 0, W, H);
+      tctx!.globalCompositeOperation = 'source-over';
+      tctx!.lineCap = 'round';
+      for (const g of lineSrc) {
+        const r = g.el.getBoundingClientRect();
+        if (!(r.bottom > -40 && r.top < innerHeight + 40 && r.width > 0)) continue;
+        let x0 = r.left, w = r.width, yy = r.top + r.height / 2, pop = 1;
+        if (g.pseudo) {
+          const cs = getComputedStyle(g.el, '::after');
+          w = parseFloat(cs.width) || 0; x0 = r.left + (parseFloat(cs.left) || 0); yy = r.bottom - (parseFloat(cs.bottom) || 0) - 1; pop = Number(cs.opacity);
+        }
+        const op = w > 0.5 && pop > 0.01 ? pop * seen(g.el) : 0;
+        if (op < 0.02) continue;
+        let sd = brSeed.get(g.el); if (sd === undefined) { sd = Math.random() * 1000; brSeed.set(g.el, sd); }
+        const L = w;
+        // a faint warm wash under the paint, where the old glow was
+        tctx!.shadowColor = `rgba(232,163,61,${(0.3 * op).toFixed(3)})`; tctx!.shadowBlur = 14;
+        tctx!.strokeStyle = `rgba(214,130,46,${(0.35 * op).toFixed(3)})`; tctx!.lineWidth = 3;
+        tctx!.beginPath(); tctx!.moveTo(x0 + 3, yy); tctx!.lineTo(x0 + Math.max(3, Math.min(L, 120) * 0.85), yy); tctx!.stroke();
+        tctx!.shadowBlur = 0;
+        const SEG = 5;
+        for (let k = 0; k < BR; k++) {
+          const v = k / (BR - 1) - 0.5;                                   // -0.5 top edge .. 0.5 bottom edge
+          const sk = hash(sd, k), c = BRC[Math.min(BR - 1, Math.max(0, k + Math.round((sk - 0.5) * 2)))];
+          const start = x0 + hash(sd + 1, k) * 4, end = x0 + L * (0.9 + 0.1 * hash(sd + 2, k));
+          if (end - start < 1) continue;
+          tctx!.strokeStyle = `rgb(${c[0]},${c[1]},${c[2]})`;
+          tctx!.lineWidth = 0.9 + hash(sd + 3, k) * 0.6;
+          let on = false;
+          tctx!.beginPath();
+          for (let x = start; x <= end; x += SEG) {
+            const d = x - x0, u = (x - start) / Math.max(1, end - start);
+            const press = 1 - 0.5 * sstep(40, 520, d);                    // the brush letting up
+            const edge = Math.abs(v) * 2;                                 // 0 centre .. 1 edge
+            if (edge > press + 0.08) { on = false; continue; }            // the stroke is narrower here: edge bristles lift off
+            const dry = 0.04 + 0.24 * sstep(60, 700, d) + 0.32 * sstep(0.7, 1, u) * sstep(30, 160, L) + 0.25 * edge;
+            const gap = hash(sd + k * 13.7, Math.floor((x - x0) / 7)) < dry;
+            if (gap) { on = false; continue; }
+            const y = yy + v * 7 * (0.55 + 0.45 * press) + Math.sin(d * 0.03 + sd) * 0.7 * sstep(60, 300, d) + (hash(k, sd) - 0.5) * 0.4;
+            if (!on) { tctx!.moveTo(x, y); on = true; } else tctx!.lineTo(x, y);
+          }
+          tctx!.globalAlpha = op * (0.55 + 0.4 * hash(sd + 4, k)) * (1 - 0.35 * Math.abs(v) * 2);
+          tctx!.stroke();
+        }
+        tctx!.globalAlpha = 1;
+      }
+    }
     function lines(dt: number, snap: boolean) {
       if (!tctx || !top) return;
+      if (PAINT) return paintLines();
       tctx.setTransform(tdpr, 0, 0, tdpr, 0, 0);
       tctx.clearRect(0, 0, W, H);
       tctx.globalCompositeOperation = 'lighter';

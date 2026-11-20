@@ -16,7 +16,8 @@ interface Props {
 }
 
 const { title, description, image = '/images/og.jpg', type = 'website', publishedTime, themeable = false } = Astro.props;
-// The swarm behind every page but home (which places its own) and admin: one shape per page, picked by path.
+// The swarm behind every page but home (which places its own) and admin: one shape per page, picked by path, painted
+// like the home page (only /restrained keeps the dots).
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const swarm =
   path === '/' || path === '/restrained' || path.startsWith('/admin') ? null
@@ -68,7 +69,7 @@ const ogImage = new URL(image, site).href;
   <a class="skip" href="#main">Skip to content</a>
   <Nav />
   <main id="main">
-    {swarm && <Swarm page={swarm} />}
+    {swarm && <Swarm page={swarm} paint />}
     <slot />
   </main>
   <Footer />
