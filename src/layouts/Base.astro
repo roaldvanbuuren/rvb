@@ -19,7 +19,7 @@ const { title, description, image = '/images/og.jpg', type = 'website', publishe
 // The swarm behind every page but home (which places its own) and admin: one shape per page, picked by path.
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const swarm =
-  path === '/' || path === '/starry' || path.startsWith('/admin') ? null
+  path === '/' || path === '/restrained' || path.startsWith('/admin') ? null
   : path === '/writing' ? 'journal'
   : path.startsWith('/writing/') ? 'article'
   : path === '/press' ? 'press'
@@ -38,7 +38,7 @@ const ogImage = new URL(image, site).href;
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{title}</title>
   <meta name="description" content={description} />
-  {path === '/starry' && <meta name="robots" content="noindex" />}
+  {path === '/restrained' && <meta name="robots" content="noindex" />}
   <meta name="theme-color" content="#0E0E0E" />
   <link rel="canonical" href={canonical} />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" sizes="any" />
