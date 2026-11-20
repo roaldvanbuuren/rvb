@@ -61,6 +61,14 @@ const home = page === 'home';
   html[data-theme="light"] .t-bg,html[data-theme="light"] .t-top{display:none}
   /* the lines' own layer: above the page (cards, photos), under the nav */
   .t-top{position:fixed;left:0;top:0;width:100%;height:100lvh;z-index:60;pointer-events:none}
+  /* paint: the closing fade and the footer settle into night blue, not charcoal */
+  html:has(.t-bg[data-paint]) .close.grained{background:linear-gradient(180deg,rgba(16,24,48,0) 0%,rgba(14,21,42,.45) 45%,#0E1630 100%)}
+  html:has(.t-bg[data-paint]) .close.grained::after{opacity:.14}
+  html:has(.t-bg[data-paint]) body > footer{background:linear-gradient(180deg,#0E1630 0%,#0B1226 45%,#080D1C 100%);border-top:0}
+  html:has(.t-bg[data-paint]) body > footer::after{opacity:.14}
+  html:has(.t-bg[data-paint]) .foot small{color:rgba(196,206,230,.55)}
+  html:has(.t-bg[data-paint]) .foot nav a{color:#C9D2E6}
+  html:has(.t-bg[data-paint]) .enav-bar{background:rgba(10,15,32,.74)}
 </style>
 
 <style>
