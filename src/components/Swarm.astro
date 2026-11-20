@@ -40,6 +40,7 @@ const home = page === 'home';
 <div class="t-bg" aria-hidden="true" data-page={page} data-paint={paint ? '1' : undefined}>
   <canvas id="swarm"></canvas>
   {home && <div class="t-sky"></div>}
+  {home && paint && <div class="t-scrim"></div>}
   <div class="t-shade"></div>
   <div class="t-grain"></div>
 </div>
@@ -69,6 +70,8 @@ const home = page === 'home';
   html:has(.t-bg[data-paint]) .foot small{color:rgba(196,206,230,.55)}
   html:has(.t-bg[data-paint]) .foot nav a{color:#C9D2E6}
   html:has(.t-bg[data-paint]) .enav-bar{background:rgba(10,15,32,.74)}
+  /* paint: the hero's words sit on a little shadow of their own, so the sky can stay wild around them */
+  html:has(.t-bg[data-paint]) :is(.t-h1,.t-belief,.t-lede,.t-cue){text-shadow:0 1px 2px rgba(6,10,24,.9),0 0 18px rgba(6,10,24,.85),0 0 42px rgba(6,10,24,.6)}
 </style>
 
 <style>
@@ -84,6 +87,11 @@ const home = page === 'home';
   /* paint: the canvas paints its own sky, on night blue */
   .t-bg[data-paint]{background:#101830}
   .t-bg[data-paint] .t-sky{display:none}
+  /* a dark wash under the hero's words; it lifts as you scroll into the stars */
+  .t-scrim{position:absolute;inset:0;pointer-events:none;opacity:calc(1 - var(--hz, 0) * 1.4);transition:opacity .4s ease;
+    background:radial-gradient(46% 34% at 50% 42%,rgba(8,12,28,.82) 0%,rgba(8,12,28,.62) 45%,rgba(8,12,28,0) 100%)}
+  :global(html[data-act]:not([data-act="0"])) .t-scrim{opacity:0}
+  @media (max-width:700px){.t-scrim{background:radial-gradient(80% 40% at 50% 44%,rgba(8,12,28,.84) 0%,rgba(8,12,28,.6) 50%,rgba(8,12,28,0) 100%)}}
   .t-bg[data-paint] .t-shade{background:linear-gradient(90deg,rgba(9,13,26,.9) 0%,rgba(9,13,26,.7) 28%,rgba(9,13,26,.16) 50%,rgba(9,13,26,0) 62%)}
   .t-bg[data-paint] .t-grain{opacity:.07;box-shadow:inset 0 0 240px 70px rgba(4,6,14,.6)}
   @media (max-width:700px){.t-bg[data-paint] .t-shade{background:linear-gradient(0deg,rgba(9,13,26,.94) 0%,rgba(9,13,26,.8) 34%,rgba(9,13,26,.18) 56%,rgba(9,13,26,0) 66%)}}
@@ -428,6 +436,15 @@ void main(){ o = vec4(vCol.rgb * vCol.a, vCol.a); }`;
       }
       const m = Math.sqrt(fx * fx + fy * fy) + 1e-5; fx /= m; fy /= m;
     }
+    // the hero's words: the sky thins out behind them (an ellipse round the text block, in world units)
+    const heroText = document.querySelector<HTMLElement>('.t-hero-in');
+    let tcx = 0, tcy = 0, trx = 1, try_ = 1;
+    function measureText() {
+      if (!heroText) return;
+      const r = heroText.getBoundingClientRect();
+      tcx = wx(r.left + r.width / 2); tcy = wy(r.top + r.height * 0.42);
+      trx = Math.max(0.2, (Math.min(r.width, 980) / H) * 0.62); try_ = Math.max(0.2, (r.height / H) * 0.62);
+    }
     const heroRidge = (x: number) => {
       const imgW = Math.max(2 * A * 1.04, 2.1), imgH = imgW / 3, x0 = wide ? -imgW / 2 : -imgW * 0.6, top = -1.02 + imgH;
       return top - ridgeAt((x - x0) / imgW) * imgH - hz * 0.95;
@@ -458,6 +475,7 @@ void main(){ o = vec4(vCol.rgb * vCol.a, vCol.a); }`;
       const e = snap ? 1 : Math.min(1, dt * 1.5);
       turb += (tt - turb) * e; skyA += (sa - skyA) * e;
       placeEddies(tm);
+      if (act === 0) measureText();
       // agents: the stroke follows the agent's own motion, laid into the flow
       const de = snap ? 1 : Math.min(1, dt * 5);
       for (let j = 0; j < M; j++) {
@@ -478,6 +496,10 @@ void main(){ o = vec4(vCol.rgb * vCol.a, vCol.a); }`;
         if (Math.abs(kx[k]) > A * 1.1 || Math.abs(ky[k]) > 1.1) { spawnSky(k, false); }
         const hero = clamp((skyA - 0.16) / 0.84); // 1 in the hero, 0 below it: below, the sky keeps only its blues
         let a = Math.sin(Math.PI * clamp(kage[k] / klife[k])) * skyA * 0.3 * kb[k] * (kh[k] > 0.4 ? 0.35 + 0.65 * hero : 1), h = (kh[k] > 0.4 ? 0.3 + (kh[k] - 0.3) * hero : kh[k]) + 0.2 * turb * (kh[k] > 0.4 ? 1 : 0.4) * hero;
+        if (act === 0) { // behind the words, a quieter sky; it fills back in as you scroll
+          const ex = (kx[k] - tcx) / trx, ey = (ky[k] - tcy) / try_, e2 = ex * ex + ey * ey;
+          a *= 1 - (1 - sstep(0.35, 1.25, e2)) * 0.82 * (1 - sstep(0.1, 0.6, hz));
+        }
         if (act === 0) { // over the Alps only, warmer toward the ridge at dusk; as you look up it becomes all sky
           const ry = heroRidge(kx[k]), lift = ky[k] - ry, up = sstep(0.12, 0.8, hz);
           a *= up + (1 - up) * sstep(-0.01, 0.06, lift);
