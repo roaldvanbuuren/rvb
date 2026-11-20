@@ -443,9 +443,10 @@ void main(){ o = vec4(vCol.rgb * vCol.a, vCol.a); }`;
       else if (act === 4) tt = 0.06;
       else if (act === 5) tt = 0.08 + 0.92 * G;
       else if (act === 7) tt = 0.08;
-      else if (act === 3 || act === 6) tt = 0.32;
-      else tt = 0.38;
-      const sa = act === 0 ? 1 : act >= STORY0 && act <= STORY1 ? 0.6 : 0.5;
+      else if (act === 3 || act === 6) tt = 0.16;
+      else tt = 0.14;
+      // the starry sky is the hero's; below it the canvas stays a quiet ground of level blue strokes
+      const sa = act === 0 ? 1 : 0.16;
       const e = snap ? 1 : Math.min(1, dt * 1.5);
       turb += (tt - turb) * e; skyA += (sa - skyA) * e;
       placeEddies(tm);
@@ -467,7 +468,8 @@ void main(){ o = vec4(vCol.rgb * vCol.a, vCol.a); }`;
         flow(kx[k], ky[k], tm);
         if (!snap) { kx[k] += fx * spd * dt; ky[k] += fy * spd * dt; }
         if (Math.abs(kx[k]) > A * 1.1 || Math.abs(ky[k]) > 1.1) { spawnSky(k, false); }
-        let a = Math.sin(Math.PI * clamp(kage[k] / klife[k])) * skyA * 0.3 * kb[k], h = kh[k] + 0.2 * turb * (kh[k] > 0.4 ? 1 : 0.4);
+        const hero = clamp((skyA - 0.16) / 0.84); // 1 in the hero, 0 below it: below, the sky keeps only its blues
+        let a = Math.sin(Math.PI * clamp(kage[k] / klife[k])) * skyA * 0.3 * kb[k] * (kh[k] > 0.4 ? 0.35 + 0.65 * hero : 1), h = (kh[k] > 0.4 ? 0.3 + (kh[k] - 0.3) * hero : kh[k]) + 0.2 * turb * (kh[k] > 0.4 ? 1 : 0.4) * hero;
         if (act === 0) { // over the Alps only, warmer toward the ridge at dusk; as you look up it becomes all sky
           const ry = heroRidge(kx[k]), lift = ky[k] - ry, up = sstep(0.12, 0.8, hz);
           a *= up + (1 - up) * sstep(-0.01, 0.06, lift);
@@ -606,7 +608,7 @@ void main(){
       gl.viewport(0, 0, canvas!.width, canvas!.height);
       gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
       // dry: the canvas slowly goes back to night blue, so the painting keeps being repainted
-      const k = still || fresh ? 1 : 1 - Math.exp(-frameDt * (half ? 0.55 : 2.5));
+      const k = still || fresh ? 1 : 1 - Math.exp(-frameDt * (half ? (act === 0 ? 0.55 : 1.8) : 2.5)); // below the hero the paint dries fast: less memory, quieter ground
       fresh = false;
       gl.useProgram(dprog); gl.uniform1f(duK, k); gl.bindVertexArray(vaoQ); gl.drawArrays(gl.TRIANGLES, 0, 3);
       if (netA > 0.01 && lineCount) {
@@ -990,7 +992,7 @@ void main(){
         col[o4] *= m; col[o4 + 1] *= m; col[o4 + 2] *= m;
         if (i % 7 === 3 && h < 0.5) { col[o4] = col[o4] * 0.7 + 0.08; col[o4 + 1] = col[o4 + 1] * 0.7 + 0.2; col[o4 + 2] = col[o4 + 2] * 0.7 + 0.1; }
       }
-      col[o4 + 3] = PAINT ? Math.min(0.92, ca[i] * (act >= 7 ? 0.62 : 1.25) * gDim * (1 + hT[i] * 0.8)) : Math.min(1.6, ca[i] * 1.5 * gDim * (1 + hT[i] * 0.8));
+      col[o4 + 3] = PAINT ? Math.min(0.92, ca[i] * (act >= 7 ? 0.36 : act === 0 ? 1.25 : 0.9) * gDim * (1 + hT[i] * 0.8)) : Math.min(1.6, ca[i] * 1.5 * gDim * (1 + hT[i] * 0.8));
       size[i] = cs[i] * 1.45 * (1 + hT[i] * 0.5);
     }
     function writeTrail(snap: boolean) {
