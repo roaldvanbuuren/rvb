@@ -1,5 +1,5 @@
 ---
-title: "Fair to Everyone, Fair to No One"
+title: "Fair to everyone, fair to no one"
 date: 2026-11-22
 summary: "Trying to build a system fair to everyone creates gridlock that is fair to no one. Using AI simulations to see downstream consequences, humans can finally stop pretending nobody loses and own the trade-offs."
 cover: /images/writing/posts/fair-to-everyone-fair-to-no-one/img-6239-99c553.jpg
