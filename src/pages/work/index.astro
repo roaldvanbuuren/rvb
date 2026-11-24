@@ -141,6 +141,7 @@ const testimonials = [
   .testimonials-head{margin-bottom:clamp(28px,4vw,48px)}
   .testimonials-head .h2{margin:10px 0 0}
   .voices{display:grid;grid-template-columns:minmax(230px,.36fr) minmax(0,.64fr);gap:clamp(20px,4vw,56px);align-items:stretch}
+  .voices:not(.is-enhanced){grid-template-columns:1fr}
   .voice-tabs{display:none}
   .voices.is-enhanced .voice-tabs{display:flex;flex-direction:column;border-top:1px solid var(--hair)}
   .voice-tab{display:grid;grid-template-columns:34px minmax(0,1fr) 12px;align-items:center;gap:12px;width:100%;padding:17px 10px;text-align:left;color:var(--body);background:none;border:0;border-bottom:1px solid var(--hair);cursor:pointer;transition:background .2s,color .2s}
