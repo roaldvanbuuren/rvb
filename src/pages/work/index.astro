@@ -29,11 +29,10 @@ const testimonials = [
     context: 'ELO delivered a report on market research, opportunities, and detailed product analysis.',
   },
   {
-    quote: 'My time at Fnatic marked the highlight of my e-sports journalism career. I would like to say that this is thanks to Roald who is the best Editor in Chief I have worked under. He is extremely easy to approach which is important when dealing with a number of individuals working below you. If I ever had a problem or question, I could always go to Roald and be sure to get an answer for my question.\\n\\nWorking under Roald is the environment people dream of and when it comes to managing a group of individuals and getting them to get a job done, Roald is the obvious choice.',
+    quote: 'My time at Fnatic marked the highlight of my e-sports journalism career. I would like to say that this is thanks to Roald who is the best Editor in Chief I have worked under. He is extremely easy to approach which is important when dealing with a number of individuals working below you. If I ever had a problem or question, I could always go to Roald and be sure to get an answer for my question.\n\nWorking under Roald is the environment people dream of and when it comes to managing a group of individuals and getting them to get a job done, Roald is the obvious choice.',
     name: 'Maximilian Kieturakis',
     role: 'Editor at Fnatic',
     context: 'Worked directly under Roald while he was Editor-in-Chief at Fnatic.',
-    href: 'https://www.linkedin.com/in/maxkieturakis/',
   },
 ];
 ---
@@ -74,7 +73,7 @@ const testimonials = [
           <figure class="quote-card">
             <blockquote>{item.quote}</blockquote>
             <figcaption>
-              <strong>{item.href ? <a href={item.href} target="_blank" rel="noopener">{item.name}</a> : item.name}</strong>
+              <strong>{item.name}</strong>
               <span class="quote-role">{item.role}</span>
               <span class="quote-context">{item.context}</span>
             </figcaption>
