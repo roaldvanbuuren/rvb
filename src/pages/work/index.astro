@@ -8,8 +8,29 @@ const stories = [
   { href: '/work/fnatic', title: 'Fnatic', years: '2008–2011', line: 'From $200 a month as an editor to General Manager.', image: 'tl-03-fnatic-lan', tone: 'amber' },
   { href: '/work/faceit', title: 'FACEIT', years: '2012–2022', line: 'Ten years, from Quake Live to the London Major.', image: 'tl-04-faceit-arena', tone: 'bone' },
 ];
+
+const testimonials = [
+  {
+    quote: 'Roald has been a great asset in running R6 EUL and events from 2020 to 2022. The operational items were in safe hands with him and his team. The collaboration was effective, and Roald made sure to implement feedback swiftly to run an efficient league. I was impressed with his problem-solving skills and agility to meet Ubisoft needs.',
+    name: 'Christoph Thann',
+    role: 'Associate Director, Esports, EMEA at Ubisoft',
+    context: 'Worked together on the Rainbow Six European League program and R6 Majors at FACEIT.',
+  },
+  {
+    quote: 'Roald consistently tackled obstacles head-on, leveraging expertise to develop creative solutions that propelled our esports programs to new heights.',
+    name: 'Jaspreet Marwaha',
+    role: 'Senior Manager at ESL FACEIT Group',
+    context: 'Colleagues at FACEIT; Jaspreet led product for the media team coordinating departments across live events and broadcasts.',
+  },
+  {
+    quote: 'ELO provided us with a solid foundation for our esports program and sales strategy. Their insights and thorough understanding of the industry helped us refine our vision. Their professionalism and dedication ensured a smooth and productive collaboration.\n\nWorking with ELO was a great experience. Their team delivered a clear and effective blueprint for our esports program and sales strategy. Their industry expertise and professionalism made a significant impact, helping us strengthen our approach and move forward with confidence.',
+    name: 'Anmar Alharbi',
+    role: 'CEO at Rize.gg',
+    context: 'ELO delivered a report on market research, opportunities, and detailed product analysis.',
+  },
+];
 ---
-<Base title="Work – Roald van Buuren" description="The longer stories behind the timeline.">
+<Base title="Work – Roald van Buuren" description="The longer stories behind the timeline, and what collaborators say about working together.">
   <section class="zone z-a">
     <div class="wrap page-head">
       <h1 class="h1">Work.</h1>
@@ -35,6 +56,26 @@ const stories = [
     ))}
     <p class="meta wk-note">What I'm working on now, including our research, is at <a href={links.labs} target="_blank" rel="noopener">ELO Labs →<span class="vh"> (opens in a new tab)</span></a></p>
   </section>
+  <section class="zone z-b testimonials">
+    <div class="wrap">
+      <div class="testimonials-head">
+        <span class="wk-years">COLLABORATORS</span>
+        <h2 class="h2">In their words.</h2>
+      </div>
+      <div class="quote-grid">
+        {testimonials.map((item) => (
+          <figure class="quote-card">
+            <blockquote>{item.quote}</blockquote>
+            <figcaption>
+              <strong>{item.name}</strong>
+              <span class="quote-role">{item.role}</span>
+              <span class="quote-context">{item.context}</span>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
 </Base>
 
 <style>
@@ -44,4 +85,16 @@ const stories = [
   .wk-note{margin:14px 0 0}
   .wk-note a{color:var(--warm);text-underline-offset:3px}
   .wk-note a:hover{color:#fff}
+  .testimonials{padding:clamp(72px,9vw,120px) 0}
+  .testimonials-head{margin-bottom:clamp(28px,4vw,48px)}
+  .testimonials-head .h2{margin:10px 0 0}
+  .quote-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+  .quote-card{margin:0;padding:clamp(22px,3vw,34px);border:1px solid var(--line);background:var(--surface)}
+  .quote-card:last-child:nth-child(odd){grid-column:1/-1}
+  .quote-card blockquote{margin:0 0 28px;font-size:clamp(17px,1.65vw,21px);line-height:1.55;color:var(--ink);white-space:pre-line}
+  .quote-card figcaption{display:grid;gap:5px}
+  .quote-card figcaption strong{font-size:15px;color:var(--ink)}
+  .quote-role{font-size:13px;line-height:1.5;color:var(--warm)}
+  .quote-context{margin-top:7px;font-size:13px;line-height:1.6;color:var(--dim)}
+  @media(max-width:700px){.quote-grid{grid-template-columns:1fr}.quote-card:last-child:nth-child(odd){grid-column:auto}}
 </style>
