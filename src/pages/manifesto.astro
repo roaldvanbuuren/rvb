@@ -1,0 +1,87 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Manifesto – Roald van Buuren" description="Guardrails and Growth: a manifesto on designing better systems across gaming, technology, and society.">
+  <section class="zone z-a">
+    <div class="wrap page-head">
+      <h1 class="h1">Manifesto.</h1>
+      <p class="sub">Guardrails and Growth.</p>
+    </div>
+  </section>
+
+  <article class="manifesto wrap">
+    <header class="manifesto-intro">
+      <p class="manifesto-deck">Waiting for good outcomes to happen on their own leaves too much to chance.</p>
+      <p>Across gaming, tech, and politics, people often treat results as something that arrives naturally if you launch the product, run the campaign, pass the rule, or hold the protest. Sometimes it works. Most of the time, leaving things to chance means blaming the users, the market, the algorithm, or the system when things go sideways.</p>
+      <p>Complex human systems rarely hold together on chance or good intentions alone. From a squad match and a Discord server to an AI lab, a capital market, or a continent, healthy systems rely on designed guardrails, shared alignment, and honest visibility into how people actually behave.</p>
+    </header>
+
+    <section class="principle">
+      <span class="principle-number" aria-hidden="true">01</span>
+      <div>
+        <h2>Design the Foundations; Don't Wait for Magic</h2>
+        <p>In crowded markets, waiting for culture to form on its own is a risky bet. When thousands of new titles ship or noise floods every feed, attention is rented for a moment, while participation is earned through architecture.</p>
+        <p>A real community or product needs deliberate foundations before launch: a clear purpose people can rally behind, spaces where belonging is real rather than performed, room for participants to shape the world rather than just consume it, and light scaffolding that keeps momentum moving without choking it. Guardrails are not cages. Good guardrails are the banks of a river: they do not stop the water from flowing, and they keep it from turning into a flood or a mudflat.</p>
+        <p>The same applies to ambition and thought. Endless motion without space to synthesize leaves builders stuck in raw input. Real breakthroughs often require stepping away from the noise to connect dots, looking twelve to eighteen months ahead instead of building solely for today's loudest complaints, and choosing to build rather than write another paper explaining why building is hard.</p>
+      </div>
+    </section>
+
+    <section class="principle">
+      <span class="principle-number" aria-hidden="true">02</span>
+      <div>
+        <h2>Watch What People Do, Not What They Say</h2>
+        <p>Most institutions run on self-reporting: surveys, CVs, loud social threads, and stated intentions. Yet what people say they want, or claim they would do under pressure, routinely differs from what they do when stakes are real.</p>
+        <p>Games make that gap hard to miss. Every lobby, match, and community interaction logs thousands of real choices around trust, risk, cooperation, status, and hostility. Who shares resources? Who defects? Who goes quiet because they are content versus quiet because they are already walking out the door? When you treat that signal as exhaust or chase the loudest one percent over the silent ninety percent, you fly blind.</p>
+        <p>Measuring real behavior is not about surveillance or after-the-fact ban hammers. Toxicity is rarely solved by bigger rules alone; it often starts with mismatched intent, putting people who want different experiences into the same room with no way to sort or align. When you see what people actually do early, you can design better rooms, better incentives, and timely intervention instead of guessing after the damage is done.</p>
+      </div>
+    </section>
+
+    <section class="principle">
+      <span class="principle-number" aria-hidden="true">03</span>
+      <div>
+        <h2>Align the Ends; Own the Trade-Offs</h2>
+        <p>Systems fracture when they lose alignment on what they are trying to achieve.</p>
+        <p>Alignment does not mean everyone agrees step by step on the path. It means there is a shared destination strong enough that disagreements on the route can be worked out without tearing the group apart. When short-term optics, tactical infighting, or narrow self-interest replace a shared goal, energy turns into friction, whether inside a studio where product, marketing, and community pull in separate directions, across fragmented protests that never coalesce into a clear aim, or across fractured markets that never pool their strength.</p>
+        <p>Just as critical is refusing the fantasy of costless fairness. Every real choice involves trade-offs. Trying to patch every edge case to keep everyone comfortable at once only layers rule upon rule until the system grinds to a halt. Simulating downstream ripples helps us see second-, third-, and fourth-order consequences before they harden into gridlock, but machines cannot make the value judgments for us. Humans still have to decide what we are optimizing for, who carries a cost today, and what future we are willing to pay for.</p>
+      </div>
+    </section>
+
+    <section class="principle">
+      <span class="principle-number" aria-hidden="true">04</span>
+      <div>
+        <h2>Favor Diversity Over Monoculture</h2>
+        <p>Whether the arena is a game ecosystem, an AI stack, or a modern economy, narrow monocultures are brittle.</p>
+        <p>Scaling a single model, a single playbook, or a single set of clones hits a ceiling fast. Real adaptation comes from a rich gene pool: varied approaches, distinct strengths, open exchange of talent and ideas, and selection rules that reward what genuinely works rather than gaming a narrow metric. As cheap generation lowers the cost of producing raw output, human taste, meaning vision, judgment, story, and the ability to tell signal from noise, becomes the real differentiator. And if new tools free up time and resources, the test is whether they expand human agency and serious inquiry rather than turning people into passive spectators.</p>
+      </div>
+    </section>
+
+    <section class="standard">
+      <span class="wk-years">THE STANDARD</span>
+      <p class="standard-lede">Europe, gaming, and AI do not need more excuses, more posturing, or more applause for good intentions. They need clear goals, real leverage, honest behavioral data, and sturdy foundations that let people build together over time.</p>
+      <p>Build the guardrails, align the ends, pair real agency with steady momentum, and let the work prove itself.</p>
+    </section>
+  </article>
+</Base>
+
+<style>
+  .manifesto{max-width:960px;padding-top:clamp(54px,7vw,94px);padding-bottom:clamp(90px,11vw,150px)}
+  .manifesto-intro{max-width:780px;margin:0 auto clamp(62px,8vw,110px)}
+  .manifesto-intro p,.principle p,.standard p{font-size:clamp(16px,1.45vw,18px);line-height:1.8;color:var(--body)}
+  .manifesto-intro p{margin:0 0 20px}
+  .manifesto-intro .manifesto-deck{margin:0 0 30px;font:400 clamp(28px,4vw,46px)/1.18 var(--disp);color:var(--warm)}
+  .principle{display:grid;grid-template-columns:82px minmax(0,1fr);gap:clamp(18px,3vw,42px);padding:clamp(32px,5vw,62px) 0;border-top:1px solid var(--hair)}
+  .principle-number{padding-top:8px;font:400 13px/1 var(--mono);letter-spacing:.12em;color:var(--accent)}
+  .principle h2{margin:0 0 24px;font:400 clamp(30px,3.7vw,46px)/1.08 var(--disp);color:var(--warm);text-wrap:balance}
+  .principle p{margin:0 0 18px}
+  .principle p:last-child{margin-bottom:0}
+  .standard{margin-top:clamp(40px,6vw,76px);padding:clamp(28px,5vw,56px);border:1px solid rgba(var(--accent-rgb),.3);background:radial-gradient(ellipse at 90% 0%,rgba(var(--accent-rgb),.11),transparent 58%),var(--ink-2)}
+  .standard .wk-years{display:block;margin-bottom:22px;color:var(--accent)}
+  .standard .standard-lede{margin:0 0 18px;font:400 clamp(25px,3.2vw,38px)/1.28 var(--disp);color:var(--warm)}
+  .standard p:last-child{margin:0;color:var(--warm)}
+  @media(max-width:640px){
+    .principle{grid-template-columns:40px minmax(0,1fr);gap:12px}
+    .principle-number{font-size:11px}
+    .standard{padding:24px}
+  }
+</style>
