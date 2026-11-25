@@ -22,7 +22,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const swarm =
   path === '/' || path === '/restrained' || path.startsWith('/admin') ? null
   : path === '/writing' ? 'journal'
-  : path.startsWith('/writing/') ? 'article'
+  : path.startsWith('/writing/') || path === '/manifesto' ? 'article'
   : path === '/press' ? 'press'
   : path === '/work' ? 'work'
   : path.startsWith('/work/') ? 'story'
