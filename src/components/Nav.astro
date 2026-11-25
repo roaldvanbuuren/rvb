@@ -3,6 +3,7 @@ import Logo from './Logo.astro';
 const path = Astro.url.pathname;
 const onWriting = path === '/writing' || path.startsWith('/writing/');
 const onPress = path === '/press';
+const onManifesto = path === '/manifesto';
 const onWork = path === '/work' || path.startsWith('/work/');
 const onProjects = path === '/projects' || path.startsWith('/projects/');
 ---
@@ -11,6 +12,7 @@ const onProjects = path === '/projects' || path.startsWith('/projects/');
     <a class="enav-logo" href="/" aria-label="Roald van Buuren, home"><Logo /><span class="enav-name">Roald van Buuren</span></a>
     <nav class="enav-right" aria-label="Main">
       <a class="enav-link" href="/writing" aria-current={onWriting ? 'page' : undefined}>Journal</a>
+      <a class="enav-link" href="/manifesto" aria-current={onManifesto ? 'page' : undefined}>Manifesto</a>
       <a class="enav-link" href="/press" aria-current={onPress ? 'page' : undefined}>Press</a>
       <a class="enav-link" href="/work" aria-current={onWork ? 'page' : undefined}>Work</a>
       <a class="enav-link" href="/projects" aria-current={onProjects ? 'page' : undefined}>Side projects</a>
@@ -19,13 +21,13 @@ const onProjects = path === '/projects' || path.startsWith('/projects/');
 </header>
 
 <style>
-  /* Four links now sit in the bar: tighten the small-screen spacing so it still fits at 375px. */
+  /* Five links now sit in the bar: tighten small-screen spacing so the nav still fits. */
   @media (max-width:560px){
     .enav-bar{gap:12px}
     .enav-logo{font-size:17px;white-space:nowrap}
     .enav-name{display:none}
     .rvb-mark{height:26px}
-    .enav-right{gap:14px}
-    .enav-link{font-size:11px;letter-spacing:.08em}
+    .enav-right{gap:9px}
+    .enav-link{font-size:10px;letter-spacing:.02em}
   }
 </style>
