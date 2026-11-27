@@ -2,7 +2,7 @@
 title: "Why the games industry shows us that owning the cultural and creative layer wins as much as the infrastructure layer."
 date: 2026-11-27
 summary: "When game engines commoditized low-level development, creative vision and storytelling became the real differentiators. AI pushes that shift further—and European games show that cultural and creative strength can drive global consumer success without owning the underlying tech stack."
-draft: true
+draft: false
 ---
 
 The AI revolution in games has scared many, but gaming might actually be one of the industries best prepared to adopt and implement it at scale, because it's not the first time tech was commoditized and story, taste, and IP became a central USP.
