@@ -2,6 +2,7 @@
 title: "Why the games industry shows us that owning the cultural and creative layer wins as much as the infrastructure layer."
 date: 2026-11-27
 summary: "When game engines commoditized low-level development, creative vision and storytelling became the real differentiators. AI pushes that shift further—and European games show that cultural and creative strength can drive global consumer success without owning the underlying tech stack."
+cover: /images/writing/posts/why-the-games-industry-shows-us-that-owning-the-cultural-and-creative-layer-wins/img-article-575e2d.jpg
 draft: false
 ---
 
